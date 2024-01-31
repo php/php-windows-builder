@@ -10,11 +10,12 @@ inputs:
   php-version:
     description: PHP version to build
     required: true
-
-strategy:
-  matrix:
-    arch: [x64, x86]
-    ts: [nts, ts]
+  arch:
+    description: Architecture to build
+    required: true
+  ts:
+    description: Thread safety to build
+    required: true
 
 runs:
   using: composite
@@ -27,11 +28,10 @@ runs:
       run: |
         Install-Module php/BuildPhp -Force
         Invoke-PhpBuild -PhpVersion ${{github.event.inputs.php-version}} `
-                        -Arch ${{matrix.arch}} `
-                        -Ts ${{matrix.ts}}
+                        -Arch ${{github.event.inputs.php-version}} `
+                        -Ts ${{github.event.inputs.ts}}
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: *
-        path: artifacts
+        path: artifacts/*

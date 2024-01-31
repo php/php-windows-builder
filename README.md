@@ -11,11 +11,15 @@ Build PHP for a specific version.
   uses: php/php-windows-builder/php@v1
   with:
     php-version: '7.4.25'
+    arch: x64
+    ts: nts
 ```
 
 ### Inputs
 
 - `php-version` (required) - The PHP version to build. It supports values in major.minor.patch format, e.g. 7.4.25, 8.0.12, etc.
+- `arch` (required) - The architecture to build. It supports values `x64` and `x86`.
+- `ts` (required) - The thread safety to build. It supports values `ts` and `nts`.
 
 ### Outputs
 
