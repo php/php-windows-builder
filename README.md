@@ -4,13 +4,13 @@ This project provides actions to build PHP and its extensions on Windows.
 
 ## Build PHP
 
-Build PHP for a specific version.
+Build PHP for a specific version, architecture and thread safety.
 
 ```yaml
 - name: Build PHP
   uses: php/php-windows-builder/php@v1
   with:
-    php-version: '7.4.25'
+    php-version: '8.3.2'
     arch: x64
     ts: nts
 ```
@@ -25,7 +25,29 @@ Build PHP for a specific version.
 
 - `artifact-path` - The path to the artifacts produced by the action.
 
-The action will produce the following the following builds for the PHP version as artifacts.
+### Example workflow to build PHP
+
+```yaml
+jobs:
+  php:
+    strategy:
+      matrix:
+        arch: [x64, x86]
+        ts: [nts, ts]
+    runs-on: windows-2019
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        uses: php/php-windows-builder/php@v1
+        with:
+          php-version: '8.3.2'
+          arch: ${{ matrix.arch }}
+          ts: ${{ matrix.ts }}
+```
+
+The above workflow will produce the following the following builds for the PHP version `8.3.2` as artifacts.
 
 - nts-x64, nts-x64-AVX, ts-x64, nts-x86, ts-x86.
 - debug-pack and devel-pack for each the above configurations.
@@ -41,7 +63,7 @@ Build a PHP extension for a specific version.
   with:
     extension-url: https://github.com/xdebug/xdebug # optional
     extension-version: '3.3.1'
-    php-version: '7.4'
+    php-version: '8.3'
   env:
     CONFIGURE_ARGS: --enable-xdebug
 ```
