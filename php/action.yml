@@ -27,9 +27,9 @@ runs:
       shell: pwsh
       run: |
         Import-Module $pwd\php\BuildPhp -Force
-        Invoke-PhpBuild -PhpVersion ${{github.event.inputs.php-version}} `
-                        -Arch ${{github.event.inputs.php-version}} `
-                        -Ts ${{github.event.inputs.ts}}
+        Invoke-PhpBuild -PhpVersion ${{inputs.php-version}} `
+                        -Arch ${{inputs.arch}} `
+                        -Ts ${{inputs.ts}}
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
