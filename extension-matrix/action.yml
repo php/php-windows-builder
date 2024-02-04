@@ -1,0 +1,47 @@
+name: extension-matrix
+description: Get the matrix for building PHP extensions
+author: php
+
+branding:
+  icon: package
+  color: purple
+
+inputs:
+  extension-url:
+    description: URL to the extension repo
+    required: false
+  extension-ref:
+    description: Git reference in the extension repo
+    required: false
+  php-version-list:
+    description: PHP versions to build
+    required: false
+  arch-list:
+    description: Architecture to build
+    required: false
+  ts-list:
+    description: Thread safety to build
+    required: false
+
+outputs:
+  matrix:
+    description: The matrix for building PHP extensions
+    value: ${{ steps.get-matrix.outputs.matrix }}
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Get Matrix
+      id: get-matrix
+      shell: bash
+      run: |
+        bash src/extension-matrix.sh
+      env:
+        EXTENSION_URL: ${{inputs.extension-url}}
+        EXTENSION_REF: ${{inputs.extension-ref}}
+        PHP_VERSION_LIST: ${{inputs.php-version-list}}
+        ARCH_LIST: ${{inputs.arch-list}}
+        TS_LIST: ${{inputs.ts-list}}
