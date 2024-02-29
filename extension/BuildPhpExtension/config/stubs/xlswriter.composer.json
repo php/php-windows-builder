@@ -1,0 +1,12 @@
+{
+  "require": {
+    "zlib": "*"
+  },
+  "php-ext": {
+    "configure-options": [
+      {
+        "name": "enable-xlswriter"
+      }
+    ]
+  }
+}

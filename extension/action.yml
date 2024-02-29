@@ -1,0 +1,46 @@
+name: build-php-extension
+description: Build PHP Extension
+author: php
+
+branding:
+  icon: package
+  color: purple
+
+inputs:
+  extension-url:
+    description: URL to the extension source code
+    required: false
+  extension-ref:
+    description: Git reference in the extension repo
+    required: false
+  php-version:
+    description: PHP version to build
+    required: true
+  arch:
+    description: Architecture to build
+    required: true
+  ts:
+    description: Thread safety to build
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Build PHP
+      shell: pwsh
+      run: |
+        Import-Module $pwd\extension\BuildPhpExtension -Force
+        Invoke-PhpBuildExtension -ExtensionUrl ${{inputs.extension-url}} `
+                                 -ExtensionRef ${{inputs.extension-ref}} `
+                                 -PhpVersion ${{inputs.php-version}} `
+                                 -Arch ${{inputs.arch}} `
+                                 -Ts ${{inputs.ts}}
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: artifacts-${{inputs.php-version}}-${{inputs.arch}}-${{inputs.ts}}
+        path: artifacts/*

@@ -1,0 +1,75 @@
+function Invoke-PhpBuildExtension {
+    <#
+    .SYNOPSIS
+        Build PHP Extension
+    .PARAMETER ExtensionUrl
+        Extension URL
+    .PARAMETER ExtensionRef
+        Extension Reference
+    .PARAMETER PhpVersion
+        PHP Version
+    .PARAMETER Arch
+        Architecture
+    .PARAMETER Ts
+        Thread Safety
+    .PARAMETER Libraries
+        Libraries required by the extension
+    #>
+    [OutputType()]
+    param (
+        [Parameter(Mandatory = $false, Position=0, HelpMessage='Extension URL')]
+        [string] $ExtensionUrl,
+        [Parameter(Mandatory = $false, Position=1, HelpMessage='Extension Reference')]
+        [string] $ExtensionRef,
+        [Parameter(Mandatory = $true, Position=2, HelpMessage='PHP Version')]
+        [ValidateNotNull()]
+        [ValidateLength(1, [int]::MaxValue)]
+        [string] $PhpVersion,
+        [Parameter(Mandatory = $true, Position=3, HelpMessage='PHP Architecture')]
+        [ValidateNotNull()]
+        [ValidateSet('x86', 'x64')]
+        [string] $Arch,
+        [Parameter(Mandatory = $true, Position=4, HelpMessage='PHP Build Type')]
+        [ValidateNotNull()]
+        [ValidateSet('nts', 'ts')]
+        [string] $Ts
+    )
+    begin {
+    }
+    process {
+        Set-StrictMode -Off
+        $VsData = (Get-VsVersion -PhpVersion $PhpVersion)
+        if($null -eq $VsData.vs) {
+            throw "PHP version $PhpVersion is not supported."
+        }
+
+        $currentDirectory = (Get-Location).Path
+
+        $tempDirectory = [System.IO.Path]::GetTempPath()
+
+        $buildDirectory = [System.IO.Path]::Combine($tempDirectory, [System.Guid]::NewGuid().ToString())
+
+        New-Item "$buildDirectory" -ItemType "directory" -Force > $null 2>&1
+
+        Set-Location "$buildDirectory"
+
+        $extension = Get-Extension -ExtensionUrl $ExtensionUrl -ExtensionRef $ExtensionRef
+
+        $config = Add-BuildRequirements -Extension $extension `
+                                        -ExtensionRef $ExtensionRef `
+                                        -PhpVersion $PhpVersion `
+                                        -Arch $Arch `
+                                        -Ts $Ts `
+                                        -VsVersion $VsData.vs
+
+        Invoke-Build -Config $config
+
+        Add-Package -Config $config
+
+        Set-Location $currentDirectory
+
+        Move-Item -Path "$buildDirectory\artifacts" -Destination "$currentDirectory" -Force
+    }
+    end {
+    }
+}

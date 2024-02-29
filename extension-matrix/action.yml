@@ -38,7 +38,7 @@ runs:
       id: get-matrix
       shell: bash
       run: |
-        bash src/extension-matrix.sh
+        bash extension-matrix/src/extension-matrix.sh
       env:
         EXTENSION_URL: ${{inputs.extension-url}}
         EXTENSION_REF: ${{inputs.extension-ref}}

@@ -1,0 +1,53 @@
+name: Build PHP Extension
+on:
+  workflow_dispatch:
+    inputs:
+      extension_url:
+        description: 'Extension URL'
+        required: true
+      extension_ref:
+        description: 'Extension ref'
+        required: true
+jobs:
+  get-extension-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.extension-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Get the extension matrix
+        id: extension-matrix
+        uses: ./extension-matrix
+        with:
+          extension-url: ${{ inputs.extension_url }}
+          extension-ref: ${{ inputs.extension_ref }}
+          arch-list: 'x64, x86'
+          ts-list: 'nts, ts'
+
+  extension:
+    needs: get-extension-matrix
+    runs-on: windows-2019
+    strategy:
+      matrix: ${{fromJson(needs.get-extension-matrix.outputs.matrix)}}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build the extension
+        uses: ./extension
+        with:
+          extension-url: ${{ inputs.extension_url }}
+          extension-ref: ${{ inputs.extension_ref }}
+          php-version: ${{ matrix.php-version }}
+          arch: ${{ matrix.arch }}
+          ts: ${{ matrix.ts }}
+
+  artifacts:
+    runs-on: ubuntu-latest
+    needs: extension
+    steps:
+      - name: Upload artifacts
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: artifacts
+          delete-merged: true

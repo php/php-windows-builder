@@ -18,7 +18,7 @@ IFS=',' read -r -a ts_array <<<"${TS_LIST// /}"
 for php_version in "${php_version_array[@]}"; do
   for arch in "${arch_array[@]}"; do
     for ts in "${ts_array[@]}"; do
-      matrix+=("{\"php_version\": \"$php_version\", \"arch\": \"$arch\", \"ts\": \"$ts\"}")
+      matrix+=("{\"php-version\": \"$php_version\", \"arch\": \"$arch\", \"ts\": \"$ts\"}")
     done
   done
 done

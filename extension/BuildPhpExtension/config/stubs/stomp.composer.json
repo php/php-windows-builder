@@ -1,0 +1,12 @@
+{
+  "require": {
+    "openssl": "*"
+  },
+  "php-ext": {
+    "configure-options": [
+      {
+        "name": "enable-stomp"
+      }
+    ]
+  }
+}

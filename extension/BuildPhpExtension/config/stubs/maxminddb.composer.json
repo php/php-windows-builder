@@ -1,0 +1,12 @@
+{
+  "php-ext": {
+    "require": {
+      "libmaxminddb": "*"
+    },
+    "configure-options": [
+      {
+        "name": "with-maxminddb"
+      }
+    ]
+  }
+}

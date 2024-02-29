@@ -21,10 +21,6 @@ Build PHP for a specific version, architecture and thread safety.
 - `arch` (required) - The architecture to build. It supports values `x64` and `x86`.
 - `ts` (required) - The thread safety to build. It supports values `ts` and `nts`.
 
-### Outputs
-
-- `artifact-path` - The path to the artifacts produced by the action.
-
 ### Example workflow to build PHP
 
 ```yaml
@@ -68,6 +64,7 @@ Build a PHP extension for a specific version.
     arch: x64
   env:
     CONFIGURE_ARGS: --enable-xdebug
+    LIBRARIES: zlib
 ```
 
 ### Inputs
@@ -77,10 +74,6 @@ Build a PHP extension for a specific version.
 - `php-version` (required) - The PHP versions to build the extension for.
 - `arch` (required) - The architecture to build the extension for.
 - `ts` (required) - The thread safety to build the extension for.
-
-### Outputs
-
-- `artifact-path` - The path to the artifacts produced by the action.
 
 Instead of having to configure all the inputs for the extension action, you can use the `extension-matrix` action to get the matrix of jobs with different input configurations.
 
