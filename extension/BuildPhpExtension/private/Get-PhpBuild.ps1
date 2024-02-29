@@ -21,6 +21,13 @@ function Get-PhpBuild {
         $tsPart = if ($Config.ts -eq "nts") {"nts-Win32"} else {"Win32"}
         $releases = Invoke-WebRequest "$baseUrl/releases.json" | ConvertFrom-Json
         $phpSemver = $releases.$($Config.php_version).version
+        if($null -eq $phpSemver) {
+            $phpSemver = (Invoke-WebRequest $fallbackBaseUrl).Links |
+                    Where-Object { $_.href -match "php-($($Config.php_version).[0-9]+).*" } |
+                    ForEach-Object { $matches[1] } |
+                    Sort-Object { [System.Version]$_ } -Descending |
+                    Select-Object -First 1
+        }
         $binZipFile = "php-$phpSemver-$tsPart-$($Config.vs_version)-$($Config.arch).zip"
         $binUrl = "$baseUrl/$binZipFile"
 
