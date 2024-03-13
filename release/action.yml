@@ -23,10 +23,11 @@ runs:
     - name: Get artifacts
       uses: actions/download-artifact@v4
       with:
-        name: artifacts
+        path: artifacts
+        merge-multiple: true
 
     - name: Upload artifacts
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.token }}
-      run: gh release upload ${{ inputs.release }} artifacts/* --clobber
+      run: gh release upload ${{ inputs.release }} artifacts/php* --clobber
