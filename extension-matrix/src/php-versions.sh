@@ -57,10 +57,11 @@ get_php_versions() {
 
   min_version=$(grep '<min>' "$package_xml" | head -1 | sed -e 's/<[^>]*>//g' | cut -d'.' -f1,2 | xargs)
   max_version=$(grep '<max>' "$package_xml" | head -1 | sed -e 's/<[^>]*>//g' | cut -d'.' -f1,2 | xargs)
-  [[ -z "$max_version" ]] && max_version="${php_versions[-1]}"
 
   states="$(curl -sL https://www.php.net/releases/states.php)"
   IFS=' ' read -r -a php_versions <<< "$(echo "$states" | jq -r 'to_entries[] | .key as $major | .value | to_entries[] | .key' | sort -Vu | tr '\n' ' ')"
+
+  [[ -z "$max_version" ]] && max_version="${php_versions[-1]}"
 
   rm -rf "$directory"
 
