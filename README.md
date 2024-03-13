@@ -131,20 +131,21 @@ It will also check if a GitHub hosted Windows runner is available with the requi
 
 ## Release
 
-Upload the artifacts to the release.
+Upload the artifacts to a release.
 
 ```yaml
 - name: Upload artifact to the release
   uses: php/php-windows-builder/release@v1
   with:
-    tag-name: ${{ github.event.release.tag_name }}
+    release: ${{ github.event.release.tag_name }}
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ### Inputs
 
-- `tag-name` (required) - The tag name of the release.
+- `release` (required) - The release to upload the artifacts.
+- `token` (required) - The GitHub token to authenticate with.
 
 ### Example workflow to build and release an extension
 
@@ -188,9 +189,8 @@ jobs:
       - name: Upload artifact to the release
         uses: php/php-windows-builder/release@v1
         with:
-          tag-name: ${{ github.event.release.tag_name }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          release: ${{ github.event.release.tag_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ## License

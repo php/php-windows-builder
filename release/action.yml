@@ -1,0 +1,32 @@
+name: release
+description: Upload the artifacts to a release
+author: php
+
+branding:
+  icon: package
+  color: purple
+
+inputs:
+  release:
+    description: 'Git reference for the release'
+    required: true
+  token:
+    description: 'GitHub token'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Get artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: artifacts
+
+    - name: Upload artifacts
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
+      run: gh release upload ${{ inputs.release }} artifacts/* --clobber
