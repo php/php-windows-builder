@@ -22,6 +22,12 @@ inputs:
   ts:
     description: Thread safety to build
     required: true
+  args:
+    description: Additional arguments to pass to the build script
+    required: false
+  libs:
+    description: Libraries required to build the extension
+    required: false
 
 runs:
   using: composite
@@ -31,6 +37,9 @@ runs:
 
     - name: Build PHP
       shell: pwsh
+      env:
+        CONFIGURE_ARGS: ${{inputs.args}}
+        LIBRARIES: ${{inputs.libs}}
       run: |
         Import-Module $pwd\extension\BuildPhpExtension -Force
         Invoke-PhpBuildExtension -ExtensionUrl ${{inputs.extension-url}} `

@@ -81,9 +81,13 @@ Function Get-ExtensionConfig {
         }
         $config.options = $config.options -join " "
 
+        if($null -ne $env:CONFIGURE_ARGS -and -not([string]::IsNullOrWhiteSpace($env:CONFIGURE_ARGS))) {
+            $config.options += " $env:CONFIGURE_ARGS"
+        }
+
         $Libraries = @()
-        if($env:Libraries) {
-            $Libraries = ($env:Libraries -replace ' ', '') -split ','
+        if($null -ne $env:LIBRARIES -and -not([string]::IsNullOrWhiteSpace($env:LIBRARIES))) {
+            $Libraries = ($env:LIBRARIES -replace ' ', '') -split ','
         }
 
         $composerJson."require" | ForEach-Object {
@@ -102,21 +106,23 @@ Function Get-ExtensionConfig {
         }
 
         $Libraries | ForEach-Object {
-            # TODO: Implement version check
-            $phpSeries = (Invoke-WebRequest -Uri "https://windows.php.net/downloads/php-sdk/deps/series/packages-$PhpVersion-$VsVersion-$Arch-staging.txt").Content
-            $extensionSeries = Invoke-WebRequest -Uri "https://windows.php.net/downloads/pecl/deps"
-            if ($phpSeries.Contains($_) -and -not($config.php_libraries.Contains($_))) {
-                $config.php_libraries += $_
-            } elseif ($extensionSeries.Content.Contains($_) -and -not($config.extension_libraries.Contains($_))) {
-                $key = $_
-                $extensionSeries.Links | ForEach-Object {
-                    if($_.HREF -match $key) {
-                        $lib, $version = (($_.HREF -split('/') | Select-Object -Last 1) -split('-'))[0, 1]
-                        $config.extension_libraries += "$lib-$version"
+            if($null -ne $_ -and -not([string]::IsNullOrWhiteSpace($_))) {
+                # TODO: Implement version check
+                $phpSeries = (Invoke-WebRequest -Uri "https://windows.php.net/downloads/php-sdk/deps/series/packages-$PhpVersion-$VsVersion-$Arch-staging.txt").Content
+                $extensionSeries = Invoke-WebRequest -Uri "https://windows.php.net/downloads/pecl/deps"
+                if ($phpSeries.Contains($_) -and -not($config.php_libraries.Contains($_))) {
+                    $config.php_libraries += $_
+                } elseif ($extensionSeries.Content.Contains($_) -and -not($config.extension_libraries.Contains($_))) {
+                    $key = $_
+                    $extensionSeries.Links | ForEach-Object {
+                        if($_.HREF -match $key) {
+                            $lib, $version = (($_.HREF -split('/') | Select-Object -Last 1) -split('-'))[0, 1]
+                            $config.extension_libraries += "$lib-$version"
+                        }
                     }
+                } else {
+                    throw "Library $_ not found"
                 }
-            } else {
-                throw "Library $_ not found"
             }
         }
 

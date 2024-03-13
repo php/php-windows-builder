@@ -62,9 +62,8 @@ Build a PHP extension for a specific version.
     php-version: '8.3'
     ts: nts
     arch: x64
-  env:
-    CONFIGURE_ARGS: --enable-xdebug
-    LIBRARIES: zlib
+    args: --enable-xdebug
+    libs: zlib
 ```
 
 ### Inputs
@@ -74,6 +73,8 @@ Build a PHP extension for a specific version.
 - `php-version` (required) - The PHP versions to build the extension for.
 - `arch` (required) - The architecture to build the extension for.
 - `ts` (required) - The thread safety to build the extension for.
+- `args` (optional) - Additional arguments to pass to the `configure` script.
+- `libs` (optional) - Libraries required for the extension.
 
 Instead of having to configure all the inputs for the extension action, you can use the `extension-matrix` action to get the matrix of jobs with different input configurations.
 
@@ -104,6 +105,7 @@ jobs:
 - `php-version-list` (optional) - The PHP versions to build the extension for. Defaults to the PHP versions defined in the `package.xml` file.
 - `arch-list` (optional) - The architectures to build the extension for. Defaults to `x64, x86`.
 - `ts-list` (optional) - The thread safety to build the extension for. Defaults to `nts, ts`.
+- `allow-old-php-versions` (optional) - Allow building the extension for older PHP versions. Defaults to `false`.
 
 ### Outputs
 
@@ -115,7 +117,7 @@ By default, the `extension-matrix` action will use the PHP versions defined in t
 
 If the `php-version-list` input is not provided, it will use the PHP versions defined in the `package.xml` file.
 
-It will also check if a GitHub hosted Windows runner is available with the required Visual Studio version to build the extension for the PHP version. To override this for building the extension for older PHP versions, you will have to set the environment variable `ALLOW_OLD_PHP_VERSIONS` to `true` and add self-hosted Windows runners as specified in the table below.
+It will also check if a GitHub hosted Windows runner is available with the required Visual Studio version to build the extension for the PHP version. To override this for building the extension for older PHP versions, you will have to set the input `allow_old_php_versions` to `true` and add self-hosted Windows runners as specified in the table below.
 
 | PHP Version | Visual Studio Version | Windows Runner Labels       |
 |-------------|-----------------------|-----------------------------|
@@ -138,8 +140,7 @@ Upload the artifacts to a release.
   uses: php/php-windows-builder/release@v1
   with:
     release: ${{ github.event.release.tag_name }}
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    token : ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ### Inputs
