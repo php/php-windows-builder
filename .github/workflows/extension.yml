@@ -27,7 +27,7 @@ jobs:
 
   extension:
     needs: get-extension-matrix
-    runs-on: windows-2019
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix: ${{fromJson(needs.get-extension-matrix.outputs.matrix)}}
     steps:

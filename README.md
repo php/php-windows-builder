@@ -109,6 +109,26 @@ jobs:
 
 - `matrix` - The matrix of jobs with different input configurations.
 
+### PHP Version Support
+
+By default, the `extension-matrix` action will use the PHP versions defined in the `php-version-list` input.
+
+If the `php-version-list` input is not provided, it will use the PHP versions defined in the `package.xml` file.
+
+It will also check if a GitHub hosted Windows runner is available with the required Visual Studio version to build the extension for the PHP version. To override this for building the extension for older PHP versions, you will have to set the environment variable `ALLOW_OLD_PHP_VERSIONS` to `true` and add self-hosted Windows runners as specified in the table below.
+
+| PHP Version | Visual Studio Version | Windows Runner Labels       |
+|-------------|-----------------------|-----------------------------|
+| 7.0         | 2015 (vc14)           | windows-2012, self-hosted   |
+| 7.1         | 2015 (vc14)           | windows-2012, self-hosted   |
+| 7.2         | 2017 (vc15)           | windows-2016, self-hosted   |
+| 7.3         | 2017 (vc15)           | windows-2016, self-hosted   |
+| 7.4         | 2017 (vc15)           | windows-2016, self-hosted   |
+| 8.0         | 2019 (vs16)           | windows-2019, github-hosted |
+| 8.1         | 2019 (vs16)           | windows-2019, github-hosted |
+| 8.2         | 2019 (vs16)           | windows-2019, github-hosted |
+| 8.3         | 2019 (vs16)           | windows-2019, github-hosted |
+
 ## Release
 
 Upload the artifacts to the release.
@@ -148,7 +168,7 @@ jobs:
         uses: php/php-windows-builder/extension-matrix@v1
   build:
     needs: get-extension-matrix
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix: ${{fromJson(needs.get-extension-matrix.outputs.matrix)}}
     steps:

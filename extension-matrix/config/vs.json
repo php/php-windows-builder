@@ -1,0 +1,47 @@
+{
+  "7.0": {
+    "vs": "2015",
+    "os": "windows-2012",
+    "type": "self-hosted"
+  },
+  "7.1": {
+    "vs": "2015",
+    "os": "windows-2012",
+    "type": "self-hosted"
+  },
+  "7.2": {
+    "vs": "2017",
+    "os": "windows-2016",
+    "type": "self-hosted"
+  },
+  "7.3": {
+    "vs": "2017",
+    "os": "windows-2016",
+    "type": "self-hosted"
+  },
+  "7.4": {
+    "vs": "2017",
+    "os": "windows-2016",
+    "type": "self-hosted"
+  },
+  "8.0": {
+    "vs": "2019",
+    "os": "windows-2019",
+    "type": "github-hosted"
+  },
+  "8.1": {
+    "vs": "2019",
+    "os": "windows-2019",
+    "type": "github-hosted"
+  },
+  "8.2": {
+    "vs": "2019",
+    "os": "windows-2019",
+    "type": "github-hosted"
+  },
+  "8.3": {
+    "vs": "2019",
+    "os": "windows-2019",
+    "type": "github-hosted"
+  }
+}
