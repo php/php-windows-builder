@@ -26,7 +26,7 @@ runs:
     - name: Build PHP
       shell: pwsh
       run: |
-        Import-Module $pwd\php\BuildPhp -Force
+        Import-Module ${{ github.action_path }}\BuildPhp -Force
         Invoke-PhpBuild -PhpVersion ${{inputs.php-version}} `
                         -Arch ${{inputs.arch}} `
                         -Ts ${{inputs.ts}}

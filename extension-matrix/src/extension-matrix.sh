@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-. extension-matrix/src/php-versions.sh
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+. "$SCRIPT_DIR"/php-versions.sh
 
 matrix=();
 
@@ -15,7 +17,7 @@ IFS=',' read -r -a php_version_array <<<"${PHP_VERSION_LIST// /}"
 IFS=',' read -r -a arch_array <<<"${ARCH_LIST// /}"
 IFS=',' read -r -a ts_array <<<"${TS_LIST// /}"
 
-vs_json=extension-matrix/config/vs.json
+vs_json="$SCRIPT_DIR"/../config/vs.json
 filtered_versions=$(jq -r 'keys | join(" ")' "$vs_json")
 if [[ -z "$ALLOW_OLD_PHP_VERSIONS" || "$ALLOW_OLD_PHP_VERSIONS" == "false" ]]; then
   filtered_versions=$(jq -r 'to_entries | map(select(.value.type == "github-hosted") | .key) | join(" ")' "$vs_json")

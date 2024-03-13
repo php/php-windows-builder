@@ -41,7 +41,7 @@ runs:
         CONFIGURE_ARGS: ${{inputs.args}}
         LIBRARIES: ${{inputs.libs}}
       run: |
-        Import-Module $pwd\extension\BuildPhpExtension -Force
+        Import-Module ${{ github.action_path }}\BuildPhpExtension -Force
         Invoke-PhpBuildExtension -ExtensionUrl ${{inputs.extension-url}} `
                                  -ExtensionRef ${{inputs.extension-ref}} `
                                  -PhpVersion ${{inputs.php-version}} `

@@ -42,7 +42,7 @@ runs:
       id: get-matrix
       shell: bash
       run: |
-        bash extension-matrix/src/extension-matrix.sh
+        bash ${{ github.action_path }}/src/extension-matrix.sh
       env:
         EXTENSION_URL: ${{inputs.extension-url}}
         EXTENSION_REF: ${{inputs.extension-ref}}
