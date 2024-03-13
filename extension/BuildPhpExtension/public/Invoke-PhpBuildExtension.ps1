@@ -18,9 +18,9 @@ function Invoke-PhpBuildExtension {
     [OutputType()]
     param (
         [Parameter(Mandatory = $false, Position=0, HelpMessage='Extension URL')]
-        [string] $ExtensionUrl,
+        [string] $ExtensionUrl = '',
         [Parameter(Mandatory = $false, Position=1, HelpMessage='Extension Reference')]
-        [string] $ExtensionRef,
+        [string] $ExtensionRef = '',
         [Parameter(Mandatory = $true, Position=2, HelpMessage='PHP Version')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
@@ -53,10 +53,12 @@ function Invoke-PhpBuildExtension {
 
         Set-Location "$buildDirectory"
 
-        $extension = Get-Extension -ExtensionUrl $ExtensionUrl -ExtensionRef $ExtensionRef
+        $source = Get-ExtensionSource -ExtensionUrl $ExtensionUrl -ExtensionRef $ExtensionRef
+
+        $extension = Get-Extension -ExtensionUrl $source.url -ExtensionRef $source.ref
 
         $config = Add-BuildRequirements -Extension $extension `
-                                        -ExtensionRef $ExtensionRef `
+                                        -ExtensionRef $source.ref `
                                         -PhpVersion $PhpVersion `
                                         -Arch $Arch `
                                         -Ts $Ts `

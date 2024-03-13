@@ -42,8 +42,8 @@ runs:
         LIBRARIES: ${{inputs.libs}}
       run: |
         Import-Module ${{ github.action_path }}\BuildPhpExtension -Force
-        Invoke-PhpBuildExtension -ExtensionUrl ${{inputs.extension-url}} `
-                                 -ExtensionRef ${{inputs.extension-ref}} `
+        Invoke-PhpBuildExtension -ExtensionUrl "${{inputs.extension-url}}" `
+                                 -ExtensionRef "${{inputs.extension-ref}}" `
                                  -PhpVersion ${{inputs.php-version}} `
                                  -Arch ${{inputs.arch}} `
                                  -Ts ${{inputs.ts}}

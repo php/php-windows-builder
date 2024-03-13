@@ -6,7 +6,8 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 matrix=();
 
-[ -n "$EXTENSION_URL" ] && [ -z "$EXTENSION_REF" ] && EXTENSION_REF="${GITHUB_SHA:?}"
+[ -z "$EXTENSION_URL" ] && EXTENSION_URL="https://github.com/${GITHUB_REPOSITORY:?}"
+[ -z "$EXTENSION_REF" ] && EXTENSION_REF="${GITHUB_SHA:?}"
 
 [ -z "$PHP_VERSION_LIST" ] && \
   PHP_VERSION_LIST="$(get_php_versions "$EXTENSION_URL" "$EXTENSION_REF")"

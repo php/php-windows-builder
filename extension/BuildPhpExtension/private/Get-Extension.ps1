@@ -9,17 +9,17 @@ function Get-Extension {
     #>
     [OutputType()]
     param (
-        [Parameter(Mandatory = $false, Position=0, HelpMessage='Extension URL')]
+        [Parameter(Mandatory = $true, Position=0, HelpMessage='Extension URL')]
         [string] $ExtensionUrl,
-        [Parameter(Mandatory = $false, Position=1, HelpMessage='Extension Reference')]
+        [Parameter(Mandatory = $true, Position=1, HelpMessage='Extension Reference')]
         [string] $ExtensionRef
     )
     begin {
     }
     process {
         if(
-            ($null -ne $ExtensionUrl -and $null -eq $ExtensionRef) -or
-            ($null -ne $ExtensionRef -and $null -eq $ExtensionUrl)
+            ($null -eq $ExtensionUrl -or $null -eq $ExtensionRef) -or
+            ($ExtensionUrl -eq '' -or $ExtensionRef -eq '')
         ) {
             throw "Both Extension URL and Extension Reference are required."
         }
