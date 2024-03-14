@@ -140,7 +140,7 @@ Upload the artifacts to a release.
   uses: php/php-windows-builder/release@v1
   with:
     release: ${{ github.event.release.tag_name }}
-    token : ${{ secrets.GITHUB_TOKEN }}
+    token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ### Inputs
