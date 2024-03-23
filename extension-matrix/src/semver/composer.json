@@ -1,0 +1,15 @@
+{
+    "name": "php/composer-semver",
+    "description": "Parse composer version constraints",
+    "type": "project",
+    "require": {
+        "composer/semver": "^3"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Shivam Mathur",
+            "email": "contact@shivammathur.com"
+        }
+    ]
+}
