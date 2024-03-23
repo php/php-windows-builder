@@ -30,11 +30,6 @@ function Get-Extension {
             git checkout FETCH_HEAD > $null 2>&1
         }
 
-        # TODO: Use composer.json for the extension name
-        $packageXml = Get-ChildItem (Get-Location).Path -Recurse -Filter "package.xml" -ErrorAction SilentlyContinue
-        if($null -eq $packageXml) {
-            throw "No package.xml found"
-        }
         $configW32 = Get-ChildItem (Get-Location).Path -Recurse -Filter "config.w32" -ErrorAction SilentlyContinue
         if($null -eq $configW32) {
             throw "No config.w32 found"
@@ -45,8 +40,11 @@ function Get-Extension {
             Copy-Item -Path "${subDirectory}\*" -Destination $currentDirectory -Recurse -Force
             Remove-Item -Path $subDirectory -Recurse -Force
         }
-        $xml = [xml](Get-Content $packageXml.FullName)
-        return $xml.package.name
+        $extensionLine = Get-Content -Path "config.w32" | Select-String -Pattern '\s+(ZEND_)?EXTENSION\(' | Select-Object -First 1
+        if($null -eq $extensionLine) {
+            throw "No extension found in config.w32"
+        }
+        return ($extensionLine -replace '.*EXTENSION\(([^,]+),.*', '$1') -replace '["'']', ''
     }
     end {
     }
