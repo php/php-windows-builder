@@ -38,6 +38,11 @@ runs:
     - name: Checkout
       uses: actions/checkout@v4
 
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        tools: none
+
     - name: Get Matrix
       id: get-matrix
       shell: bash
