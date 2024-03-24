@@ -8,6 +8,10 @@ on:
       extension_ref:
         description: 'Extension ref'
         required: true
+      artifact-naming-scheme:
+        description: 'Naming schema for the artifacts, pie or pecl'
+        required: false
+        default: 'pie'
 jobs:
   get-extension-matrix:
     runs-on: ubuntu-latest
@@ -36,6 +40,7 @@ jobs:
       - name: Build the extension
         uses: ./extension
         with:
+          artifact-naming-scheme: ${{ inputs.artifact-naming-scheme }}
           extension-url: ${{ inputs.extension_url }}
           extension-ref: ${{ inputs.extension_ref }}
           php-version: ${{ matrix.php-version }}

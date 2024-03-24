@@ -18,14 +18,11 @@ function Add-Package {
         Get-ChildItem -Path ..\deps -Recurse -Filter "LICENSE*" | ForEach-Object {
             Copy-Item -Path $_.FullName -Destination artifacts -Force
         }
-        if(Test-Path -Path LICENSE) {
-            Copy-Item -Path LICENSE -Destination artifacts -Force
-        }
-        if(Test-Path -Path COPYRIGHT) {
-            Copy-Item -Path COPYRIGHT -Destination artifacts -Force
-        }
-        if(Test-Path -Path COPYING) {
-            Copy-Item -Path COPYING -Destination artifacts -Force
+        $docsFiles = @("LICENSE", "COPYRIGHT", "COPYING")
+        $docsFiles | ForEach-Object {
+            if(Test-Path -Path $_) {
+                Copy-Item -Path $_ -Destination artifacts -Force
+            }
         }
         $Config.docs | ForEach-Object {
             $directoryPath = [System.IO.Path]::GetDirectoryName($_)
@@ -47,7 +44,23 @@ function Add-Package {
         if(Test-Path -Path "vc140.pdb") {
             Remove-Item -Path "vc140.pdb" -Force
         }
-        $artifact = "php_$($Config.name)-$($Config.ref)-$($Config.php_version)-$($Config.ts)-$($Config.vs_version)-$($Config.arch)"
+
+        # As per https://github.com/ThePHPF/pie-design#windows-binaries
+        if($env:ARTIFACT_NAMING_SCHEME -eq 'pie') {
+            if($Config.arch -eq 'x64') {
+                $Config.arch = 'x86_64'
+            }
+            $artifact = "php_$($Config.name)-$($Config.ref)-$($Config.php_version)-$($Config.vs_version)-$($Config.ts)-$($Config.arch)"
+            @("php_$($Config.name).dll", "php_$($Config.name).pdb") | ForEach-Object {
+                $extension = $_.Split('.')[1]
+                if(Test-Path -Path $_) {
+                    Move-Item -Path $_ -Destination "$artifact.$extension" -Force
+                }
+            }
+        } else {
+            $artifact = "php_$($Config.name)-$($Config.ref)-$($Config.php_version)-$($Config.ts)-$($Config.vs_version)-$($Config.arch)"
+        }
+
         7z a -sdel "$artifact.zip" *
 
         Set-Location $currentDirectory

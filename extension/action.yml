@@ -28,6 +28,11 @@ inputs:
   libs:
     description: Libraries required to build the extension
     required: false
+  artifact-naming-scheme:
+    description: Naming schema for the artifacts, pie or pecl
+    deprecationMessage: "This will be removed once pie is released"
+    required: false
+    default: pie
 
 runs:
   using: composite
@@ -40,6 +45,7 @@ runs:
       env:
         CONFIGURE_ARGS: ${{inputs.args}}
         LIBRARIES: ${{inputs.libs}}
+        ARTIFACT_NAMING_SCHEME: ${{inputs.artifact-naming-scheme}}
       run: |
         Import-Module ${{ github.action_path }}\BuildPhpExtension -Force
         Invoke-PhpBuildExtension -ExtensionUrl "${{inputs.extension-url}}" `
