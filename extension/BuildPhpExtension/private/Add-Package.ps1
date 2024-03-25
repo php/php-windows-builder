@@ -46,11 +46,12 @@ function Add-Package {
         }
 
         # As per https://github.com/ThePHPF/pie-design#windows-binaries
+        $arch = $Config.arch
         if($env:ARTIFACT_NAMING_SCHEME -eq 'pie') {
-            if($Config.arch -eq 'x64') {
-                $Config.arch = 'x86_64'
+            if($arch -eq 'x64') {
+                $arch = 'x86_64'
             }
-            $artifact = "php_$($Config.name)-$($Config.ref)-$($Config.php_version)-$($Config.vs_version)-$($Config.ts)-$($Config.arch)"
+            $artifact = "php_$($Config.name)-$($Config.ref)-$($Config.php_version)-$($Config.vs_version)-$($Config.ts)-$arch"
             @("php_$($Config.name).dll", "php_$($Config.name).pdb") | ForEach-Object {
                 $extension = $_.Split('.')[1]
                 if(Test-Path -Path $_) {
@@ -58,7 +59,7 @@ function Add-Package {
                 }
             }
         } else {
-            $artifact = "php_$($Config.name)-$($Config.ref)-$($Config.php_version)-$($Config.ts)-$($Config.vs_version)-$($Config.arch)"
+            $artifact = "php_$($Config.name)-$($Config.ref)-$($Config.php_version)-$($Config.ts)-$($Config.vs_version)-$arch"
         }
 
         7z a -sdel "$artifact.zip" *
