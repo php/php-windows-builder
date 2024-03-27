@@ -23,8 +23,8 @@ function Get-PhpTestPack {
         Add-Type -Assembly "System.IO.Compression.Filesystem"
 
         $releaseState = if ($PhpVersion -match "[a-z]") {"qa"} else {"releases"}
-        $baseUrl = "https://windows.php.net/downloads/$releaseState"
-        $fallbackBaseUrl = "https://windows.php.net/downloads/$releaseState/archives"
+        $baseUrl = "https://downloads.php.net/~windows/$releaseState"
+        $fallbackBaseUrl = "https://downloads.php.net/~windows/$releaseState/archives"
         $testZipFile = "php-test-pack-$PhpVersion.zip"
         $testUrl = "$baseUrl/$testZipFile"
         $fallBackUrl = "$fallbackBaseUrl/$testZipFile"

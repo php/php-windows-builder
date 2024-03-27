@@ -16,8 +16,8 @@ function Get-PhpDevelBuild {
         Add-Type -Assembly "System.IO.Compression.Filesystem"
 
         $releaseState = if ($Config.php_version -match "[a-z]") {"qa"} else {"releases"}
-        $baseUrl = "https://windows.php.net/downloads/$releaseState"
-        $fallbackBaseUrl = "https://windows.php.net/downloads/$releaseState/archives"
+        $baseUrl = "https://downloads.php.net/~windows/$releaseState"
+        $fallbackBaseUrl = "https://downloads.php.net/~windows/$releaseState/archives"
         $tsPart = if ($Config.ts -eq "nts") {"nts-Win32"} else {"Win32"}
         $releases = Invoke-WebRequest "$baseUrl/releases.json" | ConvertFrom-Json
         $phpSemver = $releases.$($Config.php_version).version

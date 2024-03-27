@@ -108,8 +108,8 @@ Function Get-ExtensionConfig {
         $Libraries | ForEach-Object {
             if($null -ne $_ -and -not([string]::IsNullOrWhiteSpace($_))) {
                 # TODO: Implement version check
-                $phpSeries = (Invoke-WebRequest -Uri "https://windows.php.net/downloads/php-sdk/deps/series/packages-$PhpVersion-$VsVersion-$Arch-staging.txt").Content
-                $extensionSeries = Invoke-WebRequest -Uri "https://windows.php.net/downloads/pecl/deps"
+                $phpSeries = (Invoke-WebRequest -Uri "https://downloads.php.net/~windows/php-sdk/deps/series/packages-$PhpVersion-$VsVersion-$Arch-staging.txt").Content
+                $extensionSeries = Invoke-WebRequest -Uri "https://downloads.php.net/~windows/pecl/deps"
                 if ($phpSeries.Contains($_) -and -not($config.php_libraries.Contains($_))) {
                     $config.php_libraries += $_
                 } elseif ($extensionSeries.Content.Contains($_) -and -not($config.extension_libraries.Contains($_))) {

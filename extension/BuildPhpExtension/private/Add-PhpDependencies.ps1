@@ -13,7 +13,7 @@ Function Add-PhpDependencies {
     begin {
     }
     process {
-        $phpBaseUrl = 'https://windows.php.net/downloads/php-sdk/deps'
+        $phpBaseUrl = 'https://downloads.php.net/~windows/php-sdk/deps'
         $phpSeries = Invoke-WebRequest -Uri "$phpBaseUrl/series/packages-$($Config.php_version)-$($Config.vs_version)-$($Config.arch)-staging.txt"
         $seriesFiles = $phpSeries.Content -Split "[\r\n]+"
         $no_matches = @()

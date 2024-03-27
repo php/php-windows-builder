@@ -42,8 +42,8 @@ function Get-PhpBuild {
         }
 
         $releaseState = if ($PhpVersion -match "[a-z]") {"qa"} else {"releases"}
-        $baseUrl = "https://windows.php.net/downloads/$releaseState"
-        $fallbackBaseUrl = "https://windows.php.net/downloads/$releaseState/archives"
+        $baseUrl = "https://downloads.php.net/~windows/$releaseState"
+        $fallbackBaseUrl = "https://downloads.php.net/~windows/$releaseState/archives"
         $tsPart = if ($Ts -eq "nts") {"nts-Win32"} else {"Win32"}
         $binZipFile = "php-$PhpVersion-$tsPart-$VsVersion-$Arch.zip"
         $binUrl = "$baseUrl/$binZipFile"
