@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-compare_versions() {
+function compare_versions() {
     local version1="$1"
     local version2="$2"
 
@@ -17,7 +17,7 @@ compare_versions() {
     fi
 }
 
-filter_versions() {
+function filter_versions() {
     local min_version=$1
     local max_version=$2
     local versions=("${@:3}")
@@ -88,6 +88,4 @@ function get_php_versions() {
     echo "No composer.json with type php-ext or package.xml found"
     exit 1
   fi
-
-  compare_versions "$directory"
 }
