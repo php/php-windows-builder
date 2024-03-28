@@ -98,7 +98,7 @@ Function Get-ExtensionConfig {
                         $extension += "-$($_.Value)"
                     }
                     $config.extensions += $extension
-                } else {
+                } elseif(-not($_.Name -match "php")) {
                     # If using the stub composer.json
                     $Libraries += $_.Name
                 }
