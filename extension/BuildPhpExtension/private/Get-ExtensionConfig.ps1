@@ -49,8 +49,6 @@ Function Get-ExtensionConfig {
         {
             if(Test-Path $PSScriptRoot\..\config\stubs\$Extension.composer.json) {
                 Copy-Item $PSScriptRoot\..\config\stubs\$Extension.composer.json composer.json
-            } else {
-                throw "No config found for $Extension in composer.json"
             }
         }
         $config = [PSCustomObject]@{
@@ -71,8 +69,6 @@ Function Get-ExtensionConfig {
         if($null -eq $composerJson."php-ext") {
             if(Test-Path $PSScriptRoot\..\config\stubs\$Extension.composer.json) {
                 Copy-Item $PSScriptRoot\..\config\stubs\$Extension.composer.json composer.json
-            } else {
-                throw "No config found for $Extension in composer.json"
             }
         }
 
