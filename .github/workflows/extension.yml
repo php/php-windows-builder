@@ -8,6 +8,10 @@ on:
       extension_ref:
         description: 'Extension ref'
         required: true
+      run_tests:
+        description: 'Run tests after building the extension'
+        required: false
+        default: 'false'
       artifact-naming-scheme:
         description: 'Naming schema for the artifacts, pie or pecl'
         required: false
@@ -46,6 +50,7 @@ jobs:
           php-version: ${{ matrix.php-version }}
           arch: ${{ matrix.arch }}
           ts: ${{ matrix.ts }}
+          run-tests: ${{ inputs.run_tests }}
 
   artifacts:
     runs-on: ubuntu-latest

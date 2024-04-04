@@ -18,6 +18,9 @@ Function Invoke-Build {
         $bat_content += "call phpize 2>&1"
         $bat_content += "call configure --with-php-build=`"..\deps`" $($Config.options) --with-mp=`"disable`" --enable-debug-pack 2>&1"
         $bat_content += "nmake /nologo 2>&1"
+        if($env:RUN_TESTS -eq "true") {
+            $bat_content += "nmake /nologo test 2>&1"
+        }
         $bat_content += "exit %errorlevel%"
         Set-Content -Encoding "ASCII" -Path task.bat -Value $bat_content
 
