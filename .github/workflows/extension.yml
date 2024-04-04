@@ -2,13 +2,13 @@ name: Build PHP Extension
 on:
   workflow_dispatch:
     inputs:
-      extension_url:
+      extension-url:
         description: 'Extension URL'
         required: true
-      extension_ref:
+      extension-ref:
         description: 'Extension ref'
         required: true
-      run_tests:
+      run-tests:
         description: 'Run tests after building the extension'
         required: false
         default: 'false'
@@ -28,8 +28,8 @@ jobs:
         id: extension-matrix
         uses: ./extension-matrix
         with:
-          extension-url: ${{ inputs.extension_url }}
-          extension-ref: ${{ inputs.extension_ref }}
+          extension-url: ${{ inputs.extension-url }}
+          extension-ref: ${{ inputs.extension-ref }}
           arch-list: 'x64, x86'
           ts-list: 'nts, ts'
 
@@ -45,12 +45,12 @@ jobs:
         uses: ./extension
         with:
           artifact-naming-scheme: ${{ inputs.artifact-naming-scheme }}
-          extension-url: ${{ inputs.extension_url }}
-          extension-ref: ${{ inputs.extension_ref }}
+          extension-url: ${{ inputs.extension-url }}
+          extension-ref: ${{ inputs.extension-ref }}
           php-version: ${{ matrix.php-version }}
           arch: ${{ matrix.arch }}
           ts: ${{ matrix.ts }}
-          run-tests: ${{ inputs.run_tests }}
+          run-tests: ${{ inputs.run-tests }}
 
   artifacts:
     runs-on: ubuntu-latest
