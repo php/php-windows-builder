@@ -32,6 +32,10 @@ inputs:
     description: Run tests after building the extension
     required: false
     default: 'false'
+  test-runner:
+    description: Test runner to use
+    required: false
+    default: 'run-tests.php'
   artifact-naming-scheme:
     description: Naming schema for the artifacts, pie or pecl
     deprecationMessage: "This will be removed once pie is released"
@@ -51,6 +55,7 @@ runs:
         LIBRARIES: ${{inputs.libs}}
         ARTIFACT_NAMING_SCHEME: ${{inputs.artifact-naming-scheme}}
         RUN_TESTS: ${{inputs.run-tests}}
+        TEST_RUNNER: ${{inputs.test-runner}}
       run: |
         Import-Module ${{ github.action_path }}\BuildPhpExtension -Force
         Invoke-PhpBuildExtension -ExtensionUrl "${{inputs.extension-url}}" `

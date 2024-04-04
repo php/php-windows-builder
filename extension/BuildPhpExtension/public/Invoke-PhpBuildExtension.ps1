@@ -66,6 +66,10 @@ function Invoke-PhpBuildExtension {
 
         Invoke-Build -Config $config
 
+        if($env:RUN_TESTS -eq 'true') {
+            Invoke-Tests -Config $config
+        }
+
         Add-Package -Config $config
 
         Set-Location $currentDirectory

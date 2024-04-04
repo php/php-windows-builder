@@ -12,6 +12,10 @@ on:
         description: 'Run tests after building the extension'
         required: false
         default: 'false'
+      test-runner:
+        description: 'Test runner to use'
+        required: false
+        default: 'run-tests.php'
       artifact-naming-scheme:
         description: 'Naming schema for the artifacts, pie or pecl'
         required: false
@@ -51,6 +55,7 @@ jobs:
           arch: ${{ matrix.arch }}
           ts: ${{ matrix.ts }}
           run-tests: ${{ inputs.run-tests }}
+          test-runner: ${{ inputs.test-runner }}
 
   artifacts:
     runs-on: ubuntu-latest
