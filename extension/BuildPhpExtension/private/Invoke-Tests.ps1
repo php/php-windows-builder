@@ -51,6 +51,9 @@ Function Invoke-Tests {
         Write-Output "TEST_PHP_ARGS $env:TEST_PHP_ARGS"
         Write-Output "TEST_PHP_EXECUTABLE $env:TEST_PHP_EXECUTABLE"
         Invoke-Expression $phpExpression
+        if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+        }
     }
     end {
     }
