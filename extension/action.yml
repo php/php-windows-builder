@@ -31,7 +31,7 @@ inputs:
   run-tests:
     description: Run tests after building the extension
     required: false
-    default: 'false'
+    default: 'true'
   test-runner:
     description: Test runner to use
     required: false
