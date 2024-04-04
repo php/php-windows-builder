@@ -75,6 +75,8 @@ Build a PHP extension for a specific version.
 - `ts` (required) - The thread safety to build the extension for.
 - `args` (optional) - Additional arguments to pass to the `configure` script.
 - `libs` (optional) - Libraries required for the extension.
+- `run-tests` (optional) - Run the extension tests. Defaults to `true`.
+- `test-runner` (optional) - The test runner to use. Defaults to `run-tests.php`.
 
 Instead of having to configure all the inputs for the extension action, you can use the `extension-matrix` action to get the matrix of jobs with different input configurations.
 
