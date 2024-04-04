@@ -20,7 +20,7 @@ Function Invoke-Build {
         $bat_content += "nmake /nologo 2>&1"
         if($env:RUN_TESTS -eq "true") {
             $php_dir = Join-Path (Get-Location).Path php-bin
-            New-Item -ItemType SymbolicLink -Path C:\php -Target $php_dir -Force
+            New-Item -ItemType SymbolicLink -Path C:\php -Target $php_dir -Force > $null 2>&1
             $bat_content += "nmake /nologo test 2>&1"
         }
         $bat_content += "exit %errorlevel%"
@@ -28,8 +28,6 @@ Function Invoke-Build {
 
         $builder = "php-sdk\phpsdk-$($Config.vs_version)-$($Config.Arch).bat"
         $task = (Get-Item -Path "." -Verbose).FullName + '\task.bat'
-        $buildOutput = & $builder -t $task
-
         $suffix = "php_" + (@(
             $Config.name,
             $Config.ref,
@@ -38,8 +36,7 @@ Function Invoke-Build {
             $Config.vs_version,
             $Config.arch
         ) -join "-")
-        $buildOutput | Out-File -FilePath "build-$suffix.txt"
-        Write-Output $buildOutput
+        & $builder -t $task | Tee-Object -FilePath "build-$suffix.txt"
     }
     end {
     }
