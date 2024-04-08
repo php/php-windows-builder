@@ -20,14 +20,14 @@ Function Invoke-Tests {
         $env:XDEBUG_MODE = ""
         $env:TEMP=$((Get-Item -LiteralPath $Env:TEMP).FullName)
         $env:TMP=$((Get-Item -LiteralPath $Env:TMP).FullName)
-        $php_args = @(
-            '-n'
-        )
+        $type='extension'
         if ((Select-String -Path 'config.w32' -Pattern 'ZEND_EXTENSION\(' -Quiet) -eq $true) {
-            $php_args += @(
-                "-d zend_extension=$currentDirectory\$($Config.build_directory)\php_$($Config.name).dll"
-            )
+            $type='zend_extension'
         }
+        $php_args = @(
+            "-n",
+            "-d $type=$currentDirectory\$($Config.build_directory)\php_$($Config.name).dll"
+        )
         $env:TEST_PHP_ARGS = $php_args -join ' '
         if ($null -eq $env:TEST_RUNNER) {
             $env:TEST_RUNNER = 'run-tests.php'
