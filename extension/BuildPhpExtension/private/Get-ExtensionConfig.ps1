@@ -51,9 +51,13 @@ Function Get-ExtensionConfig {
                 Copy-Item $PSScriptRoot\..\config\stubs\$Extension.composer.json composer.json
             }
         }
+        $ref = $ExtensionRef
+        if ($ref -match 'refs/pull/(\d+)/merge') {
+            $ref = $Matches[1]
+        }
         $config = [PSCustomObject]@{
             name = $Extension
-            ref = $ExtensionRef
+            ref = $ref
             php_version = $PhpVersion
             arch = $Arch
             ts = $Ts
