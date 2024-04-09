@@ -22,8 +22,8 @@ function Get-ExtensionSource {
                 $ExtensionUrl = "https://github.com/$env:GITHUB_REPOSITORY"
             }
             if($null -eq $ExtensionRef -or $ExtensionRef -eq '') {
-                if($env.GITHUB_EVENT -contains "pull_request") {
-                    $ExtensionRef = ($env:GITHUB_REF_NAME -replace "/merge", "")
+                if($env:GITHUB_EVENT_NAME -contains "pull_request") {
+                    $ExtensionRef = $env:GITHUB_HEAD_REF
                 } elseif($null -ne $env:GITHUB_REF_NAME) {
                     $ExtensionRef = $env:GITHUB_REF_NAME
                 } else {
