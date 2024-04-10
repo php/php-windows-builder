@@ -159,6 +159,12 @@ on:
     types: [published]
   # create: # Uncomment this to run on tag/branch creation
   # pull_request: # Uncomment this to run on pull requests  
+
+# This may be needed to be able to upload the assets to the release
+# See: https://docs.github.com/en/actions/security-guides/automatic-token-authentication#modifying-the-permissions-for-the-github_token
+#permissions:
+#  contents: write
+
 jobs:
   get-extension-matrix:
     runs-on: ubuntu-latest
