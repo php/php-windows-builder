@@ -37,10 +37,18 @@ function filter_versions() {
 function get_extension() {
   local directory=$1
   if [ -n "$EXTENSION_URL" ]; then
-    git -C "$directory" init
-    git -C "$directory" remote add origin "$EXTENSION_URL"
-    git -C "$directory" fetch --depth=1 origin "$EXTENSION_REF"
-    git -C "$directory" checkout FETCH_HEAD
+    # TODO: Remove this after PECL is deprecated
+    if [[ "$EXTENSION_URL" = *"pecl.php.net"* ]] && [ -n "$EXTENSION_REF" ]; then
+      extension="$(basename "$EXTENSION_URL")"
+      curl -o "$directory/$extension-$EXTENSION_REF.tgz" -sL "https://pecl.php.net/get/$extension-$EXTENSION_REF.tgz"
+      tar -xzf "$directory/$extension-$EXTENSION_REF.tgz" -C "$directory"
+      cp -a "$directory/$extension-$EXTENSION_REF"/* "$directory"
+    else
+      git -C "$directory" init
+      git -C "$directory" remote add origin "$EXTENSION_URL"
+      git -C "$directory" fetch --depth=1 origin "$EXTENSION_REF"
+      git -C "$directory" checkout FETCH_HEAD
+    fi
   fi
 }
 

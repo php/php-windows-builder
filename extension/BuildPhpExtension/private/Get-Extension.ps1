@@ -23,18 +23,26 @@ function Get-Extension {
         ) {
             throw "Both Extension URL and Extension Reference are required."
         }
+        $currentDirectory = (Get-Location).Path
         if($null -ne $ExtensionUrl -and $null -ne $ExtensionRef) {
-            git init > $null 2>&1
-            git remote add origin $ExtensionUrl > $null 2>&1
-            git fetch --depth=1 origin $ExtensionRef > $null 2>&1
-            git checkout FETCH_HEAD > $null 2>&1
+            if ($ExtensionUrl -like "*pecl.php.net*") {
+                $extension = Split-Path -Path $ExtensionUrl -Leaf
+                Invoke-WebRequest -Uri "https://pecl.php.net/get/$extension-$ExtensionRef.tgz" -OutFile "$extension-$ExtensionRef.tgz" -UseBasicParsing
+                & tar -xzf "$extension-$ExtensionRef.tgz" -C $currentDirectory
+                Copy-Item -Path "$extension-$ExtensionRef\*" -Destination $currentDirectory -Recurse -Force
+                Remove-Item -Path "$extension-$ExtensionRef" -Recurse -Force
+            } else {
+                git init > $null 2>&1
+                git remote add origin $ExtensionUrl > $null 2>&1
+                git fetch --depth=1 origin $ExtensionRef > $null 2>&1
+                git checkout FETCH_HEAD > $null 2>&1
+            }
         }
 
         $configW32 = Get-ChildItem (Get-Location).Path -Recurse -Filter "config.w32" -ErrorAction SilentlyContinue
         if($null -eq $configW32) {
             throw "No config.w32 found"
         }
-        $currentDirectory = (Get-Location).Path
         $subDirectory = $configW32.DirectoryName
         if((Get-Location).Path -ne $subDirectory) {
             Copy-Item -Path "${subDirectory}\*" -Destination $currentDirectory -Recurse -Force
