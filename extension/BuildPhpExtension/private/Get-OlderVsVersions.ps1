@@ -13,6 +13,7 @@ function Get-OlderVsVersion {
         [string] $PhpVersion
     )
     begin {
+        $jsonPath = [System.IO.Path]::Combine($PSScriptRoot, '..\config\vs.json')
     }
     process {
         $jsonContent = Get-Content -Path $jsonPath -Raw
