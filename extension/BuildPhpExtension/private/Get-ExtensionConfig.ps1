@@ -105,23 +105,30 @@ Function Get-ExtensionConfig {
             }
         }
 
+
+        if($Libraries.Count -gt 0) {
+            $phpSeries = (Invoke-WebRequest -Uri "https://downloads.php.net/~windows/php-sdk/deps/series/packages-$PhpVersion-$VsVersion-$Arch-staging.txt").Content
+            $extensionSeries = Invoke-WebRequest -Uri "https://downloads.php.net/~windows/pecl/deps"
+            $extensionArchivesSeries = Invoke-WebRequest -Uri "https://downloads.php.net/~windows/pecl/deps/archives"
+        }
         $Libraries | ForEach-Object {
             if($null -ne $_ -and -not([string]::IsNullOrWhiteSpace($_))) {
-                # TODO: Implement version check
-                $phpSeries = (Invoke-WebRequest -Uri "https://downloads.php.net/~windows/php-sdk/deps/series/packages-$PhpVersion-$VsVersion-$Arch-staging.txt").Content
-                $extensionSeries = Invoke-WebRequest -Uri "https://downloads.php.net/~windows/pecl/deps"
                 if ($phpSeries.Contains($_) -and -not($config.php_libraries.Contains($_))) {
                     $config.php_libraries += $_
-                } elseif ($extensionSeries.Content.Contains($_) -and -not($config.extension_libraries.Contains($_))) {
-                    $key = $_
-                    $extensionSeries.Links | ForEach-Object {
-                        if($_.HREF -match $key) {
-                            $lib, $version = (($_.HREF -split('/') | Select-Object -Last 1) -split('-'))[0, 1]
-                            $config.extension_libraries += "$lib-$version"
+                } elseif (($extensionSeries.Content + $extensionArchivesSeries.Content).ToLower().Contains($_.ToLower()) -and -not($config.extension_libraries.Contains($_))) {
+                    $lib = Get-PeclLibraryZip -Library $_ -PhpVersion $PhpVersion -VsVersion $VsVersion -Arch $Arch -ExtensionSeries $extensionSeries
+                    if($null -ne $lib) {
+                        $config.extension_libraries += $lib
+                    } else {
+                        $lib = Get-PeclLibraryZip -Library $_ -PhpVersion $PhpVersion -VsVersion $VsVersion -Arch $Arch -ExtensionSeries $extensionArchivesSeries
+                        if($null -ne $lib) {
+                            $config.extension_libraries += $lib
+                        } else {
+                            throw "Library $_ not found for the PHP version $PhpVersion and Visual Studio version $VsVersion"
                         }
                     }
                 } else {
-                    throw "Library $_ not found"
+                    throw "Library $_ not found for the PHP version $PhpVersion and Visual Studio version $VsVersion"
                 }
             }
         }
