@@ -69,15 +69,18 @@ Function Get-ExtensionConfig {
             docs = @()
             build_directory = ""
         }
-        $composerJson = Get-Content composer.json -Raw | ConvertFrom-Json
-        if($null -eq $composerJson."php-ext") {
-            if(Test-Path $PSScriptRoot\..\config\stubs\$Extension.composer.json) {
+        $composerJson = $null
+        if(Test-Path composer.json) {
+            $composerJson = Get-Content composer.json -Raw | ConvertFrom-Json
+        }
+        if($null -eq $composerJson -or $null -eq $composerJson."php-ext") {
+            if (Test-Path $PSScriptRoot\..\config\stubs\$Extension.composer.json) {
                 Copy-Item $PSScriptRoot\..\config\stubs\$Extension.composer.json composer.json
             }
-        }
-
-        $composerJson."php-ext"."configure-options" | ForEach-Object {
-            $config.options += "--$($_.name)"
+        } else {
+            $composerJson."php-ext"."configure-options" | ForEach-Object {
+                $config.options += "--$( $_.name )"
+            }
         }
         $config.options = $config.options -join " "
 
@@ -90,21 +93,22 @@ Function Get-ExtensionConfig {
             $Libraries = ($env:LIBRARIES -replace ' ', '') -split ','
         }
 
-        $composerJson."require" | ForEach-Object {
-            $_.PSObject.Properties | ForEach-Object {
-                if($_.Name -match "ext-") {
-                    $extension = $_.Name
-                    if($_.Value -match "\d+\.\d+.*") {
-                        $extension += "-$($_.Value)"
+        if($null -ne $composerJson) {
+            $composerJson."require" | ForEach-Object {
+                $_.PSObject.Properties | ForEach-Object {
+                    if($_.Name -match "ext-") {
+                        $extension = $_.Name
+                        if($_.Value -match "\d+\.\d+.*") {
+                            $extension += "-$($_.Value)"
+                        }
+                        $config.extensions += $extension
+                    } elseif(-not($_.Name -match "php")) {
+                        # If using the stub composer.json
+                        $Libraries += $_.Name
                     }
-                    $config.extensions += $extension
-                } elseif(-not($_.Name -match "php")) {
-                    # If using the stub composer.json
-                    $Libraries += $_.Name
                 }
             }
         }
-
 
         if($Libraries.Count -gt 0) {
             $phpSeries = (Invoke-WebRequest -Uri "https://downloads.php.net/~windows/php-sdk/deps/series/packages-$PhpVersion-$VsVersion-$Arch-staging.txt").Content
