@@ -15,9 +15,10 @@ Function Add-ExtensionDependencies {
     process {
         $Config.extension_libraries | ForEach-Object {
             $url = "https://downloads.php.net/~windows/pecl/deps/$_"
-            Invoke-WebRequest -Uri $url -OutFile $outputZip -UseBasicParsing
-            Expand-Archive -Path $outputZip -DestinationPath "..\deps"
-            Rename-Item -Path "..\deps\LICENSE" -NewName "..\deps\LICENSE.$_"
+            Invoke-WebRequest -Uri $url -OutFile $_ -UseBasicParsing
+            Expand-Archive -Path $_ -DestinationPath "..\deps"
+            $libName = $_.split('-')[0]
+            Rename-Item -Path "..\deps\LICENSE" -NewName "LICENSE.$libName"
         }
     }
     end {
