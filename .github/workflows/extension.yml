@@ -8,6 +8,12 @@ on:
       extension-ref:
         description: 'Extension ref'
         required: true
+      args:
+        description: 'Configure arguments'
+        required: false
+      libs:
+        description: 'Libraries'
+        required: false
       run-tests:
         description: 'Run tests after building the extension'
         required: false
@@ -55,6 +61,8 @@ jobs:
           php-version: ${{ matrix.php-version }}
           arch: ${{ matrix.arch }}
           ts: ${{ matrix.ts }}
+          args: ${{ inputs.args }}
+          libs: ${{ inputs.libs }}
           run-tests: ${{ inputs.run-tests }}
           test-runner: ${{ inputs.test-runner }}
 
