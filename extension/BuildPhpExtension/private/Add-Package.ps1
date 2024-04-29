@@ -15,8 +15,10 @@ function Add-Package {
     process {
         $currentDirectory = (Get-Location).Path
         New-Item -Path $currentDirectory\artifacts -ItemType Directory -Force | Out-Null
-        Get-ChildItem -Path ..\deps -Recurse -Filter "LICENSE*" | ForEach-Object {
-            Copy-Item -Path $_.FullName -Destination artifacts -Force
+        if(Test-Path ..\deps) {
+            Get-ChildItem -Path ..\deps -Recurse -Filter "LICENSE*" | ForEach-Object {
+                Copy-Item -Path $_.FullName -Destination artifacts -Force
+            }
         }
         $docsFiles = @("LICENSE", "COPYRIGHT", "COPYING")
         $docsFiles | ForEach-Object {
@@ -39,6 +41,12 @@ function Add-Package {
             $pdbFilePath = Join-Path -Path $Config.build_directory -ChildPath ($_.BaseName + ".pdb")
             if (Test-Path -Path $pdbFilePath) {
                 Copy-Item -Path $pdbFilePath -Destination artifacts -Force
+            }
+        }
+        # TODO: Filter these using deplister
+        if(Test-Path ..\deps) {
+            Get-ChildItem -Path ..\deps\bin -Recurse -Filter "*.dll" | ForEach-Object {
+                Copy-Item -Path $_.FullName -Destination artifacts -Force
             }
         }
 
