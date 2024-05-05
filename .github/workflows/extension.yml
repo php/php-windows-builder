@@ -1,4 +1,5 @@
 name: Build PHP Extension
+run-name: Build PHP Extension ${{ inputs.extension-url }}, ${{ inputs.extension-ref }}
 on:
   workflow_dispatch:
     inputs:
