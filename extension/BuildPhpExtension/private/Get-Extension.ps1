@@ -52,7 +52,11 @@ function Get-Extension {
         if($null -eq $extensionLine) {
             throw "No extension found in config.w32"
         }
-        return ($extensionLine -replace '.*EXTENSION\(([^,]+),.*', '$1') -replace '["'']', ''
+        $name = ($extensionLine -replace '.*EXTENSION\(([^,]+),.*', '$1') -replace '["'']', ''
+        if(Test-Path -PATH $PSScriptRoot\..\patches\$name.ps1) {
+            . $PSScriptRoot\..\patches\$name.ps1
+        }
+        return $name
     }
     end {
     }
