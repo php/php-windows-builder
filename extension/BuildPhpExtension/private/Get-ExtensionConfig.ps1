@@ -115,7 +115,7 @@ Function Get-ExtensionConfig {
             $extensionSeries = Invoke-WebRequest -Uri "https://downloads.php.net/~windows/pecl/deps"
             $extensionArchivesSeries = Invoke-WebRequest -Uri "https://downloads.php.net/~windows/pecl/deps/archives"
         }
-        $Libraries | ForEach-Object {
+        $Libraries | Select-Object -Unique | ForEach-Object {
             if($null -ne $_ -and -not([string]::IsNullOrWhiteSpace($_))) {
                 if ($phpSeries.Contains($_) -and -not($config.php_libraries.Contains($_))) {
                     $config.php_libraries += $_
