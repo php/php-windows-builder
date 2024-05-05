@@ -44,7 +44,7 @@ function Add-Package {
             }
         }
         # TODO: Filter these using deplister
-        if(Test-Path ..\deps) {
+        if(Test-Path ..\deps\bin) {
             Get-ChildItem -Path ..\deps\bin -Recurse -Include "*.dll", "*.pdb" | ForEach-Object {
                 Copy-Item -Path $_.FullName -Destination artifacts -Force
             }
