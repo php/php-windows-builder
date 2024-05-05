@@ -45,8 +45,14 @@ function Add-Package {
         }
         # TODO: Filter these using deplister
         if(Test-Path ..\deps) {
-            Get-ChildItem -Path ..\deps\bin -Recurse -Filter "*.dll" | ForEach-Object {
+            Get-ChildItem -Path ..\deps\bin -Recurse -Include "*.dll", "*.pdb" | ForEach-Object {
                 Copy-Item -Path $_.FullName -Destination artifacts -Force
+            }
+            if(Test-Path (Join-Path -Path ..\deps\bin -ChildPath "*.xml")) {
+                New-Item -ItemType Directory -Path artifacts\config -Force | Out-Null
+                Get-ChildItem -Path ..\deps\bin -Recurse -Filter "*.xml" | ForEach-Object {
+                    Copy-Item -Path $_.FullName -Destination artifacts\config -Force
+                }
             }
         }
 
