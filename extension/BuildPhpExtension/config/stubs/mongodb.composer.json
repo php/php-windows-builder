@@ -1,6 +1,5 @@
 {
   "require": {
-    "libsasl": "*",
     "openssl": "*"
   },
   "php-ext": {
@@ -9,10 +8,10 @@
         "name": "enable-mongodb"
       },
       {
-        "name": "with-mongodb-sasl"
+        "name": "with-mongodb-sasl=yes"
       },
       {
-        "name": "with-mongodb-client-side-encryption"
+        "name": "with-mongodb-client-side-encryption=yes"
       }
     ]
   }
