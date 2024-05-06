@@ -18,7 +18,9 @@ Function Add-ExtensionDependencies {
             Invoke-WebRequest -Uri $url -OutFile $_ -UseBasicParsing
             Expand-Archive -Path $_ -DestinationPath "..\deps"
             $libName = $_.split('-')[0]
-            Rename-Item -Path "..\deps\LICENSE" -NewName "LICENSE.$libName"
+            if(Test-Path "..\deps\LICENSE") {
+                Rename-Item -Path "..\deps\LICENSE" -NewName "LICENSE.$libName"
+            }
         }
     }
     end {
