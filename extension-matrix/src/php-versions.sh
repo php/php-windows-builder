@@ -59,26 +59,16 @@ function compare_versions_using_composer() {
   states="$(curl -sL https://www.php.net/releases/states.php)"
   php_versions="$(echo "$states" | jq -r 'to_entries[] | .key as $major | .value | to_entries[] | .key' | sort -Vu | tr '\n' ',')"
   constraint=$(jq -r .require.php "$composer_json")
-
-  rm -rf "$directory"
-
-  php "$SCRIPT_DIR"/semver/semver.phar "$constraint" "$php_versions"
+  php "$SCRIPT_DIR"/semver/semver.phar composer.json "$constraint" "$php_versions"
 }
 
 function compare_versions_using_package_xml() {
   local directory=$1
   local package_xml=$2
-  min_version=$(grep '<min>' "$package_xml" | head -1 | sed -e 's/<[^>]*>//g' | cut -d'.' -f1,2 | xargs)
-  max_version=$(grep '<max>' "$package_xml" | head -1 | sed -e 's/<[^>]*>//g' | cut -d'.' -f1,2 | xargs)
-
+  SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
   states="$(curl -sL https://www.php.net/releases/states.php)"
-  IFS=' ' read -r -a php_versions <<< "$(echo "$states" | jq -r 'to_entries[] | .key as $major | .value | to_entries[] | .key' | sort -Vu | tr '\n' ' ')"
-
-  [[ -z "$max_version" ]] && max_version="${php_versions[-1]}"
-
-  rm -rf "$directory"
-
-  filter_versions "$min_version" "$max_version" "${php_versions[@]}"
+  php_versions="$(echo "$states" | jq -r 'to_entries[] | .key as $major | .value | to_entries[] | .key' | sort -Vu | tr '\n' ',')"
+  php "$SCRIPT_DIR"/semver/semver.phar package.xml "$package_xml" "$php_versions"
 }
 
 function get_php_versions() {
@@ -90,8 +80,10 @@ function get_php_versions() {
   package_xml=$(find "$directory" -name package.xml)
   if [ -n "$composer_json" ]; then
     compare_versions_using_composer "$directory" "$composer_json"
+    rm -rf "$directory"
   elif [ -n "$package_xml" ]; then
     compare_versions_using_package_xml "$directory" "$package_xml"
+    rm -rf "$directory"
   else
     echo "No composer.json with type php-ext or package.xml found"
     exit 1
