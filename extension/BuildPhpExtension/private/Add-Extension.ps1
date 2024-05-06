@@ -24,12 +24,18 @@ Function Add-Extension {
         # TODO: Replace fetching the extension using the new extension tool
         Invoke-WebRequest -Uri "https://pecl.php.net/get/$Extension" -OutFile "$Extension.tgz"
         $currentDirectory = (Get-Location).Path
-        Expand-Archive "$Extension.tgz" -DestinationPath $currentDirectory
+        & tar -xzf "$Extension.tgz" -C $currentDirectory
         Set-Location "$Extension-*"
-        & phpize
-        .\configure.bat --with-php-build=..\..\deps $Config.options --with-prefix=$Prefix
-        & nmake
-        & nmake install
+        $bat_content = @()
+        $bat_content += ""
+        $bat_content += "call phpize 2>&1"
+        $bat_content += "call configure --with-php-build=`"..\deps`" $($Config.options) --with-prefix=$Prefix 2>&1"
+        $bat_content += "nmake /nologo 2>&1"
+        $bat_content += "exit %errorlevel%"
+        Set-Content -Encoding "ASCII" -Path $Extension-task.bat -Value $bat_content
+        $builder = "$currentDirectory\php-sdk\phpsdk-$($Config.vs_version)-$($Config.Arch).bat"
+        $task = (Get-Item -Path "." -Verbose).FullName + "\$Extension-task.bat"
+        & $builder -t $task
         Set-Location $currentDirectory
     }
     end {
