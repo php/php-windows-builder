@@ -63,6 +63,9 @@ function Add-Package {
 
         # As per https://github.com/ThePHPF/pie-design#windows-binaries
         $arch = $Config.arch
+        if(-not(Test-Path -Path "php_$($Config.name).dll")) {
+            throw "Failed to build extension"
+        }
         if($env:ARTIFACT_NAMING_SCHEME -eq 'pie') {
             if($arch -eq 'x64') {
                 $arch = 'x86_64'
