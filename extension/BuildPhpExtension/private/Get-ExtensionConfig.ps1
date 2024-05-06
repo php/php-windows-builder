@@ -97,7 +97,7 @@ Function Get-ExtensionConfig {
             $composerJson."require" | ForEach-Object {
                 $_.PSObject.Properties | ForEach-Object {
                     if($_.Name -match "ext-") {
-                        $extension = $_.Name
+                        $extension = $_.Name.replace("ext-", "")
                         if($_.Value -match "\d+\.\d+.*") {
                             $extension += "-$($_.Value)"
                         }
