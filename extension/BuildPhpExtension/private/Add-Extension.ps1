@@ -2,6 +2,8 @@ Function Add-Extension {
     <#
     .SYNOPSIS
         Build a PHP extension.
+    .PAMAETER Extension
+        Extension name.
     .PARAMETER Config
         Configuration for the extension.
     .PARAMETER Prefix
@@ -9,19 +11,21 @@ Function Add-Extension {
     #>
     [OutputType()]
     param(
-        [Parameter(Mandatory = $true, Position=0, HelpMessage='Configuration for the extension')]
+        [Parameter(Mandatory = $true, Position=0, HelpMessage='Extension name')]
+        [PSCustomObject] $Extension,
+        [Parameter(Mandatory = $true, Position=1, HelpMessage='Configuration for the extension')]
         [PSCustomObject] $Config,
-        [Parameter(Mandatory = $true, Position=1, HelpMessage='Extension build prefix')]
+        [Parameter(Mandatory = $true, Position=2, HelpMessage='Extension build prefix')]
         [string] $Prefix
     )
     begin {
     }
     process {
         # TODO: Replace fetching the extension using the new extension tool
-        Invoke-WebRequest -Uri "https://pecl.php.net/get/$($Config.name)" -OutFile "$($Config.name).tgz"
+        Invoke-WebRequest -Uri "https://pecl.php.net/get/$Extension" -OutFile "$Extension.tgz"
         $currentDirectory = (Get-Location).Path
-        Expand-Archive "$($Config.name).tgz" -DestinationPath $currentDirectory
-        Set-Location "$($Config.name)-*"
+        Expand-Archive "$Extension.tgz" -DestinationPath $currentDirectory
+        Set-Location "$Extension-*"
         & phpize
         .\configure.bat --with-php-build=..\..\deps $Config.options --with-prefix=$Prefix
         & nmake
