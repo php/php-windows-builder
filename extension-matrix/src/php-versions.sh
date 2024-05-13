@@ -71,13 +71,21 @@ function compare_versions_using_package_xml() {
   php "$SCRIPT_DIR"/semver/semver.phar package.xml "$package_xml" "$php_versions"
 }
 
+function get_package_json() {
+  local directory=$1
+  package_xmls=$(find "$directory" -name 'package*.xml')
+  for file in $package_xmls; do
+    grep -q '<php>' "$file" && echo "$file" && break
+  done
+}
+
 function get_php_versions() {
   directory=$(mktemp -d)
 
   get_extension "$directory" > /dev/null 2>&1
 
   composer_json="$(find "$directory" -name composer.json -exec sh -c 'jq -e ".type == \"php-ext\"" "$1" >/dev/null && echo "$1"' sh {} \; | head -n 1)"
-  package_xml=$(find "$directory" -name package.xml)
+  package_xml=$(get_package_json "$directory")
   if [ -n "$composer_json" ]; then
     compare_versions_using_composer "$directory" "$composer_json"
     rm -rf "$directory"
