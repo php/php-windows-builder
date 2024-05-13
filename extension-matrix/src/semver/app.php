@@ -16,7 +16,8 @@ if($file === 'composer.json') {
 } else if($file === 'package.xml') {
     $package_xml = $argv[2];
     $xml = simplexml_load_file($package_xml);
-    $xml->registerXPathNamespace("p", "http://pear.php.net/dtd/package-2.0");
+    $namespace = $xml->getNamespaces()[""] ?? "http://pear.php.net/dtd/package-2.0";
+    $xml->registerXPathNamespace("p", $namespace);
     $min = $xml->xpath("//p:php/p:min")[0] ?? null;
     $max = $xml->xpath("//p:php/p:max")[0] ?? null;
     $constraint = '';
