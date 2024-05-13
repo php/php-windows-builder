@@ -36,6 +36,9 @@ Function Add-Extension {
         $builder = "$currentDirectory\php-sdk\phpsdk-$($Config.vs_version)-$($Config.Arch).bat"
         $task = (Get-Item -Path "." -Verbose).FullName + "\$Extension-task.bat"
         & $builder -t $task
+        $includePath = "$currentDirectory\php-dev\include"
+        New-Item -Path $includePath\ext -Name $Extension -ItemType "directory" | Out-Null
+        Copy-Item "*.h" -Destination "$includePath\ext\$Extension" -Recurse
         Set-Location $currentDirectory
     }
     end {
