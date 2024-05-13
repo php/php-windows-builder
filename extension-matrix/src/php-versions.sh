@@ -56,8 +56,8 @@ function compare_versions_using_composer() {
   local directory=$1
   local composer_json=$2
   SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-  states="$(curl -sL https://www.php.net/releases/states.php)"
-  php_versions="$(echo "$states" | jq -r 'to_entries[] | .key as $major | .value | to_entries[] | .key' | sort -Vu | tr '\n' ',')"
+  vs_json="$SCRIPT_DIR"/../config/vs.json
+  php_versions=$(jq -r 'keys | join(",")' "$vs_json")
   constraint=$(jq -r .require.php "$composer_json")
   php "$SCRIPT_DIR"/semver/semver.phar composer.json "$constraint" "$php_versions"
 }
@@ -66,8 +66,8 @@ function compare_versions_using_package_xml() {
   local directory=$1
   local package_xml=$2
   SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-  states="$(curl -sL https://www.php.net/releases/states.php)"
-  php_versions="$(echo "$states" | jq -r 'to_entries[] | .key as $major | .value | to_entries[] | .key' | sort -Vu | tr '\n' ',')"
+  vs_json="$SCRIPT_DIR"/../config/vs.json
+  php_versions=$(jq -r 'keys | join(",")' "$vs_json")
   php "$SCRIPT_DIR"/semver/semver.phar package.xml "$package_xml" "$php_versions"
 }
 
