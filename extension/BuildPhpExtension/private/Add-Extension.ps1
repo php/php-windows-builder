@@ -38,7 +38,7 @@ Function Add-Extension {
         & $builder -t $task
         $includePath = "$currentDirectory\php-dev\include"
         New-Item -Path $includePath\ext -Name $Extension -ItemType "directory" | Out-Null
-        Copy-Item "*.h" -Destination "$includePath\ext\$Extension" -Recurse
+        Get-ChildItem -Path (Get-Location).Path -Recurse -Include '*.h', '*.c' | Copy-Item -Destination "$includePath\ext\$Extension"
         Set-Location $currentDirectory
     }
     end {
