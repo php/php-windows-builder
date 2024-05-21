@@ -45,11 +45,7 @@ function Invoke-PhpBuildExtension {
 
         $currentDirectory = (Get-Location).Path
 
-        $tempDirectory = [System.IO.Path]::GetTempPath()
-
-        $buildDirectory = [System.IO.Path]::Combine($tempDirectory, [System.Guid]::NewGuid().ToString())
-
-        New-Item "$buildDirectory" -ItemType "directory" -Force > $null 2>&1
+        $buildDirectory = Get-BuildDirectory
 
         Set-Location "$buildDirectory"
 

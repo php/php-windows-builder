@@ -75,6 +75,7 @@ Build a PHP extension for a specific version.
 - `ts` (required) - The thread safety to build the extension for.
 - `args` (optional) - Additional arguments to pass to the `configure` script.
 - `libs` (optional) - Libraries required for the extension.
+- `build-directory` (optional) - The directory to build the extension in, defaults to the user's temporary directory.
 - `run-tests` (optional) - Run the extension tests. Defaults to `true`.
 - `test-runner` (optional) - The test runner to use. Defaults to `run-tests.php`.
 
