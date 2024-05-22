@@ -32,6 +32,9 @@ function Get-Extension {
                 Copy-Item -Path "$extension-$ExtensionRef\*" -Destination $currentDirectory -Recurse -Force
                 Remove-Item -Path "$extension-$ExtensionRef" -Recurse -Force
             } else {
+                if($null -ne $env:AUTH_TOKEN) {
+                    $ExtensionUrl = $ExtensionUrl -replace '^https://', "https://${Env:AUTH_TOKEN}@"
+                }
                 git init > $null 2>&1
                 git remote add origin $ExtensionUrl > $null 2>&1
                 git fetch --depth=1 origin $ExtensionRef > $null 2>&1

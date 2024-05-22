@@ -13,6 +13,9 @@ inputs:
   extension-ref:
     description: Git reference in the extension repo
     required: false
+  auth-token:
+    description: Auth token
+    required: false
   php-version-list:
     description: PHP versions to build
     required: false
@@ -55,3 +58,4 @@ runs:
         ARCH_LIST: ${{inputs.arch-list}}
         TS_LIST: ${{inputs.ts-list}}
         ALLOW_OLD_PHP_VERSIONS: ${{inputs.allow-old-php-versions}}
+        AUTH_TOKEN: ${{inputs.auth-token}}

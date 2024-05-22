@@ -13,6 +13,9 @@ inputs:
   extension-ref:
     description: Git reference in the extension repo
     required: false
+  auth-token:
+    description: Auth token to fetch the extension source code
+    required: false
   php-version:
     description: PHP version to build
     required: true
@@ -61,6 +64,7 @@ runs:
         RUN_TESTS: ${{inputs.run-tests}}
         TEST_RUNNER: ${{inputs.test-runner}}
         BUILD_DIRECTORY: ${{inputs.build-directory}}
+        AUTH_TOKEN: ${{inputs.auth-token}}
       run: |
         Import-Module ${{ github.action_path }}\BuildPhpExtension -Force
         Invoke-PhpBuildExtension -ExtensionUrl "${{inputs.extension-url}}" `

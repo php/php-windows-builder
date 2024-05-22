@@ -44,6 +44,7 @@ function get_extension() {
       tar -xzf "$directory/$extension-$EXTENSION_REF.tgz" -C "$directory"
       cp -a "$directory/$extension-$EXTENSION_REF"/* "$directory"
     else
+      [ -n "$AUTH_TOKEN" ] && EXTENSION_URL="https://${AUTH_TOKEN}@${EXTENSION_URL/https:\/\/}"
       git -C "$directory" init
       git -C "$directory" remote add origin "$EXTENSION_URL"
       git -C "$directory" fetch --depth=1 origin "$EXTENSION_REF"

@@ -78,6 +78,7 @@ Build a PHP extension for a specific version.
 - `build-directory` (optional) - The directory to build the extension in, defaults to the user's temporary directory.
 - `run-tests` (optional) - Run the extension tests. Defaults to `true`.
 - `test-runner` (optional) - The test runner to use. Defaults to `run-tests.php`.
+- `auth-token` (optional) - Authentication token to use in case the extension is hosted on a private repository.
 
 Instead of having to configure all the inputs for the extension action, you can use the `extension-matrix` action to get the matrix of jobs with different input configurations.
 
@@ -109,6 +110,7 @@ jobs:
 - `arch-list` (optional) - The architectures to build the extension for. Defaults to `x64, x86`.
 - `ts-list` (optional) - The thread safety to build the extension for. Defaults to `nts, ts`.
 - `allow-old-php-versions` (optional) - Allow building the extension for older PHP versions. Defaults to `false`.
+- `auth-token` (optional) - Authentication token to use in case the extension is hosted on a private repository.
 
 ### Outputs
 
