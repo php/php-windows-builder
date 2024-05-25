@@ -32,6 +32,10 @@ function Get-PhpDevelBuild {
         $binUrl = "$baseUrl/$binZipFile"
         $fallBackUrl = "$fallbackBaseUrl/$binZipFile"
 
+        if($Config.php_version -lt '7.4') {
+            $fallBackUrl = $fallBackUrl.replace("vc", "VC")
+        }
+
         try {
             Invoke-WebRequest $binUrl -OutFile $binZipFile
         } catch {
