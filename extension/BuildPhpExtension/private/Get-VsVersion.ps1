@@ -25,21 +25,25 @@ function Get-VsVersion {
             throw "vswhere is not available"
         }
         $MSVCDirectory = vswhere -latest -find "VC\Tools\MSVC"
-        $toolset = $null
+        $selectedToolset = $null
+        $minor = $null
         foreach ($toolset in (Get-ChildItem $MSVCDirectory)) {
             $toolsetMajorVersion, $toolsetMinorVersion = $toolset.Name.split(".")[0,1]
             $requiredVs = $VsConfig.vs.$VsVersion
             if ($requiredVs.major -eq $toolsetMajorVersion -and ($null -eq $requiredVs.minor -or $toolsetMinorVersion -le $requiredVs.minor)) {
-                $toolset = $toolset.Name
-                break
+                if($null -eq $minor -or $toolsetMinorVersion -gt $minor)
+                {
+                    $selectedToolset = $toolset.Name.Trim()
+                    $minor = $toolsetMinorVersion
+                }
             }
         }
-        if (-not $toolset) {
+        if (-not $selectedToolset) {
             throw "toolset not available"
         }
         return [PSCustomObject]@{
             vs = $VsVersion
-            toolset = $toolset
+            toolset = $selectedToolset
         }
     }
     end {

@@ -58,7 +58,8 @@ function Invoke-PhpBuildExtension {
                                         -PhpVersion $PhpVersion `
                                         -Arch $Arch `
                                         -Ts $Ts `
-                                        -VsVersion $VsData.vs
+                                        -VsVersion $VsData.vs `
+                                        -VsToolset $VsData.toolset
 
         Invoke-Build -Config $config
 

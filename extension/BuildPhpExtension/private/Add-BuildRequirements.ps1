@@ -14,6 +14,8 @@ function Add-BuildRequirements {
         Extension Thread Safety
     .PARAMETER VsVersion
         Visual Studio version
+    .PARAMETER VsToolset
+        Visual Studio toolset
     #>
     [OutputType()]
     param (
@@ -40,7 +42,11 @@ function Add-BuildRequirements {
         [Parameter(Mandatory = $true, Position=5, HelpMessage='Visual Studio version')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
-        [string] $VsVersion
+        [string] $VsVersion,
+        [Parameter(Mandatory = $true, Position=6, HelpMessage='Visual Studio toolset')]
+        [ValidateNotNull()]
+        [ValidateLength(1, [int]::MaxValue)]
+        [string] $VsToolset
     )
     begin {
     }
@@ -51,7 +57,8 @@ function Add-BuildRequirements {
                                       -PhpVersion $PhpVersion `
                                       -Arch $Arch `
                                       -Ts $Ts `
-                                      -VsVersion $VsVersion
+                                      -VsVersion $VsVersion `
+                                      -VsToolset $VsToolset
         $prefix = Get-PhpBuild -Config $config
         Get-PhpDevelBuild -Config $config
         Add-Dependencies -Config $config -Prefix $prefix

@@ -14,6 +14,8 @@ Function Get-ExtensionConfig {
         Extension Thread Safety
     .PARAMETER VsVersion
         Visual Studio version
+    .PARAMETER VsToolset
+        Visual Studio toolset
     #>
     [OutputType()]
     param(
@@ -40,7 +42,11 @@ Function Get-ExtensionConfig {
         [Parameter(Mandatory = $true, Position=5, HelpMessage='Visual Studio version')]
         [ValidateNotNull()]
         [ValidateLength(1, [int]::MaxValue)]
-        [string] $VsVersion
+        [string] $VsVersion,
+        [Parameter(Mandatory = $true, Position=6, HelpMessage='Visual Studio toolset')]
+        [ValidateNotNull()]
+        [ValidateLength(1, [int]::MaxValue)]
+        [string] $VsToolset
     )
     begin {
     }
@@ -62,6 +68,7 @@ Function Get-ExtensionConfig {
             arch = $Arch
             ts = $Ts
             vs_version = $VsVersion
+            vs_toolset = $VsToolset
             options = @()
             php_libraries = @()
             extension_libraries = @()

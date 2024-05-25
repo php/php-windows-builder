@@ -31,7 +31,7 @@ Function Invoke-Build {
             $Config.vs_version,
             $Config.arch
         ) -join "-")
-        & $builder -t $task | Tee-Object -FilePath "build-$suffix.txt"
+        & $builder -s $Config.vs_toolset -t $task | Tee-Object -FilePath "build-$suffix.txt"
     }
     end {
     }
