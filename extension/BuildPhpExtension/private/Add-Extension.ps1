@@ -26,6 +26,14 @@ Function Add-Extension {
         $currentDirectory = (Get-Location).Path
         & tar -xzf "$Extension.tgz" -C $currentDirectory
         Set-Location "$Extension-*"
+        # Apply patches only for php/php-windows-builder and shivammathur/php-windows-builder
+        if($null -ne $env:GITHUB_REPOSITORY) {
+            if($env:GITHUB_REPOSITORY -eq 'php/php-windows-builder' -or $env:GITHUB_REPOSITORY -eq 'shivammathur/php-windows-builder') {
+                if(Test-Path -PATH $PSScriptRoot\..\patches\$Extension.ps1) {
+                    . $PSScriptRoot\..\patches\$Extension.ps1
+                }
+            }
+        }
         $bat_content = @()
         $bat_content += ""
         $bat_content += "call phpize 2>&1"
