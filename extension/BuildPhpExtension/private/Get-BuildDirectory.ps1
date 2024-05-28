@@ -9,7 +9,7 @@ Function Get-BuildDirectory {
     begin {
     }
     process {
-        if ($null -ne $env:BUILD_DIRECTORY) {
+        if ($null -ne $env:BUILD_DIRECTORY -and $env:BUILD_DIRECTORY -ne "") {
             $parentBuildDirectory = $env:BUILD_DIRECTORY
         } else {
             $parentBuildDirectory = [System.IO.Path]::GetTempPath()
