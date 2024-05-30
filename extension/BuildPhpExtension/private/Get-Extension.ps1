@@ -51,11 +51,15 @@ function Get-Extension {
             Copy-Item -Path "${subDirectory}\*" -Destination $currentDirectory -Recurse -Force
             Remove-Item -Path $subDirectory -Recurse -Force
         }
-        $extensionLine = Get-Content -Path "config.w32" | Select-String -Pattern '\s+(ZEND_)?EXTENSION\(' | Select-Object -First 1
+        $configW32Content = [string](Get-Content -Path "config.w32")
+        $extensionLine = $configW32Content | Select-String -Pattern '\s+(ZEND_)?EXTENSION\(' | Select-Object -First 1
         if($null -eq $extensionLine) {
             throw "No extension found in config.w32"
         }
         $name = ($extensionLine -replace '.*EXTENSION\(([^,]+),.*', '$1') -replace '["'']', ''
+        if ($configW32Content -match ($([regex]::Escape($name)) + '\s*=\s*["''](.+?)["'']')) {
+            $name = $matches[1]
+        }
 
         # Apply patches only for php/php-windows-builder and shivammathur/php-windows-builder
         if($null -ne $env:GITHUB_REPOSITORY) {
