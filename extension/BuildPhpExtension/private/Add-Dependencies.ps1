@@ -19,6 +19,7 @@ Function Add-Dependencies {
     process {
         Add-PhpDependencies -Config $Config
         Add-ExtensionDependencies -Config $Config
+        Add-BuildTools -Config $Config
         Add-Extensions -Config $Config -Prefix $Prefix
     }
     end {

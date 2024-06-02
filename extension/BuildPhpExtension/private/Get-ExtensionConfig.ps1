@@ -72,6 +72,7 @@ Function Get-ExtensionConfig {
             options = @()
             php_libraries = @()
             extension_libraries = @()
+            build_tools = @()
             extensions = @()
             docs = @()
             build_directory = ""
@@ -159,6 +160,13 @@ Function Get-ExtensionConfig {
                     $path = $path.TrimStart("/")
                 }
                 $path -replace "/", "\"
+            }
+        }
+
+        $configW32Content = [string](Get-Content -Path "config.w32")
+        if($configW32Content.contains('PATH_PROG')) {
+            [regex]::Matches($configW32Content, 'PATH_PROG\(([''"])([^''"]+)\1') | ForEach-Object {
+                $config.build_tools += $_.Groups[2].Value
             }
         }
 
