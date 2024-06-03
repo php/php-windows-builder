@@ -18,8 +18,8 @@ Function Add-Path {
         $currentUserPath = [System.Environment]::GetEnvironmentVariable("PATH", [System.EnvironmentVariableTarget]::User)
         $machinePath = [System.Environment]::GetEnvironmentVariable("PATH", [System.EnvironmentVariableTarget]::Machine)
         $currentPath = $currentUserPath + ";" + $machinePath
-        if (-not($currentPath.Split(';').Contains($PathItem))) {
-            $newUserPath = $currentUserPath + ";" + $PathItem
+        if (-not($currentPath.Split(';').Contains(($PathItem + ";")))) {
+            $newUserPath = $PathItem + ";" + $currentUserPath
             [System.Environment]::SetEnvironmentVariable("PATH", $newUserPath, [System.EnvironmentVariableTarget]::User)
             $machinePath = [System.Environment]::GetEnvironmentVariable("PATH", [System.EnvironmentVariableTarget]::Machine)
             $env:PATH = $newUserPath + ";" + $machinePath

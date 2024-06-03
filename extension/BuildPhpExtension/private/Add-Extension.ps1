@@ -26,6 +26,7 @@ Function Add-Extension {
         $currentDirectory = (Get-Location).Path
         & tar -xzf "$Extension.tgz" -C $currentDirectory
         Set-Location "$Extension-*"
+        $extensionBuildDirectory = Join-Path -Path (Get-Location).Path -ChildPath $config.build_directory
         # Apply patches only for php/php-windows-builder and shivammathur/php-windows-builder
         if($null -ne $env:GITHUB_REPOSITORY) {
             if($env:GITHUB_REPOSITORY -eq 'php/php-windows-builder' -or $env:GITHUB_REPOSITORY -eq 'shivammathur/php-windows-builder') {
@@ -55,6 +56,9 @@ Function Add-Extension {
         $includePath = "$currentDirectory\php-dev\include"
         New-Item -Path $includePath\ext -Name $Extension -ItemType "directory" | Out-Null
         Get-ChildItem -Path (Get-Location).Path -Recurse -Include '*.h', '*.c' | Copy-Item -Destination "$includePath\ext\$Extension"
+        Copy-Item -Path "$extensionBuildDirectory\*.dll" -Destination "$currentDirectory\php-bin\ext" -Force
+        Copy-Item -Path "$extensionBuildDirectory\*.lib" -Destination "$currentDirectory\php-dev\lib" -Force
+        Add-Content -Path "$currentDirectory\php-bin\php.ini" -Value "extension=$Extension"
         Set-Location $currentDirectory
     }
     end {

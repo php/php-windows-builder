@@ -53,6 +53,7 @@ function Get-PhpBuild {
 
         [System.IO.Compression.ZipFile]::ExtractToDirectory($binZipFilePath, $binDirectoryPath)
         Add-Path -PathItem $binDirectoryPath
+        Add-Content -Path $binDirectoryPath\php.ini -Value "extension_dir=$binDirectoryPath\ext"
         return $binDirectoryPath
     }
     end {
