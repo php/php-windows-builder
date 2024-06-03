@@ -49,9 +49,13 @@ function Get-PeclLibraryZip {
                     if($null -eq $lib_version -or $matches[1] -match ('^' + $lib_version + '.*'))
                     {
                         if($link_matches[1].Contains('.')) { $suffix="" } else { $suffix=".0" }
+                        $versionParts = $link_matches[1] -split '-'
+                        if($null -ne $versionParts[1] -and $versionParts[1].Contains('.')) {
+                            $versionParts[0] = $versionParts[0] + $versionParts[1].Replace('.', '')
+                        }
                         $options += @{
                             name = ($_.HREF -split ('/') | Select-Object -Last 1)
-                            version = (($link_matches[1] -replace '-', '.') + $suffix)
+                            version = ($versionParts[0] + $suffix)
                         }
                     }
                 }
