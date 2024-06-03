@@ -27,7 +27,14 @@ function Get-Extension {
         if($null -ne $ExtensionUrl -and $null -ne $ExtensionRef) {
             if ($ExtensionUrl -like "*pecl.php.net*") {
                 $extension = Split-Path -Path $ExtensionUrl -Leaf
-                Invoke-WebRequest -Uri "https://pecl.php.net/get/$extension-$ExtensionRef.tgz" -OutFile "$extension-$ExtensionRef.tgz" -UseBasicParsing
+                try {
+                    Invoke-WebRequest -Uri "https://pecl.php.net/get/$extension-$ExtensionRef.tgz" -OutFile "$extension-$ExtensionRef.tgz" -UseBasicParsing
+                } catch {}
+                if(-not(Test-Path "$extension-$ExtensionRef.tgz")) {
+                    try {
+                        Invoke-WebRequest -Uri "https://pecl.php.net/get/$($extension.ToUpper())-$ExtensionRef.tgz" -OutFile "$extension-$ExtensionRef.tgz" -UseBasicParsing
+                    } catch {}
+                }
                 & tar -xzf "$extension-$ExtensionRef.tgz" -C $currentDirectory
                 Copy-Item -Path "$extension-$ExtensionRef\*" -Destination $currentDirectory -Recurse -Force
                 Remove-Item -Path "$extension-$ExtensionRef" -Recurse -Force

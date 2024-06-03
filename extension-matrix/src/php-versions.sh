@@ -41,6 +41,14 @@ function get_extension() {
     if [[ "$EXTENSION_URL" = *"pecl.php.net"* ]] && [ -n "$EXTENSION_REF" ]; then
       extension="$(basename "$EXTENSION_URL")"
       curl -o "$directory/$extension-$EXTENSION_REF.tgz" -sL "https://pecl.php.net/get/$extension-$EXTENSION_REF.tgz"
+      if ! [ -e "$directory/$extension-$EXTENSION_REF.tgz" ] || file "$directory/$extension-$EXTENSION_REF.tgz" | grep -q HTML; then
+        extension_upper="$(echo "$extension" | tr '[:lower:]' '[:upper:]')"
+        curl -o "$directory/$extension-$EXTENSION_REF.tgz" -sL "https://pecl.php.net/get/$extension_upper-$EXTENSION_REF.tgz"
+      fi
+      if ! [ -e "$directory/$extension-$EXTENSION_REF.tgz" ] || file "$directory/$extension-$EXTENSION_REF.tgz" | grep -q HTML; then
+        echo "Extension $extension not found on PECL"
+        exit 1
+      fi
       tar -xzf "$directory/$extension-$EXTENSION_REF.tgz" -C "$directory"
       cp -a "$directory/$extension-$EXTENSION_REF"/* "$directory"
     else
