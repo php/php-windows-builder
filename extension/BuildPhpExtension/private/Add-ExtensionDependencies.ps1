@@ -14,12 +14,20 @@ Function Add-ExtensionDependencies {
     }
     process {
         $Config.extension_libraries | ForEach-Object {
-            $url = "https://downloads.php.net/~windows/pecl/deps/$_"
-            Invoke-WebRequest -Uri $url -OutFile $_ -UseBasicParsing
-            Expand-Archive -Path $_ -DestinationPath "..\deps"
-            $libName = $_.split('-')[0]
-            if(Test-Path "..\deps\LICENSE") {
-                Rename-Item -Path "..\deps\LICENSE" -NewName "LICENSE.$libName"
+            switch ($_)
+            {
+                instantclient {
+                    Add-OciSdk -Config $Config
+                }
+                Default {
+                    $url = "https://downloads.php.net/~windows/pecl/deps/$_"
+                    Invoke-WebRequest -Uri $url -OutFile $_ -UseBasicParsing
+                    Expand-Archive -Path $_ -DestinationPath "..\deps"
+                    $libName = $_.split('-')[0]
+                    if(Test-Path "..\deps\LICENSE") {
+                        Rename-Item -Path "..\deps\LICENSE" -NewName "LICENSE.$libName"
+                    }
+                }
             }
         }
     }

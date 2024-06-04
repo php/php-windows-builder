@@ -70,7 +70,7 @@ function Add-Package {
             if($arch -eq 'x64') {
                 $arch = 'x86_64'
             }
-            $artifact = "php_$($Config.name)-$($Config.ref)-$($Config.php_version)-$($Config.ts)-$($Config.vs_version)-$arch"
+            $artifact = "php_$($Config.package_name)-$($Config.ref)-$($Config.php_version)-$($Config.ts)-$($Config.vs_version)-$arch"
             @("php_$($Config.name).dll", "php_$($Config.name).pdb") | ForEach-Object {
                 $extension = $_.Split('.')[1]
                 if(Test-Path -Path $_) {
@@ -78,7 +78,7 @@ function Add-Package {
                 }
             }
         } else {
-            $artifact = "php_$($Config.name)-$($Config.ref)-$($Config.php_version)-$($Config.ts)-$($Config.vs_version)-$arch"
+            $artifact = "php_$($Config.package_name)-$($Config.ref)-$($Config.php_version)-$($Config.ts)-$($Config.vs_version)-$arch"
         }
 
         7z a -sdel "$artifact.zip" *

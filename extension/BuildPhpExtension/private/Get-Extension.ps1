@@ -58,13 +58,15 @@ function Get-Extension {
             Copy-Item -Path "${subDirectory}\*" -Destination $currentDirectory -Recurse -Force
             Remove-Item -Path $subDirectory -Recurse -Force
         }
-        $configW32Content = [string](Get-Content -Path "config.w32")
-        $extensionLine = $configW32Content | Select-String -Pattern '\s+(ZEND_)?EXTENSION\(' | Select-Object -First 1
+        $configW32Content = Get-Content -Path "config.w32"
+        $extensionLine =  $configW32Content | Select-String -Pattern '\s+(ZEND_)?EXTENSION\(' | Select-Object -Last 1
         if($null -eq $extensionLine) {
             throw "No extension found in config.w32"
         }
         $name = ($extensionLine -replace '.*EXTENSION\(([^,]+),.*', '$1') -replace '["'']', ''
-        if ($configW32Content -match ($([regex]::Escape($name)) + '\s*=\s*["''](.+?)["'']')) {
+        if($name.Contains('oci8')) {
+            $name = 'oci8_19'
+        } elseif ([string]$configW32Content -match ($([regex]::Escape($name)) + '\s*=\s*["''](.+?)["'']')) {
             $name = $matches[1]
         }
 
