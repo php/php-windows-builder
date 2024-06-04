@@ -15,15 +15,17 @@ function Add-Package {
     process {
         $currentDirectory = (Get-Location).Path
         New-Item -Path $currentDirectory\artifacts -ItemType Directory -Force | Out-Null
-        if(Test-Path ..\deps) {
-            Get-ChildItem -Path ..\deps -Recurse -Filter "LICENSE*" | ForEach-Object {
-                Copy-Item -Path $_.FullName -Destination artifacts -Force
-            }
-        }
         $docsFiles = @("LICENSE", "COPYRIGHT", "COPYING")
         $docsFiles | ForEach-Object {
             if(Test-Path -Path $_) {
                 Copy-Item -Path $_ -Destination artifacts -Force
+            }
+        }
+        if(Test-Path ..\deps) {
+            Get-ChildItem -Path ..\deps -Recurse -Filter "LICENSE*" | ForEach-Object {
+                if(Test-Path -Path $_ -PathType Leaf) {
+                    Copy-Item -Path $_.FullName -Destination artifacts -Force
+                }
             }
         }
         $Config.docs | ForEach-Object {

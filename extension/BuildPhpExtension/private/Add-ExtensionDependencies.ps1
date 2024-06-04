@@ -19,6 +19,9 @@ Function Add-ExtensionDependencies {
                 instantclient {
                     Add-OciSdk -Config $Config
                 }
+                odbc_cli {
+                    Add-OdbcCli -Config $Config
+                }
                 Default {
                     $url = "https://downloads.php.net/~windows/pecl/deps/$_"
                     Invoke-WebRequest -Uri $url -OutFile $_ -UseBasicParsing

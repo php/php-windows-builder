@@ -127,8 +127,11 @@ Function Get-ExtensionConfig {
             $extensionSeries = Invoke-WebRequest -Uri "https://downloads.php.net/~windows/pecl/deps"
             $extensionArchivesSeries = Invoke-WebRequest -Uri "https://downloads.php.net/~windows/pecl/deps/archives"
         }
+        $thirdPartyLibraries = @("instantclient", "odbc_cli")
         $Libraries | Select-Object -Unique | ForEach-Object {
-            if($null -ne $_ -and -not([string]::IsNullOrWhiteSpace($_))) {
+            if($thirdPartyLibraries.Contains($_)) {
+                $config.extension_libraries += $_
+            } elseif($null -ne $_ -and -not([string]::IsNullOrWhiteSpace($_))) {
                 if ($phpSeries.Content.ToLower().Contains($_) -and -not($config.php_libraries.Contains($_))) {
                     $config.php_libraries += $_
                 } elseif (($extensionSeries.Content + $extensionArchivesSeries.Content).ToLower().Contains($_.ToLower()) -and -not($config.extension_libraries.Contains($_))) {
