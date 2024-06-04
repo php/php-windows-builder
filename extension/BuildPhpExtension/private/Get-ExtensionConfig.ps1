@@ -61,9 +61,13 @@ Function Get-ExtensionConfig {
         if ($ref -match 'refs/pull/(\d+)/merge') {
             $ref = $Matches[1]
         }
+        $packageName = $Extension
+        if($Extension.Contains("oci8")) {
+            $packageName = "oci8"
+        }
         $config = [PSCustomObject]@{
             name = $Extension
-            package_name = $Extension
+            package_name = $packageName
             ref = $ref
             php_version = $PhpVersion
             arch = $Arch
@@ -78,18 +82,14 @@ Function Get-ExtensionConfig {
             docs = @()
             build_directory = ""
         }
-        if($Extension.Contains("oci8")) {
-            $config.package_name = "oci8"
-        }
         $composerJson = $null
+        if((-not(Test-Path composer.json)) -and (Test-Path $PSScriptRoot\..\config\stubs\$packageName.composer.json)) {
+            Copy-Item $PSScriptRoot\..\config\stubs\$packageName.composer.json composer.json
+        }
         if(Test-Path composer.json) {
             $composerJson = Get-Content composer.json -Raw | ConvertFrom-Json
         }
-        if($null -eq $composerJson -or $null -eq $composerJson."php-ext") {
-            if (Test-Path $PSScriptRoot\..\config\stubs\${config.package_name}.composer.json) {
-                Copy-Item $PSScriptRoot\..\config\stubs\${config.package_name}.composer.json composer.json
-            }
-        } else {
+        if($null -ne $composerJson -and $null -ne $composerJson."php-ext") {
             $composerJson."php-ext"."configure-options" | ForEach-Object {
                 $config.options += "--$( $_.name )"
             }
