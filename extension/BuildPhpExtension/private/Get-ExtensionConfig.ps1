@@ -127,7 +127,7 @@ Function Get-ExtensionConfig {
             $extensionSeries = Invoke-WebRequest -Uri "https://downloads.php.net/~windows/pecl/deps"
             $extensionArchivesSeries = Invoke-WebRequest -Uri "https://downloads.php.net/~windows/pecl/deps/archives"
         }
-        $thirdPartyLibraries = @("instantclient", "odbc_cli")
+        $thirdPartyLibraries = @("boost", "instantclient", "odbc_cli")
         $Libraries | Select-Object -Unique | ForEach-Object {
             if($thirdPartyLibraries.Contains($_)) {
                 $config.extension_libraries += $_

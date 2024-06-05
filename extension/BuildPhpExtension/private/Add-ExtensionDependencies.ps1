@@ -16,6 +16,9 @@ Function Add-ExtensionDependencies {
         $Config.extension_libraries | ForEach-Object {
             switch ($_)
             {
+                boost {
+                    Add-Boost
+                }
                 instantclient {
                     Add-OciSdk -Config $Config
                 }
