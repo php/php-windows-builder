@@ -12,6 +12,14 @@ on:
       php-version-list:
         description: 'PHP versions to build'
         required: false
+      arch-list:
+        description: 'Architectures to build'
+        required: false
+        default: 'x64, x86'
+      ts-list:
+        description: 'Thread safety to build'
+        required: false
+        default: 'nts, ts'
       args:
         description: 'Configure arguments'
         required: false
@@ -52,8 +60,8 @@ jobs:
           extension-url: ${{ inputs.extension-url }}
           extension-ref: ${{ inputs.extension-ref }}
           php-version-list: ${{ inputs.php-version-list }}
-          arch-list: 'x64, x86'
-          ts-list: 'nts, ts'
+          arch-list: ${{ inputs.arch-list }}
+          ts-list: ${{ inputs.ts-list }}
 
   extension:
     needs: get-extension-matrix
