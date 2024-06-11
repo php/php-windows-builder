@@ -1,4 +1,4 @@
-name: Build PHP Extension
+name: Build PHP Extension From PECL
 run-name: Build PHP Extension ${{ inputs.extension-url }}, ${{ inputs.extension-ref }}
 on:
   workflow_dispatch:
@@ -67,7 +67,7 @@ jobs:
       - name: Build the extension
         uses: ./extension
         with:
-          artifact-naming-scheme: pie
+          artifact-naming-scheme: 'pecl'
           extension-url: ${{ inputs.extension-url }}
           extension-ref: ${{ inputs.extension-ref }}
           php-version: ${{ matrix.php-version }}
@@ -88,3 +88,28 @@ jobs:
         with:
           name: artifacts
           delete-merged: true
+
+  pecl-release:
+    runs-on: ubuntu-latest
+    needs: artifacts
+    steps:
+      - name: Get artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: artifacts
+          path: artifacts
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ls -l artifacts
+          extension=$(basename "${{ inputs.extension-url }}")
+          mkdir -p /tmp/$extension/${{ inputs.extension-ref }}/
+          cp -a artifacts/* /tmp/$extension/${{ inputs.extension-ref }}/
+          cd /tmp || exit 1
+          zip -r $extension-${{ inputs.extension-ref }}.zip $extension
+          if ! gh release view pecl -R ${{ github.repository }}; then
+            gh release create pecl $extension-${{ inputs.extension-ref }}.zip -t pecl -n pecl -R ${{ github.repository }}
+          else
+            gh release upload pecl $extension-${{ inputs.extension-ref }}.zip -R ${{ github.repository }} --clobber
+          fi
