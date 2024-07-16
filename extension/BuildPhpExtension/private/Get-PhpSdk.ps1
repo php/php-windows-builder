@@ -7,7 +7,8 @@ function Get-PhpSdk {
     param (
     )
     begin {
-        $url = "https://github.com/php/php-sdk-binary-tools/archive/master.zip"
+        $sdkVersion = "2.3.0"
+        $url = "https://github.com/php/php-sdk-binary-tools/archive/php-sdk-$sdkVersion.zip"
     }
     process {
         Add-Type -Assembly "System.IO.Compression.Filesystem"
@@ -16,7 +17,7 @@ function Get-PhpSdk {
         $currentDirectory = (Get-Location).Path
         $sdkZipFilePath = Join-Path $currentDirectory php-sdk.zip
         [System.IO.Compression.ZipFile]::ExtractToDirectory($sdkZipFilePath, $currentDirectory)
-        Rename-Item -Path php-sdk-binary-tools-master php-sdk
+        Rename-Item -Path php-sdk-binary-tools-php-sdk-$sdkVersion php-sdk
 
         $sdkDirectoryPath = Join-Path $currentDirectory php-sdk
         $sdkBinDirectoryPath = Join-Path $sdkDirectoryPath bin
