@@ -128,9 +128,9 @@ It will also check if a GitHub hosted Windows runner is available with the requi
 |-------------|-----------------------|-----------------------------|
 | 7.0         | 2015 (vc14)           | windows-2012, self-hosted   |
 | 7.1         | 2015 (vc14)           | windows-2012, self-hosted   |
-| 7.2         | 2017 (vc15)           | windows-2016, self-hosted   |
-| 7.3         | 2017 (vc15)           | windows-2016, self-hosted   |
-| 7.4         | 2017 (vc15)           | windows-2016, self-hosted   |
+| 7.2         | 2017 (vc15)           | windows-2019, github-hosted |
+| 7.3         | 2017 (vc15)           | windows-2019, github-hosted |
+| 7.4         | 2017 (vc15)           | windows-2019, github-hosted |
 | 8.0         | 2019 (vs16)           | windows-2019, github-hosted |
 | 8.1         | 2019 (vs16)           | windows-2019, github-hosted |
 | 8.2         | 2019 (vs16)           | windows-2019, github-hosted |
