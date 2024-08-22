@@ -176,6 +176,9 @@ Function Get-ExtensionConfig {
                 $config.build_tools += $_.Groups[2].Value
             }
         }
+        if($configW32Content.contains('PYTHONHOME')) {
+            $config.build_tools += "python"
+        }
 
         $config.build_directory = if ($Arch -eq "x64") { "x64\" } else { "" }
         $config.build_directory += "Release"

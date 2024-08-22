@@ -32,10 +32,28 @@ Function Add-BuildTools {
                         choco install git.install --params "'/GitAndUnixToolsOnPath /WindowsTerminal /NoAutoCrlf'" -y --force
                     }
                     Default {
+                        $program = $_
                         $resultLines = (choco search $_ --limit-output) -split "\`r?\`n"
-                        if($resultLines | Where-Object { $_ -match "^$_\|" }) {
+                        if($resultLines | Where-Object { $_ -match "^$program\|" }) {
                             choco install $_ -y --force
                         }
+                    }
+                }
+            } else {
+                switch ($_)
+                {
+                    # Check if python is actually installed.
+                    python {
+                        $pythonVersion = python --version 2>&1
+                        if($pythonVersion -match "not found") {
+                            choco install python -y --force
+                        }
+                        $pythonPath = (Get-Command python).Source
+                        $pythonHome = Split-Path $pythonPath
+                        [Environment]::SetEnvironmentVariable("PYTHONPATH", $pythonPATH, [System.EnvironmentVariableTarget]::User)
+                        $env:PYTHONPATH = $pythonPath
+                        [Environment]::SetEnvironmentVariable("PYTHONHOME", $pythonHome, [System.EnvironmentVariableTarget]::User)
+                        $env:PYTHONHOME = $pythonHome
                     }
                 }
             }
