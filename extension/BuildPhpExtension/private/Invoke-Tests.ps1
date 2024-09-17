@@ -24,9 +24,13 @@ Function Invoke-Tests {
         if ((Select-String -Path 'config.w32' -Pattern 'ZEND_EXTENSION\(' -Quiet) -eq $true) {
             $type='zend_extension'
         }
+        $extensionPath = "$currentDirectory\$($Config.build_directory)\php_$($Config.name).dll"
+        if(-not(Test-Path $extensionPath)) {
+            throw "Extension was not built successfully. Cannot run tests."
+        }
         $php_args = @(
             "-n",
-            "-d $type=$currentDirectory\$($Config.build_directory)\php_$($Config.name).dll"
+            "-d $type=$extensionPath"
         )
         $env:TEST_PHP_ARGS = $php_args -join ' '
         if ($null -eq $env:TEST_RUNNER) {
