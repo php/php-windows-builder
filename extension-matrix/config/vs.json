@@ -43,5 +43,11 @@
     "vs": "2019",
     "os": "windows-2019",
     "type": "github-hosted"
+  },
+  "8.4": {
+    "vs": "2022",
+    "os": "windows-2022",
+    "type": "github-hosted",
+    "dev": true
   }
 }

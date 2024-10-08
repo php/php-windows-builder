@@ -60,7 +60,7 @@
     # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport = 'Invoke-PhpBuildExtension', 'Add-BuildRequirements', 'Add-Path', 'Get-PhpSdk', 'Add-Dependencies', 'Add-PhpDependencies', 'Get-VsVersion', 'Add-Extension', 'Get-Extension', 'Get-BuildDirectory', 'Get-ExtensionSource', 'Add-ExtensionDependencies', 'Add-BuildTools', 'Add-OciSdk', 'Add-OdbcCli', 'Get-ExtensionConfig', 'Add-Extensions', 'Get-PhpBuild', 'Invoke-Build', 'Invoke-Tests', 'Add-Package', 'Get-PhpDevelBuild', 'Get-OlderVsVersion', 'Get-PeclLibraryZip'
+    FunctionsToExport = 'Invoke-PhpBuildExtension', 'Add-BuildRequirements', 'Add-Path', 'Get-PhpSdk', 'Add-Dependencies', 'Add-PhpDependencies', 'Get-VsVersion', 'Add-Extension', 'Get-Extension', 'Get-BuildDirectory', 'Get-ExtensionSource', 'Add-ExtensionDependencies', 'Add-BuildTools', 'Add-OciSdk', 'Add-OdbcCli', 'Get-ExtensionConfig', 'Add-Extensions', 'Get-PhpBuild', 'Get-PhpBuildDetails', 'Invoke-Build', 'Invoke-Tests', 'Add-Package', 'Get-PhpDevelBuild', 'Get-OlderVsVersion', 'Get-PeclLibraryZip'
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
     CmdletsToExport = '*'

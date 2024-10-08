@@ -59,8 +59,9 @@ function Add-BuildRequirements {
                                       -Ts $Ts `
                                       -VsVersion $VsVersion `
                                       -VsToolset $VsToolset
-        $prefix = Get-PhpBuild -Config $config
-        Get-PhpDevelBuild -Config $config
+        $buildDetails = Get-PhpBuildDetails -Config $Config
+        $prefix = Get-PhpBuild -Config $config -BuildDetails $buildDetails
+        Get-PhpDevelBuild -Config $config -BuildDetails $buildDetails
         Add-Dependencies -Config $config -Prefix $prefix
         return $config
     }
