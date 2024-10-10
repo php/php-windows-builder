@@ -33,6 +33,10 @@ Function Add-ExtensionDependencies {
                     if(Test-Path "..\deps\LICENSE") {
                         Rename-Item -Path "..\deps\LICENSE" -NewName "LICENSE.$libName"
                     }
+                    if(Test-Path "..\deps\lib\ossl-modules") {
+                        Move-Item -Path "..\deps\lib\ossl-modules\*" -Destination "..\deps\lib"
+                        Remove-Item -Path "..\deps\lib\ossl-modules" -Force -Recurse
+                    }
                 }
             }
         }
