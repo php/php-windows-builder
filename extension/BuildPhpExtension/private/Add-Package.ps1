@@ -51,9 +51,10 @@ function Add-Package {
             # TODO: Filter these using deplister
             if(Test-Path ..\deps\bin) {
                 Get-ChildItem -Path ..\deps\bin -Recurse -Include "*.dll", "*.pdb" | ForEach-Object {
-                    $fileName = $_.Name.Split('.')[0]
-                    if(-not(Test-Path "php-bin\$fileName.dll")) {
-                        Copy-Item -Path $_.FullName -Destination artifacts -Force
+                    if(-not(Test-Path "php-bin\$($_.Name.Split('.')[0]).dll")) {
+                        if($_.Extension -eq ".dll" -or (Test-Path ([IO.Path]::ChangeExtension($_.FullName, "dll")))) {
+                            Copy-Item -Path $_.FullName -Destination artifacts -Force
+                        }
                     }
                 }
                 if(Test-Path (Join-Path -Path ..\deps\bin -ChildPath "*.xml")) {
