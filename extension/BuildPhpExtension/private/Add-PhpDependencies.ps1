@@ -17,20 +17,12 @@ Function Add-PhpDependencies {
             Add-StepLog "Adding libraries (core)"
         }
         $phpBaseUrl = 'https://downloads.php.net/~windows/php-sdk/deps'
-        $phpSeries = Invoke-WebRequest -Uri "$phpBaseUrl/$($Config.vs_version)/$($Config.arch)"
+        $phpSeries = Invoke-WebRequest -Uri "$phpBaseUrl/series/packages-$($Config.php_version)-$($Config.vs_version)-$($Config.arch)-staging.txt" -UseBasicParsing
         foreach ($library in $Config.php_libraries) {
             try {
-                $installed = $null
-                foreach ($file in $phpSeries.Links.Href) {
-                    if ($file -match "^$library") {
-                        Invoke-WebRequest "$phpBaseUrl/$($Config.vs_version)/$($Config.arch)/$file" -OutFile $library
-                        Expand-Archive $library "../deps"
-                        $installed = $file
-                        break
-                    }
-                }
-                if (-not $installed) {
-                    throw "Failed to download $library"
+                $matches = $phpSeries.Content | Select-String -Pattern "(^|\n)$library.*"
+                if ($matches.Count -eq 0) {
+                    throw "Failed to find $library"
                 }
                 $file = $matches.Matches[0].Value.Trim()
                 Invoke-WebRequest "$phpBaseUrl/$($Config.vs_version)/$($Config.arch)/$file" -OutFile $library
