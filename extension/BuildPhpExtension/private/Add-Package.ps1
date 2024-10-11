@@ -51,7 +51,10 @@ function Add-Package {
             # TODO: Filter these using deplister
             if(Test-Path ..\deps\bin) {
                 Get-ChildItem -Path ..\deps\bin -Recurse -Include "*.dll", "*.pdb" | ForEach-Object {
-                    Copy-Item -Path $_.FullName -Destination artifacts -Force
+                    $fileName = $_.Name.Split('.')[0]
+                    if(-not(Test-Path "php-bin\$fileName.dll")) {
+                        Copy-Item -Path $_.FullName -Destination artifacts -Force
+                    }
                 }
                 if(Test-Path (Join-Path -Path ..\deps\bin -ChildPath "*.xml")) {
                     New-Item -ItemType Directory -Path artifacts\config -Force | Out-Null
