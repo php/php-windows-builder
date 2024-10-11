@@ -13,27 +13,32 @@ Function Add-PhpDependencies {
     begin {
     }
     process {
+        if($Config.php_libraries.Count -ne 0) {
+            Add-StepLog "Adding libraries (core)"
+        }
         $phpBaseUrl = 'https://downloads.php.net/~windows/php-sdk/deps'
         $phpSeries = Invoke-WebRequest -Uri "$phpBaseUrl/$($Config.vs_version)/$($Config.arch)"
-        $no_matches = @()
         foreach ($library in $Config.php_libraries) {
-            $installed = $false
-            foreach ($file in $phpSeries.Links.Href) {
-                if ($file -match "^$library") {
-                    Invoke-WebRequest "$phpBaseUrl/$($Config.vs_version)/$($Config.arch)/$file" -OutFile $library
-                    Expand-Archive $library "../deps"
-                    $installed = $true
-                    break
+            try {
+                $installed = $null
+                foreach ($file in $phpSeries.Links.Href) {
+                    if ($file -match "^$library") {
+                        Invoke-WebRequest "$phpBaseUrl/$($Config.vs_version)/$($Config.arch)/$file" -OutFile $library
+                        Expand-Archive $library "../deps"
+                        $installed = $file
+                        break
+                    }
                 }
-            }
-            if (-not $installed) {
-                $no_matches += $library
-            }
-        }
-        if ($no_matches.Count -gt 0) {
-            foreach ($library in $no_matches) {
-                Write-Output "$library not available"
-                exit 1
+                if (-not $installed) {
+                    throw "Failed to download $library"
+                }
+                $file = $matches.Matches[0].Value.Trim()
+                Invoke-WebRequest "$phpBaseUrl/$($Config.vs_version)/$($Config.arch)/$file" -OutFile $library
+                Expand-Archive $library "../deps"
+                Add-BuildLog tick "$library" "Added $($file -replace '\.zip$')"
+            } catch {
+                Add-BuildLog cross "$library" "Failed to download $library"
+                throw
             }
         }
     }

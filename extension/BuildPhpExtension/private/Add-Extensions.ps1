@@ -17,8 +17,18 @@ Function Add-Extensions {
     begin {
     }
     process {
+        if($config.extensions.Count -ne 0) {
+            Add-StepLog "Adding extensions"
+        }
         $config.extensions | ForEach-Object {
-            Add-Extension -Extension $_ -Config $Config -Prefix $Prefix
+            $extension = $_
+            try {
+                Add-Extension -Extension $extension -Config $Config -Prefix $Prefix
+                Add-BuildLog tick $extension "Added"
+            } catch {
+                Add-BuildLog cross $extension "Failed to add $extension"
+                throw
+            }
         }
     }
     end {
