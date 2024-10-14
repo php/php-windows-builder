@@ -69,7 +69,9 @@ function Get-Extension {
             if($name.Contains('oci8')) {
                 $name = 'oci8_19'
             } elseif ([string]$configW32Content -match ($([regex]::Escape($name)) + '\s*=\s*["''](.+?)["'']')) {
-                $name = $matches[1]
+                if($matches[1] -ne 'no') {
+                    $name = $matches[1]
+                }
             }
 
             # Apply patches only for php/php-windows-builder and shivammathur/php-windows-builder
