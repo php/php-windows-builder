@@ -48,13 +48,19 @@ function Add-Package {
                     Copy-Item -Path $pdbFilePath -Destination artifacts -Force
                 }
             }
-            # TODO: Filter these using deplister
+
             if(Test-Path ..\deps\bin) {
-                Get-ChildItem -Path ..\deps\bin -Recurse -Include "*.dll", "*.pdb" | ForEach-Object {
-                    if(-not(Test-Path "php-bin\$($_.Name.Split('.')[0]).dll")) {
-                        if($_.Extension -eq ".dll" -or (Test-Path ([IO.Path]::ChangeExtension($_.FullName, "dll")))) {
+                $dllMap = Invoke-WebRequest -Uri "https://downloads.php.net/~windows/pecl/deps/dllmapping.json"
+                Get-ChildItem -Path ..\deps\bin -Recurse -Include "*.dll" | ForEach-Object {
+                    if($dllMap.content.Contains($_.Name)) {
+                        if(-not(Test-Path "php-bin\$($_.Name)")) {
                             Copy-Item -Path $_.FullName -Destination artifacts -Force
                         }
+                    }
+                }
+                Get-ChildItem -Path ..\deps\bin -Recurse -Include "*.pdb" | ForEach-Object {
+                    if(Test-Path "artifacts\$($_.Name.Split('.')[0]).dll") {
+                        Copy-Item -Path $_.FullName -Destination artifacts -Force
                     }
                 }
                 if(Test-Path (Join-Path -Path ..\deps\bin -ChildPath "*.xml")) {
@@ -87,7 +93,7 @@ function Add-Package {
                     }
                 }
             } else {
-                $artifact = "php_$($Config.package_name)-$($Config.ref)-$($Config.php_version)-$($Config.ts)-$($Config.vs_version)-$arch"
+                $artifact = "php_$($Config.package_name)-$($Config.ref.ToLower())-$($Config.php_version)-$($Config.ts)-$($Config.vs_version)-$arch"
             }
 
             7z a -sdel "$artifact.zip" *
