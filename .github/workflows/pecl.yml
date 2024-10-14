@@ -101,19 +101,15 @@ jobs:
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REF: ${{ inputs.extension-ref }}
-          URL: ${{ inputs.extension-url }}
-          REPO: ${{ github.repository }}
         run: |
           ls -l artifacts
-          ref=$(echo "$REF" | tr "[:upper:]" "[:lower:]")
-          extension=$(basename "$URL")
-          mkdir -p /tmp/$extension/$ref/
-          cp -a artifacts/* /tmp/$extension/$ref/
+          extension=$(basename "${{ inputs.extension-url }}")
+          mkdir -p /tmp/$extension/${{ inputs.extension-ref }}/
+          cp -a artifacts/* /tmp/$extension/${{ inputs.extension-ref }}/
           cd /tmp || exit 1
-          zip -r $extension-$ref.zip $extension
-          if ! gh release view pecl -R $REPO; then
-            gh release create pecl $extension-$ref.zip -t pecl -n pecl -R $REPO
+          zip -r $extension-${{ inputs.extension-ref }}.zip $extension
+          if ! gh release view pecl -R ${{ github.repository }}; then
+            gh release create pecl $extension-${{ inputs.extension-ref }}.zip -t pecl -n pecl -R ${{ github.repository }}
           else
-            gh release upload pecl $extension-$ref.zip -R $REPO --clobber
+            gh release upload pecl $extension-${{ inputs.extension-ref }}.zip -R ${{ github.repository }} --clobber
           fi
