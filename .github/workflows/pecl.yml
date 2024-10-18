@@ -67,7 +67,6 @@ jobs:
       - name: Build the extension
         uses: ./extension
         with:
-          artifact-naming-scheme: 'pecl'
           extension-url: ${{ inputs.extension-url }}
           extension-ref: ${{ inputs.extension-ref }}
           php-version: ${{ matrix.php-version }}
@@ -78,6 +77,8 @@ jobs:
           build-directory: ${{ inputs.build-directory }}
           run-tests: ${{ inputs.run-tests }}
           test-runner: ${{ inputs.test-runner }}
+        env:
+          artifact-naming-scheme: pecl
 
   artifacts:
     runs-on: ubuntu-latest

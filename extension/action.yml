@@ -43,11 +43,6 @@ inputs:
     description: Directory to build the extension in
     required: false
     default: 'build'
-  artifact-naming-scheme:
-    description: Naming schema for the artifacts, pie or pecl
-    deprecationMessage: "This will be removed once pie is released"
-    required: false
-    default: pie
 
 runs:
   using: composite
@@ -60,7 +55,7 @@ runs:
       env:
         CONFIGURE_ARGS: ${{inputs.args}}
         LIBRARIES: ${{inputs.libs}}
-        ARTIFACT_NAMING_SCHEME: ${{inputs.artifact-naming-scheme}}
+        ARTIFACT_NAMING_SCHEME: ${{env.artifact-naming-scheme}}
         RUN_TESTS: ${{inputs.run-tests}}
         TEST_RUNNER: ${{inputs.test-runner}}
         BUILD_DIRECTORY: ${{inputs.build-directory}}

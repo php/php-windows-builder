@@ -27,7 +27,7 @@ Function Invoke-Build {
             $builder = "php-sdk\phpsdk-$($Config.vs_version)-$($Config.Arch).bat"
             $task = (Get-Item -Path "." -Verbose).FullName + '\task.bat'
             $ref = $Config.ref
-            if($env:ARTIFACT_NAMING_SCHEME -ne 'pie') {
+            if($env:ARTIFACT_NAMING_SCHEME -eq 'pecl') {
                 $ref = $Config.ref.ToLower()
             }
             $suffix = "php_" + (@(

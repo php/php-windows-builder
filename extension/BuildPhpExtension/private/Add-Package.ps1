@@ -81,7 +81,9 @@ function Add-Package {
             if(-not(Test-Path -Path "php_$($Config.name).dll")) {
                 throw "Failed to build extension"
             }
-            if($env:ARTIFACT_NAMING_SCHEME -eq 'pie') {
+            if($env:ARTIFACT_NAMING_SCHEME -eq 'pecl') {
+                $artifact = "php_$($Config.package_name)-$($Config.ref.ToLower())-$($Config.php_version)-$($Config.ts)-$($Config.vs_version)-$arch"
+            } else {
                 if($arch -eq 'x64') {
                     $arch = 'x86_64'
                 }
@@ -92,8 +94,6 @@ function Add-Package {
                         Move-Item -Path $_ -Destination "$artifact.$extension" -Force
                     }
                 }
-            } else {
-                $artifact = "php_$($Config.package_name)-$($Config.ref.ToLower())-$($Config.php_version)-$($Config.ts)-$($Config.vs_version)-$arch"
             }
 
             7z a -sdel "$artifact.zip" *
