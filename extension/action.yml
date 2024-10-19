@@ -39,6 +39,10 @@ inputs:
     description: Test runner to use
     required: false
     default: 'run-tests.php'
+  test-opcache-mode:
+    description: Test opcache mode
+    required: false
+    default: 'on'
   build-directory:
     description: Directory to build the extension in
     required: false
@@ -58,6 +62,7 @@ runs:
         ARTIFACT_NAMING_SCHEME: ${{env.artifact-naming-scheme}}
         RUN_TESTS: ${{inputs.run-tests}}
         TEST_RUNNER: ${{inputs.test-runner}}
+        TEST_OPCACHE_MODE: ${{inputs.test-opcache-mode}}
         BUILD_DIRECTORY: ${{inputs.build-directory}}
         AUTH_TOKEN: ${{inputs.auth-token}}
       run: |

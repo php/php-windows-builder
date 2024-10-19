@@ -13,15 +13,13 @@ Function Invoke-Tests {
     begin {
     }
     process {
-        Add-StepLog "Running tests for $($Config.name) extension"
         try {
             $currentDirectory = (Get-Location).Path
             $php_dir = Join-Path $currentDirectory php-bin
             $env:TEST_PHP_EXECUTABLE = "$php_dir\php.exe"
             $env:REPORT_EXIT_STATUS = 1
             $env:XDEBUG_MODE = ""
-            $env:TEMP=$((Get-Item -LiteralPath $Env:TEMP).FullName)
-            $env:TMP=$((Get-Item -LiteralPath $Env:TMP).FullName)
+            $tempOriginal = $env:TEMP
             $type='extension'
             if ((Select-String -Path 'config.w32' -Pattern 'ZEND_EXTENSION\(' -Quiet) -eq $true) {
                 $type='zend_extension'
@@ -47,22 +45,58 @@ Function Invoke-Tests {
                 '--show-diff',
                 '--show-slow 1000',
                 '--set-timeout 120',
-                '-g FAIL,XFAIL,BORK,WARN,LEAK,SKIP',
-                '--temp-source ' + $env:TEMP,
-                '--temp-target ' + $env:TEMP
+                '-g FAIL,XFAIL,BORK,WARN,LEAK,SKIP'
             )
-            $phpExpression = "php $env:TEST_RUNNER " + ($test_runner_args -join ' ')
-            chcp 65001
-            Write-Output "Running tests... $phpExpression"
-            Write-Output "TEST_PHP_ARGS $env:TEST_PHP_ARGS"
-            Write-Output "TEST_PHP_EXECUTABLE $env:TEST_PHP_EXECUTABLE"
-            Invoke-Expression $phpExpression
-            if ($LASTEXITCODE -ne 0) {
-                exit $LASTEXITCODE
+
+            $opcacheModes = @($env:TEST_OPCACHE_MODE)
+            if($env:TEST_OPCACHE_MODE -eq 'both') {
+                $opcacheModes = @('on', 'off')
             }
-            Add-BuildLog tick $($Config.name) "Tests executed successfully"
+            $success = $True
+            foreach($opcacheMode in $opcacheModes) {
+                $suffix = ""
+                if($env:TEST_OPCACHE_MODE -eq 'both') {
+                    $suffix = " (opcache=$opcacheMode)"
+                }
+                Add-StepLog "Running tests for $($Config.name) extension$suffix"
+                Set-GAGroup start
+                $tempDirectory = Get-BuildDirectory $currentDirectory
+                $env:TEMP=$tempDirectory
+                $env:TMP=$tempDirectory
+                $env:OPCACHE = $opcacheMode
+                $test_runner_args += '--temp-source ' + $tempDirectory;
+                $test_runner_args += '--temp-target ' + $tempDirectory;
+                $opcache_args = @()
+                if($opcacheMode -eq 'on') {
+                    $opcache_args += "-d zend_extension=$php_dir\ext\php_opcache.dll"
+                    $opcache_args += "-d opcache.enable=1"
+                    $opcache_args += "-d opcache.enable_cli=1"
+                    $opcache_args += "-d opcache.optimization_level=1"
+                }
+                $phpExpression = @(
+                    'php',
+                    $env:TEST_RUNNER,
+                    ($test_runner_args -join ' '),
+                    ($opcache_args -join ' ')
+                ) -join ' '
+                Write-Host "Running tests... $phpExpression"
+                Write-Host "TEST_PHP_ARGS $env:TEST_PHP_ARGS"
+                Write-Host "TEST_PHP_EXECUTABLE $env:TEST_PHP_EXECUTABLE"
+                chcp 65001
+                Invoke-Expression $phpExpression
+                if ($LASTEXITCODE -ne 0) {
+                    $success = $False
+                }
+                Set-GAGroup end
+            }
+            $env:TEMP = $tempOriginal
+            $env:TMP = $tempOriginal
+            if(-not $success) {
+                throw "Failed to run tests successfully"
+            }
+            Add-BuildLog tick $($Config.name) "Tests run successfully"
         } catch {
-            Add-BuildLog cross $($Config.name) "Failed to run tests"
+            Add-BuildLog cross $($Config.name) "Failed to run tests successfully"
             throw
         }
     }
