@@ -60,7 +60,24 @@
     # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport = 'Invoke-PhpBuild', 'Invoke-PhpTests', 'Add-BuildRequirements', 'Get-PhpBuild', 'Get-PhpTestPack', 'Get-VsVersion', 'Add-TestRequirements', 'Get-PhpSdk', 'Get-TestSettings', 'Set-PhpIniForTests', 'Get-OciSdk', 'Get-PhpSrc', 'Get-TestsList'
+    FunctionsToExport = @(
+        # Private functions
+        'Add-BuildRequirements',
+        'Add-TestRequirements',
+        'Get-OciSdk',
+        'Get-PhpBuild',
+        'Get-PhpSdk',
+        'Get-PhpSrc',
+        'Get-PhpTestPack',
+        'Get-TestSettings',
+        'Get-TestsList'
+        'Get-VsVersion',
+        'Set-PhpIniForTests'
+
+        # Public functions
+        'Invoke-PhpBuild',
+        'Invoke-PhpTests'
+    )
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
     CmdletsToExport = '*'
