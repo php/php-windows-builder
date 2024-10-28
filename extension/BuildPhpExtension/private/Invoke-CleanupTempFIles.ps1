@@ -7,9 +7,9 @@ Function Invoke-CleanupTempFiles {
     $tempFiles = $newSystemFiles + $newUserFiles
     if($tempFiles.Count -gt 0) {
         Write-Host "Cleaning up temporary files"
-    }
-    $newSystemFiles + $newUserFiles | ForEach-Object {
-        Write-Host "Removing $($_.FullName)"
-        Remove-Item -Path $_.FullName -Force
+        $tempFiles | ForEach-Object {
+            Write-Host "Removing $($_.FullName)"
+            Remove-Item -Path $_.FullName -Force
+        }
     }
 }
