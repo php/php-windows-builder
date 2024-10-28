@@ -95,6 +95,7 @@ function Add-Package {
                     }
                 }
             }
+            Add-Content "artifact=$artifact" -Path $env:GITHUB_OUTPUT -Encoding utf8
 
             7z a -sdel "$artifact.zip" *
 

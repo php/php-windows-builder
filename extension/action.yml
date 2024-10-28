@@ -55,6 +55,7 @@ runs:
       uses: actions/checkout@v4
 
     - name: Build PHP
+      id: build
       shell: pwsh
       env:
         CONFIGURE_ARGS: ${{inputs.args}}
@@ -73,8 +74,8 @@ runs:
                                  -Arch ${{inputs.arch}} `
                                  -Ts ${{inputs.ts}}
 
-    - name: Upload artifacts
+    - name: Upload the build artifact
       uses: actions/upload-artifact@v4
       with:
-        name: artifacts-${{inputs.php-version}}-${{inputs.arch}}-${{inputs.ts}}
+        name: ${{ steps.build.outputs.artifact }}
         path: artifacts/*
