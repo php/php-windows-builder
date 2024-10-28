@@ -46,9 +46,6 @@ on:
         description: 'Test opcache mode'
         required: false
         default: 'on'
-      build-directory:
-        description: 'Directory to build the extension in'
-        required: false
 jobs:
   get-extension-matrix:
     runs-on: ubuntu-latest
@@ -86,10 +83,10 @@ jobs:
           ts: ${{ matrix.ts }}
           args: ${{ inputs.args }}
           libs: ${{ inputs.libs }}
-          build-directory: ${{ inputs.build-directory }}
           run-tests: ${{ inputs.run-tests }}
           test-runner: ${{ inputs.test-runner }}
           test-opcache-mode: ${{ inputs.test-opcache-mode }}
+          build-directory: C:\build
 
   artifacts:
     runs-on: ubuntu-latest
