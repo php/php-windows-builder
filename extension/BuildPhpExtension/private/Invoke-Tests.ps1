@@ -20,6 +20,7 @@ Function Invoke-Tests {
             $env:REPORT_EXIT_STATUS = 1
             $env:XDEBUG_MODE = ""
             $tempOriginal = $env:TEMP
+            Get-TempFiles
             $type='extension'
             if ((Select-String -Path 'config.w32' -Pattern 'ZEND_EXTENSION\(' -Quiet) -eq $true) {
                 $type='zend_extension'
@@ -87,10 +88,11 @@ Function Invoke-Tests {
                 if ($LASTEXITCODE -ne 0) {
                     $success = $False
                 }
+                $env:TEMP = $tempOriginal
+                $env:TMP = $tempOriginal
+                Invoke-CleanupTempFiles
                 Set-GAGroup end
             }
-            $env:TEMP = $tempOriginal
-            $env:TMP = $tempOriginal
             if(-not $success) {
                 throw "Failed to run tests successfully"
             }
