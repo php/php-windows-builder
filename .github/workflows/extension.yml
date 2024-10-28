@@ -67,7 +67,6 @@ jobs:
       - name: Build the extension
         uses: ./extension
         with:
-          artifact-naming-scheme: pie
           extension-url: ${{ inputs.extension-url }}
           extension-ref: ${{ inputs.extension-ref }}
           php-version: ${{ matrix.php-version }}
