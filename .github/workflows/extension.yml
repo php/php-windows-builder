@@ -34,6 +34,12 @@ on:
         description: 'Test runner to use'
         required: false
         default: 'run-tests.php'
+      test-opcache-mode:
+        type: choice
+        options: ['on', 'off', 'both']
+        description: 'Test opcache mode'
+        required: false
+        default: 'on'
       build-directory:
         description: 'Directory to build the extension in'
         required: false
@@ -77,6 +83,7 @@ jobs:
           build-directory: ${{ inputs.build-directory }}
           run-tests: ${{ inputs.run-tests }}
           test-runner: ${{ inputs.test-runner }}
+          test-opcache-mode: ${{ inputs.test-opcache-mode }}
 
   artifacts:
     runs-on: ubuntu-latest
