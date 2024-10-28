@@ -64,7 +64,6 @@ Function Invoke-Tests {
                 $tempDirectory = Get-BuildDirectory $currentDirectory
                 $env:TEMP=$tempDirectory
                 $env:TMP=$tempDirectory
-                $env:OPCACHE = $opcacheMode
                 $test_runner_args += '--temp-source ' + $tempDirectory;
                 $test_runner_args += '--temp-target ' + $tempDirectory;
                 $opcache_args = @()
@@ -73,6 +72,10 @@ Function Invoke-Tests {
                     $opcache_args += "-d opcache.enable=1"
                     $opcache_args += "-d opcache.enable_cli=1"
                     $opcache_args += "-d opcache.optimization_level=1"
+                } else {
+                    $opcache_args += "-d opcache.enable=0"
+                    $opcache_args += "-d opcache.enable_cli=0"
+                    $opcache_args += "-d opcache.optimization_level=0"
                 }
                 $phpExpression = @(
                     'php',
