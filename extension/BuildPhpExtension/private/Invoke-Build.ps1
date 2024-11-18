@@ -24,7 +24,7 @@ Function Invoke-Build {
             $bat_content += "exit %errorlevel%"
             Set-Content -Encoding "ASCII" -Path task.bat -Value $bat_content
 
-            $builder = "php-sdk\phpsdk-$($Config.vs_version)-$($Config.Arch).bat"
+            $builder = "php-sdk\phpsdk-starter.bat"
             $task = (Get-Item -Path "." -Verbose).FullName + '\task.bat'
             $ref = $Config.ref
             if($env:ARTIFACT_NAMING_SCHEME -eq 'pecl') {
@@ -38,7 +38,7 @@ Function Invoke-Build {
                 $Config.vs_version,
                 $Config.arch
             ) -join "-")
-            & $builder -s $Config.vs_toolset -t $task | Tee-Object -FilePath "build-$suffix.txt"
+            & $builder -c $Config.vs_version -a $Config.Arch -s $Config.vs_toolset -t $task | Tee-Object -FilePath "build-$suffix.txt"
             Set-GAGroup end
             Add-BuildLog tick $Config.name "Extension $($Config.name) built successfully"
         } catch {

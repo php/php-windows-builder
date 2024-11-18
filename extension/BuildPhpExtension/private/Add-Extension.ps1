@@ -42,7 +42,7 @@ Function Add-Extension {
         $bat_content += "nmake /nologo 2>&1"
         $bat_content += "exit %errorlevel%"
         Set-Content -Encoding "ASCII" -Path $Extension-task.bat -Value $bat_content
-        $builder = "$currentDirectory\php-sdk\phpsdk-$($Config.vs_version)-$($Config.Arch).bat"
+        $builder = "$currentDirectory\php-sdk\phpsdk-starter.bat"
         $task = (Get-Item -Path "." -Verbose).FullName + "\$Extension-task.bat"
         $suffix = "php_" + (@(
             $Config.name,
@@ -52,7 +52,7 @@ Function Add-Extension {
             $Config.vs_version,
             $Config.arch
         ) -join "-")
-        & $builder -t $task | Tee-Object -FilePath "build-$suffix.txt"
+        & $builder -c $Config.vs_version -a $Config.Arch -t $task | Tee-Object -FilePath "build-$suffix.txt"
         $includePath = "$currentDirectory\php-dev\include"
         New-Item -Path $includePath\ext -Name $Extension -ItemType "directory" | Out-Null
         Get-ChildItem -Path (Get-Location).Path -Recurse -Include '*.h', '*.c' | Copy-Item -Destination "$includePath\ext\$Extension"

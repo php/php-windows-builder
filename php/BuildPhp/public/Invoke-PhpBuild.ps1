@@ -53,7 +53,7 @@ function Invoke-PhpBuild {
 
         $task = "$PSScriptRoot\..\runner\task-$Ts.bat"
 
-        & "$buildDirectory\php-sdk\phpsdk-$VsVersion-$Arch.bat" -t $task
+        & "$buildDirectory\php-sdk\phpsdk-starter.bat" -c $VsVersion -a $Arch -t $task
         if (-not $?) {
             throw "build failed with errorlevel $LastExitCode"
         }
