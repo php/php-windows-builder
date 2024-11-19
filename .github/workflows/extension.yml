@@ -14,16 +14,16 @@ on:
         required: false
       arch-list:
         type: choice
-        options: ['x64', 'x86', 'x64, x86']
+        options: ['x64', 'x86', 'x64,x86']
         description: 'Architectures to build'
         required: false
-        default: 'x64, x86'
+        default: 'x64,x86'
       ts-list:
         type: choice
-        options: ['nts', 'ts', 'nts, ts']
+        options: ['nts', 'ts', 'nts,ts']
         description: 'Thread safety to build'
         required: false
-        default: 'nts, ts'
+        default: 'nts,ts'
       args:
         description: 'Configure arguments'
         required: false
