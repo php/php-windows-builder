@@ -21,7 +21,7 @@ Function Add-Extension {
     begin {
     }
     process {
-        # TODO: Replace fetching the extension using the new extension tool
+        Set-GAGroup start
         Invoke-WebRequest -Uri "https://pecl.php.net/get/$Extension" -OutFile "$Extension.tgz"
         $currentDirectory = (Get-Location).Path
         & tar -xzf "$Extension.tgz" -C $currentDirectory
@@ -38,7 +38,7 @@ Function Add-Extension {
         $bat_content = @()
         $bat_content += ""
         $bat_content += "call phpize 2>&1"
-        $bat_content += "call configure --with-php-build=`"..\deps`" $($Config.options) --with-prefix=$Prefix 2>&1"
+        $bat_content += "call configure --with-php-build=`"..\deps`" $($Config.options) --with-mp=`"disable`" --with-prefix=$Prefix 2>&1"
         $bat_content += "nmake /nologo 2>&1"
         $bat_content += "exit %errorlevel%"
         Set-Content -Encoding "ASCII" -Path $Extension-task.bat -Value $bat_content
@@ -52,7 +52,8 @@ Function Add-Extension {
             $Config.vs_version,
             $Config.arch
         ) -join "-")
-        & $builder -c $Config.vs_version -a $Config.Arch -t $task | Tee-Object -FilePath "build-$suffix.txt"
+        & $builder -c $Config.vs_version -a $Config.Arch -s $Config.vs_toolset -t $task | Tee-Object -FilePath "build-$suffix.txt"
+        Write-Host (Get-Content "build-$suffix.txt" -Raw)
         $includePath = "$currentDirectory\php-dev\include"
         New-Item -Path $includePath\ext -Name $Extension -ItemType "directory" | Out-Null
         Get-ChildItem -Path (Get-Location).Path -Recurse -Include '*.h', '*.c' | Copy-Item -Destination "$includePath\ext\$Extension"
@@ -60,6 +61,7 @@ Function Add-Extension {
         Copy-Item -Path "$extensionBuildDirectory\*.lib" -Destination "$currentDirectory\php-dev\lib" -Force
         Add-Content -Path "$currentDirectory\php-bin\php.ini" -Value "extension=$Extension"
         Set-Location $currentDirectory
+        Set-GAGroup end
     }
     end {
     }

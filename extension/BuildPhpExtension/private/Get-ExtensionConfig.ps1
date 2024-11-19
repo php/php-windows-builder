@@ -111,11 +111,11 @@ Function Get-ExtensionConfig {
                 $composerJson."require" | ForEach-Object {
                     $_.PSObject.Properties | ForEach-Object {
                         if($_.Name -match "ext-") {
-                            $extension = $_.Name.replace("ext-", "")
+                            $requiredExtension = $_.Name.replace("ext-", "")
                             if($_.Value -match "\d+\.\d+.*") {
-                                $extension += "-$($_.Value)"
+                                $requiredExtension += "-$($_.Value)"
                             }
-                            $config.extensions += $extension
+                            $config.extensions += $requiredExtension
                         } elseif(-not($_.Name -match "php")) {
                             # If using the stub composer.json
                             $Libraries += $_.Name
