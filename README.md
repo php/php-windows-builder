@@ -10,7 +10,7 @@ Build PHP for a specific version, architecture and thread safety.
 - name: Build PHP
   uses: php/php-windows-builder/php@v1
   with:
-    php-version: '8.3.2'
+    php-version: '8.4.1'
     arch: x64
     ts: nts
 ```
@@ -38,7 +38,7 @@ jobs:
       - name: Build
         uses: php/php-windows-builder/php@v1
         with:
-          php-version: '8.3.2'
+          php-version: '8.4.1'
           arch: ${{ matrix.arch }}
           ts: ${{ matrix.ts }}
 ```
@@ -58,7 +58,7 @@ Build a PHP extension for a specific version.
   uses: php/php-windows-builder/extension@v1
   with:
     extension-url: https://github.com/xdebug/xdebug
-    extension-ref: '3.3.1'
+    extension-ref: '3.3.2'
     php-version: '8.3'
     ts: nts
     arch: x64
@@ -97,8 +97,8 @@ jobs:
         uses: php/php-windows-builder/extension-matrix@v1
         with:
           extension-url: https://github.com/xdebug/xdebug
-          extension-ref: '3.3.1'
-          php-version-list: '8.3, 8.4'
+          extension-ref: '3.3.2'
+          php-version-list: '8.2, 8.3'
           arch-list: 'x64, x86'
           ts-list: 'nts, ts'
 ```
@@ -136,6 +136,7 @@ It will also check if a GitHub hosted Windows runner is available with the requi
 | 8.1         | 2019 (vs16)           | windows-2019, github-hosted |
 | 8.2         | 2019 (vs16)           | windows-2019, github-hosted |
 | 8.3         | 2019 (vs16)           | windows-2019, github-hosted |
+| 8.4         | 2022 (vs17)           | windows-2022, github-hosted |
 
 ## Release
 
