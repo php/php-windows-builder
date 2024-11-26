@@ -35,10 +35,12 @@ Function Add-Extension {
                 }
             }
         }
+        $configW32Content = [string](Get-Content -Path "config.w32")
+        $argument = Get-ArgumentFromConfig $Extension $configW32Content
         $bat_content = @()
         $bat_content += ""
         $bat_content += "call phpize 2>&1"
-        $bat_content += "call configure --with-php-build=`"..\deps`" $($Config.options) --with-mp=`"disable`" --with-prefix=$Prefix 2>&1"
+        $bat_content += "call configure --with-php-build=`"..\deps`" $argument --with-mp=`"disable`" --with-prefix=$Prefix 2>&1"
         $bat_content += "nmake /nologo 2>&1"
         $bat_content += "exit %errorlevel%"
         Set-Content -Encoding "ASCII" -Path $Extension-task.bat -Value $bat_content

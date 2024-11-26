@@ -82,6 +82,7 @@ jobs:
           build-directory: C:\build
         env:
           artifact-naming-scheme: pecl
+          auto-detect-args: true
 
   artifacts:
     runs-on: ubuntu-latest

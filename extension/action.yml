@@ -66,6 +66,7 @@ runs:
         TEST_OPCACHE_MODE: ${{inputs.test-opcache-mode}}
         BUILD_DIRECTORY: ${{inputs.build-directory}}
         AUTH_TOKEN: ${{inputs.auth-token}}
+        AUTO_DETECT_ARGS: ${{env.auto-detect-args}}
       run: |
         Import-Module ${{ github.action_path }}\BuildPhpExtension -Force
         Invoke-PhpBuildExtension -ExtensionUrl "${{inputs.extension-url}}" `

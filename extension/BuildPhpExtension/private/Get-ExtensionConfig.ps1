@@ -182,6 +182,19 @@ Function Get-ExtensionConfig {
                 $config.build_tools += "python"
             }
 
+            if($env:AUTO_DETECT_ARGS -eq 'true') {
+                $buildArgPrefix = $null;
+                $dashedExtension = $Extension -replace "_", "-"
+                if($configW32Content.contains("ARG_ENABLE(`"$dashedExtension`"")) {
+                    $buildArgPrefix = "enable"
+                } elseif($configW32Content.contains("ARG_WITH(`"$dashedExtension`"")) {
+                    $buildArgPrefix = "with"
+                }
+                if(-not($config.options.contains("--$buildArgPrefix-$dashedExtension"))) {
+                    $config.options += " --$buildArgPrefix-$dashedExtension"
+                }
+            }
+
             $config.build_directory = if ($Arch -eq "x64") { "x64\" } else { "" }
             $config.build_directory += "Release"
             if ($Ts -eq "ts") { $config.build_directory += "_TS" }
