@@ -124,6 +124,42 @@ Function Get-ExtensionConfig {
                 }
             }
 
+            $configW32Content = [string](Get-Content -Path "config.w32")
+            if($configW32Content.contains('PATH_PROG')) {
+                [regex]::Matches($configW32Content, 'PATH_PROG\(([''"])([^''"]+)\1') | ForEach-Object {
+                    $config.build_tools += $_.Groups[2].Value
+                }
+            }
+            if($configW32Content.contains('PYTHONHOME')) {
+                $config.build_tools += "python"
+            }
+
+            if($env:AUTO_DETECT_ARGS -eq 'true') {
+                $argument = Get-ArgumentFromConfig $Extension $configW32Content
+                $argumentKey = $argument.Split("=")[0]
+                if($null -ne $argument -and -not($config.options.contains($argumentKey))) {
+                    $config.options += " $argument"
+                }
+            }
+
+            if($env:AUTO_DETECT_LIBS -eq 'true') {
+                $detectedLibraries = Get-LibrariesFromConfig $Extension $VsVersion $Arch $configW32Content
+                if($null -ne $detectedLibraries) {
+                    $LibrariesList = $Libraries
+                    $Libraries = $detectedLibraries.Split(" ")
+                    $LibrariesList | ForEach-Object {
+                        $libraryName = $_
+                        $_ -Match '^(.+?)-\d|' | Out-Null
+                        if($Matches.Count -gt 1) {
+                            $libraryName = $Matches[1]
+                        }
+                        if (-not(($Libraries -Join ' ').Contains($libraryName))) {
+                            $Libraries += $_
+                        }
+                    }
+                }
+            }
+
             if($Libraries.Count -gt 0) {
                 $phpSeries = Invoke-WebRequest -Uri "https://downloads.php.net/~windows/php-sdk/deps/$VsVersion/$Arch"
                 $extensionSeries = Invoke-WebRequest -Uri "https://downloads.php.net/~windows/pecl/deps"
@@ -169,29 +205,6 @@ Function Get-ExtensionConfig {
                         $path = $path.TrimStart("/")
                     }
                     $path -replace "/", "\"
-                }
-            }
-
-            $configW32Content = [string](Get-Content -Path "config.w32")
-            if($configW32Content.contains('PATH_PROG')) {
-                [regex]::Matches($configW32Content, 'PATH_PROG\(([''"])([^''"]+)\1') | ForEach-Object {
-                    $config.build_tools += $_.Groups[2].Value
-                }
-            }
-            if($configW32Content.contains('PYTHONHOME')) {
-                $config.build_tools += "python"
-            }
-
-            if($env:AUTO_DETECT_ARGS -eq 'true') {
-                $buildArgPrefix = $null;
-                $dashedExtension = $Extension -replace "_", "-"
-                if($configW32Content.contains("ARG_ENABLE(`"$dashedExtension`"")) {
-                    $buildArgPrefix = "enable"
-                } elseif($configW32Content.contains("ARG_WITH(`"$dashedExtension`"")) {
-                    $buildArgPrefix = "with"
-                }
-                if(-not($config.options.contains("--$buildArgPrefix-$dashedExtension"))) {
-                    $config.options += " --$buildArgPrefix-$dashedExtension"
                 }
             }
 

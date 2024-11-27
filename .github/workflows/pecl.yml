@@ -83,6 +83,7 @@ jobs:
         env:
           artifact-naming-scheme: pecl
           auto-detect-args: true
+          auto-detect-libs: true
 
   artifacts:
     runs-on: ubuntu-latest

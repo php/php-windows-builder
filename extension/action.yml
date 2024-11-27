@@ -67,6 +67,7 @@ runs:
         BUILD_DIRECTORY: ${{inputs.build-directory}}
         AUTH_TOKEN: ${{inputs.auth-token}}
         AUTO_DETECT_ARGS: ${{env.auto-detect-args}}
+        AUTO_DETECT_LIBS: ${{env.auto-detect-libs}}
       run: |
         Import-Module ${{ github.action_path }}\BuildPhpExtension -Force
         Invoke-PhpBuildExtension -ExtensionUrl "${{inputs.extension-url}}" `

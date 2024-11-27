@@ -81,6 +81,7 @@
         'Get-Extension',
         'Get-ExtensionConfig',
         'Get-ExtensionSource',
+        'Get-LibrariesFromConfig',
         'Get-OlderVsVersion',
         'Get-PeclLibraryZip',
         'Get-PhpBuild',
