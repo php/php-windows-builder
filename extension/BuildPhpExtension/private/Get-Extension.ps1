@@ -51,6 +51,14 @@ function Get-Extension {
                 }
             }
 
+            $patches = $False
+            if(Test-Path -PATH $PSScriptRoot\..\patches\$extension.ps1) {
+                if((Get-Content $PSScriptRoot\..\patches\$extension.ps1).Contains('config.w32')) {
+                     Add-Patches $extension
+                     $patches = $True
+                }
+            }
+
             $configW32 = Get-ChildItem (Get-Location).Path -Recurse -Filter "config.w32" -ErrorAction SilentlyContinue
             if($null -eq $configW32) {
                 throw "No config.w32 found"
@@ -74,13 +82,8 @@ function Get-Extension {
                 }
             }
 
-            # Apply patches only for php/php-windows-builder and shivammathur/php-windows-builder
-            if($null -ne $env:GITHUB_REPOSITORY) {
-                if($env:GITHUB_REPOSITORY -eq 'php/php-windows-builder' -or $env:GITHUB_REPOSITORY -eq 'shivammathur/php-windows-builder') {
-                    if(Test-Path -PATH $PSScriptRoot\..\patches\$name.ps1) {
-                        . $PSScriptRoot\..\patches\$name.ps1
-                    }
-                }
+            if(!$patches) {
+                Add-Patches $name
             }
             Add-BuildLog tick $name "Fetched $name extension"
             return $name

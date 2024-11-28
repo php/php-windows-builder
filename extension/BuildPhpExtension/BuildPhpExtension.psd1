@@ -73,6 +73,7 @@
         'Add-OciSdk',
         'Add-OdbcCli',
         'Add-Package',
+        'Add-Patches',
         'Add-Path',
         'Add-PhpDependencies',
         'Add-StepLog',
