@@ -17,14 +17,24 @@ Function Add-PhpDependencies {
             Add-StepLog "Adding libraries (core)"
         }
         $phpBaseUrl = 'https://downloads.php.net/~windows/php-sdk/deps'
+        $phpTrunkBaseUrl = "https://downloads.php.net/~windows/php-sdk/deps/$($Config.vs_version)/$($Config.arch)"
         $phpSeries = Invoke-WebRequest -Uri "$phpBaseUrl/series/packages-$($Config.php_version)-$($Config.vs_version)-$($Config.arch)-staging.txt" -UseBasicParsing
+        $phpTrunk = Invoke-WebRequest -Uri $phpTrunkBaseUrl -UseBasicParsing
         foreach ($library in $Config.php_libraries) {
             try {
-                $matches = $phpSeries.Content | Select-String -Pattern "(^|\n)$library.*"
-                if ($matches.Count -eq 0) {
+                $matchesFound = $phpSeries.Content | Select-String -Pattern "(^|\n)$library.*"
+                if ($matchesFound.Count -eq 0) {
+                    foreach ($file in $phpTrunk.Links.Href) {
+                        if ($file -match "^$library") {
+                            $matchesFound = $file | Select-String -Pattern '.*'
+                            break
+                        }
+                    }
+                }
+                if ($matchesFound.Count -eq 0) {
                     throw "Failed to find $library"
                 }
-                $file = $matches.Matches[0].Value.Trim()
+                $file = $matchesFound.Matches[0].Value.Trim()
                 Invoke-WebRequest "$phpBaseUrl/$($Config.vs_version)/$($Config.arch)/$file" -OutFile $library
                 Expand-Archive $library "../deps"
                 Add-BuildLog tick "$library" "Added $($file -replace '\.zip$')"
