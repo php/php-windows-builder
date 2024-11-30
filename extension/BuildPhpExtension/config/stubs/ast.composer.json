@@ -1,9 +1,0 @@
-{
-  "php-ext": {
-    "configure-options": [
-      {
-        "name": "enable-ast"
-      }
-    ]
-  }
-}

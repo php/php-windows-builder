@@ -1,6 +1,6 @@
 {
   "require": {
-        "ext-psr": "*"
+    "ext-psr": "*"
   },
   "php-ext": {
     "configure-options": [

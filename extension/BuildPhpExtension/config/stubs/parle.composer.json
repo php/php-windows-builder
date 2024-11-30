@@ -5,7 +5,7 @@
         "name": "enable-parle=shared"
       },
       {
-          "name": "disable-parle-utf32"
+        "name": "disable-parle-utf32"
       }
     ]
   }
