@@ -42,7 +42,7 @@ inputs:
   test-opcache-mode:
     description: Test opcache mode
     required: false
-    default: 'on'
+    default: 'off'
   build-directory:
     description: Directory to build the extension in
     required: false

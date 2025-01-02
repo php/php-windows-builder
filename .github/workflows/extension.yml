@@ -45,7 +45,7 @@ on:
         options: ['on', 'off', 'both']
         description: 'Test opcache mode'
         required: false
-        default: 'on'
+        default: 'off'
 jobs:
   get-extension-matrix:
     runs-on: ubuntu-latest
