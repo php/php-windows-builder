@@ -119,3 +119,14 @@ jobs:
           else
             gh release upload pecl $extension-${{ inputs.extension-ref }}.zip -R ${{ github.repository }} --clobber
           fi
+  upload:
+    runs-on: ubuntu-latest
+    needs: pecl-release
+    steps:
+      - name: Upload to downloads server
+        run: |
+          extension=$(basename "${{ inputs.extension-url }}")
+          url="https://github.com/${{ github.repository }}/releases/download/pecl/$extension-${{ inputs.extension-ref }}.zip"
+          gh workflow run pecl.yml -R php/web-downloads -f url="$url" -f extension="$extension" -f ref="${{ inputs.extension-ref }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
