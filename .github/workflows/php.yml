@@ -46,4 +46,4 @@ jobs:
           url="https://api.github.com/repos/${{ github.repository }}/actions/artifacts/${{ needs.artifacts.outputs.artifact-id }}/zip"
           gh workflow run php.yml -R php/web-downloads -f url="$url"
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.WINDOWS_BUILDS_TOKEN }}

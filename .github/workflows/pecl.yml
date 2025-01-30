@@ -129,4 +129,4 @@ jobs:
           url="https://github.com/${{ github.repository }}/releases/download/pecl/$extension-${{ inputs.extension-ref }}.zip"
           gh workflow run pecl.yml -R php/web-downloads -f url="$url" -f extension="$extension" -f ref="${{ inputs.extension-ref }}"
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.WINDOWS_BUILDS_TOKEN }}
