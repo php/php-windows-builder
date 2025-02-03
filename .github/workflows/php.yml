@@ -44,6 +44,6 @@ jobs:
       - name: Upload to downloads server
         run: |
           url="https://api.github.com/repos/${{ github.repository }}/actions/artifacts/${{ needs.artifacts.outputs.artifact-id }}/zip"
-          gh workflow run php.yml -R php/web-downloads -f url="$url"
+          gh workflow run php.yml -R php/web-downloads -f url="$url" -f php-version=${{ inputs.php-version }}
         env:
           GITHUB_TOKEN: ${{ secrets.WINDOWS_BUILDS_TOKEN }}
