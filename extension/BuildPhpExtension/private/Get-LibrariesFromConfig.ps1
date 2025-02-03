@@ -71,7 +71,7 @@ Function Get-LibrariesFromConfig {
 
         $foundItems = @()
         $libraryFilesFound = @()
-        [regex]::Matches($ConfigW32Content, 'CHECK_LIB\(["'']([^"'']+)["'']|["'']([^"'']+.lib)["'']|(\w+\.lib)') | ForEach-Object {
+        [regex]::Matches($ConfigW32Content, 'CHECK_LIB\(["'']([^"'']+)["'']|["'']([^"'']+\.lib)["'']|(\w+\.lib)') | ForEach-Object {
             $_.Groups[1].Value.Split(';') + ($_.Groups[2].Value -Split '[^\w\.]') + ($_.Groups[3].Value -Split '[^\w\.]') | ForEach-Object {
                 $libraryFilesFound += $_
             }
