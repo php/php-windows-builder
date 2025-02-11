@@ -59,7 +59,7 @@ function Add-Package {
                     }
                 }
                 Get-ChildItem -Path ..\deps\bin -Recurse -Include "*.pdb" | ForEach-Object {
-                    if(Test-Path "artifacts\$($_.Name.Split('.')[0]).dll") {
+                    if(Test-Path "artifacts\$($_.Name.Replace('.pdb', '.dll'))") {
                         Copy-Item -Path $_.FullName -Destination artifacts -Force
                     }
                 }
