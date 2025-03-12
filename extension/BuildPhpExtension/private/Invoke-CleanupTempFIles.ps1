@@ -9,7 +9,11 @@ Function Invoke-CleanupTempFiles {
         Write-Host "Cleaning up temporary files"
         $tempFiles | ForEach-Object {
             Write-Host "Removing $($_.FullName)"
-            Remove-Item -Path $_.FullName -Force
+            try {
+                Remove-Item -Path $_.FullName -Force
+            } catch {
+                Write-Host "Failed to remove $($_.FullName)"
+            }
         }
     }
 }
