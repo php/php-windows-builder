@@ -4,7 +4,7 @@ Function Invoke-CleanupTempFiles {
 
     $newSystemFiles = Compare-Object -ReferenceObject $script:initialSystemState -DifferenceObject $currentSystemState -Property FullName | Where-Object {$_.SideIndicator -eq "=>"}
     $newUserFiles = Compare-Object -ReferenceObject $script:initialUserState -DifferenceObject $currentUserState -Property FullName | Where-Object {$_.SideIndicator -eq "=>"}
-    $tempFiles = $newSystemFiles + $newUserFiles
+    $tempFiles = @($newSystemFiles) + @($newUserFiles)
     if($tempFiles.Count -gt 0) {
         Write-Host "Cleaning up temporary files"
         $tempFiles | ForEach-Object {
