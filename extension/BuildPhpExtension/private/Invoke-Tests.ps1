@@ -40,7 +40,6 @@ Function Invoke-Tests {
                 throw "Test runner $env:TEST_RUNNER does not exist."
             }
             $test_runner_args = @(
-                '-j8',
                 '-q',
                 '--offline',
                 '--show-diff',
@@ -48,6 +47,9 @@ Function Invoke-Tests {
                 '--set-timeout 120',
                 '-g FAIL,XFAIL,BORK,WARN,LEAK,SKIP'
             )
+            if($Config.php_version -ge '7.4') {
+                $test_runner_args += '-j8'
+            }
 
             $opcacheModes = @($env:TEST_OPCACHE_MODE)
             if($env:TEST_OPCACHE_MODE -eq 'both') {
