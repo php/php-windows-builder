@@ -79,6 +79,7 @@ Build a PHP extension for a specific version.
 - `run-tests` (optional) - Run the extension tests. Defaults to `true`.
 - `test-runner` (optional) - The test runner to use. Defaults to `run-tests.php`.
 - `test-opcache-mode` (optional) - Run tests with opcache `on`, `off` or `both`. Defaults to `off`.
+- `test-workers` (optional) - The number of workers to use when running tests. Defaults to `8`.
 - `auth-token` (optional) - Authentication token to use in case the extension is hosted on a private repository.
 
 Instead of having to configure all the inputs for the extension action, you can use the `extension-matrix` action to get the matrix of jobs with different input configurations.

@@ -43,6 +43,10 @@ inputs:
     description: Test opcache mode
     required: false
     default: 'off'
+  test-workers:
+    description: Test workers
+    required: false
+    default: '8'
   build-directory:
     description: Directory to build the extension in
     required: false
@@ -64,6 +68,7 @@ runs:
         RUN_TESTS: ${{inputs.run-tests}}
         TEST_RUNNER: ${{inputs.test-runner}}
         TEST_OPCACHE_MODE: ${{inputs.test-opcache-mode}}
+        TEST_WORKERS: ${{inputs.test-workers}}
         BUILD_DIRECTORY: ${{inputs.build-directory}}
         AUTH_TOKEN: ${{inputs.auth-token}}
         AUTO_DETECT_ARGS: ${{env.auto-detect-args}}

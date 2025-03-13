@@ -47,8 +47,12 @@ Function Invoke-Tests {
                 '--set-timeout 120',
                 '-g FAIL,XFAIL,BORK,WARN,LEAK,SKIP'
             )
+            $test_workers = 8
+            if($null -ne $env:TEST_WORKERS -and $env:TEST_WORKERS -ne '') {
+                $test_workers = $env:TEST_WORKERS
+            }
             if($Config.php_version -ge '7.4') {
-                $test_runner_args += '-j8'
+                $test_runner_args += ('-j' + $test_workers)
             }
 
             $opcacheModes = @($env:TEST_OPCACHE_MODE)
