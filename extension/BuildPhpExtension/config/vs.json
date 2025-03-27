@@ -13,19 +13,23 @@
   "vs" : {
     "vc14": {
       "major": 14,
-      "minor": 9
+      "minorMin": 0,
+      "minorMax": 9
     },
     "vc15": {
       "major": 14,
-      "minor": 19
+      "minorMin": 10,
+      "minorMax": 19
     },
     "vs16": {
       "major": 14,
-      "minor": 29
+      "minorMin": 20,
+      "minorMax": 29
     },
     "vs17": {
       "major": 14,
-      "minor": 42
+      "minorMin": 30,
+      "minorMax": null
     }
   }
 }
