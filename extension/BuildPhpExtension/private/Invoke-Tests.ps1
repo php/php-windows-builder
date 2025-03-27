@@ -19,6 +19,7 @@ Function Invoke-Tests {
             $env:TEST_PHP_EXECUTABLE = "$php_dir\php.exe"
             $env:REPORT_EXIT_STATUS = 1
             $env:XDEBUG_MODE = ""
+            $env:MAGICK_CONFIGURE_PATH = "$currentDirectory\..\deps\bin"
             $tempOriginal = $env:TEMP
             Get-TempFiles
             $type='extension'
