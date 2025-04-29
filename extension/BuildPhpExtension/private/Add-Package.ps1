@@ -76,6 +76,15 @@ function Add-Package {
                 Remove-Item -Path "vc140.pdb" -Force
             }
 
+            # Keep only the extension DLL for ddtrace.
+            if($Config.name -eq 'ddtrace') {
+                Get-ChildItem -Filter "*.dll" | ForEach-Object {
+                    if($_.Name -ne "php_$($Config.name).dll") {
+                        Remove-Item -Path $_.FullName -Force
+                    }
+                }
+            }
+
             # As per https://github.com/ThePHPF/pie-design#windows-binaries
             $arch = $Config.arch
             if(-not(Test-Path -Path "php_$($Config.name).dll")) {
