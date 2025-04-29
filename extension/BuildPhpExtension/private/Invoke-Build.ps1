@@ -16,16 +16,16 @@ Function Invoke-Build {
         Add-StepLog "Building $($Config.name) extension"
         try {
             Set-GAGroup start
-            $bat_content = @()
-            $bat_content += ""
-            $bat_content += "call phpize 2>&1"
-            $bat_content += "call configure --with-php-build=`"..\deps`" $($Config.options) --with-mp=`"disable`" --enable-debug-pack 2>&1"
-            $bat_content += "nmake /nologo 2>&1"
-            $bat_content += "exit %errorlevel%"
-            Set-Content -Encoding "ASCII" -Path task.bat -Value $bat_content
 
             $builder = "php-sdk\phpsdk-starter.bat"
-            $task = (Get-Item -Path "." -Verbose).FullName + '\task.bat'
+            $task = [System.IO.Path]::Combine($PSScriptRoot, '..\config\task.bat')
+
+            $options = $Config.options
+            if ($Config.debug_symbols) {
+                $options += " --enable-debug-pack"
+            }
+            Set-Content -Path $task -Value (Get-Content -Path $task -Raw).Replace("OPTIONS", $options)
+
             $ref = $Config.ref
             if($env:ARTIFACT_NAMING_SCHEME -eq 'pecl') {
                 $ref = $Config.ref.ToLower()

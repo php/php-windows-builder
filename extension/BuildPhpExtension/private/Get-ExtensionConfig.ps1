@@ -79,6 +79,7 @@ Function Get-ExtensionConfig {
                 ts = $Ts
                 vs_version = $VsVersion
                 vs_toolset = $VsToolset
+                debug_symbols = $True
                 options = @()
                 php_libraries = @()
                 extension_libraries = @()
@@ -143,6 +144,10 @@ Function Get-ExtensionConfig {
                 if($null -ne $argument -and -not($config.options.contains($argumentKey))) {
                     $config.options += " $argument"
                 }
+            }
+
+            if ([System.Environment]::GetEnvironmentVariable("no-debug-symbols-$Extension") -eq 'true') {
+                $config.debug_symbols = $False
             }
 
             if($env:AUTO_DETECT_LIBS -eq 'true') {
