@@ -84,6 +84,7 @@ jobs:
           artifact-naming-scheme: pecl
           auto-detect-args: true
           auto-detect-libs: true
+          no-debug-symbols-ddtrace: true
 
   artifacts:
     runs-on: ubuntu-latest
