@@ -20,25 +20,12 @@ function Get-VsVersion {
         $VsConfig = ConvertFrom-Json -InputObject $jsonContent
         $majorMinor = $PhpVersion.Substring(0, 3)
         $VsVersion = $($VsConfig.php.$majorMinor)
-
-        if($null -eq (Get-Command vswhere -ErrorAction SilentlyContinue)) {
-            throw "vswhere is not available"
-        }
-        $MSVCDirectory = vswhere -latest -find "VC\Tools\MSVC"
         $selectedToolset = $null
-        $minor = $null
-        foreach ($toolset in (Get-ChildItem $MSVCDirectory)) {
-            $toolsetMajorVersion, $toolsetMinorVersion = $toolset.Name.split(".")[0,1]
-            $requiredVs = $VsConfig.vs.$VsVersion
-            if ($requiredVs.major -eq $toolsetMajorVersion -and ($toolsetMinorVersion -ge $requiredVs.minorMin -and ($null -eq $requiredVs.minorMax -or $toolsetMinorVersion -le $requiredVs.minorMax))) {
-                if($null -eq $minor -or $toolsetMinorVersion -gt $minor) {
-                    $selectedToolset = $toolset.Name.Trim()
-                    $minor = $toolsetMinorVersion
-                }
-            }
-        }
-        if (-not $selectedToolset) {
-            throw "toolset not available"
+        try {
+            $selectedToolset = Get-VsVersionHelper -VsVersion $VsVersion -VsConfig $VsConfig
+        } catch {
+            Add-Vs -VsVersion $VsVersion -VsConfig $VsConfig
+            $selectedToolset = Get-VsVersionHelper -VsVersion $VsVersion -VsConfig $VsConfig
         }
         return [PSCustomObject]@{
             vs = $VsVersion
