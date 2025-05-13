@@ -20,6 +20,8 @@ Function Invoke-Tests {
             $env:REPORT_EXIT_STATUS = 1
             $env:XDEBUG_MODE = ""
             $env:MAGICK_CONFIGURE_PATH = "$currentDirectory\..\deps\bin"
+            $env:PHP_AMQP_HOST="rabbitmq"
+            $env:PHP_AMQP_SSL_HOST="rabbitmq.example.org"
             $tempOriginal = $env:TEMP
             Get-TempFiles
             $type='extension'
