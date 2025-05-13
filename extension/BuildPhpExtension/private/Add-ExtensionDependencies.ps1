@@ -33,7 +33,7 @@ Function Add-ExtensionDependencies {
                     Default {
                         $url = "https://downloads.php.net/~windows/pecl/deps/$_"
                         Invoke-WebRequest -Uri $url -OutFile $_ -UseBasicParsing
-                        Expand-Archive -Path $_ -DestinationPath "..\deps"
+                        Expand-Archive -Path $_ -DestinationPath "..\deps" -Force
                         if(Test-Path "..\deps\LICENSE") {
                             Rename-Item -Path "..\deps\LICENSE" -NewName "LICENSE.$library"
                         }
