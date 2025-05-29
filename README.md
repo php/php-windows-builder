@@ -4,7 +4,7 @@ This project provides actions to build PHP and its extensions on Windows.
 
 ## Build PHP
 
-Build PHP for a specific version, architecture and thread safety.
+Build a specific version of PHP, with the required architecture and thread safety.
 
 ```yaml
 - name: Build PHP
@@ -30,7 +30,7 @@ jobs:
       matrix:
         arch: [x64, x86]
         ts: [nts, ts]
-    runs-on: windows-2019
+    runs-on: windows-2022
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,7 +43,7 @@ jobs:
           ts: ${{ matrix.ts }}
 ```
 
-The above workflow will produce the following the following builds for the PHP version `8.3.2` as artifacts.
+The above workflow will produce the following builds for the PHP version `8.4.1` as artifacts.
 
 - nts-x64, nts-x64-AVX, ts-x64, nts-x86, ts-x86.
 - debug-pack and devel-pack for each the above configurations.
@@ -51,7 +51,7 @@ The above workflow will produce the following the following builds for the PHP v
 
 ## Build a PHP extension
 
-Build a PHP extension for a specific version.
+Build a specific version of a PHP extension.
 
 ```yaml
 - name: Build the extension
@@ -133,10 +133,10 @@ It will also check if a GitHub hosted Windows runner is available with the requi
 | 7.2         | 2017 (vc15)           | windows-2019, github-hosted |
 | 7.3         | 2017 (vc15)           | windows-2019, github-hosted |
 | 7.4         | 2017 (vc15)           | windows-2019, github-hosted |
-| 8.0         | 2019 (vs16)           | windows-2019, github-hosted |
-| 8.1         | 2019 (vs16)           | windows-2019, github-hosted |
-| 8.2         | 2019 (vs16)           | windows-2019, github-hosted |
-| 8.3         | 2019 (vs16)           | windows-2019, github-hosted |
+| 8.0         | 2019 (vs16)           | windows-2022, github-hosted |
+| 8.1         | 2019 (vs16)           | windows-2022, github-hosted |
+| 8.2         | 2019 (vs16)           | windows-2022, github-hosted |
+| 8.3         | 2019 (vs16)           | windows-2022, github-hosted |
 | 8.4         | 2022 (vs17)           | windows-2022, github-hosted |
 
 ## Release
