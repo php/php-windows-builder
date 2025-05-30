@@ -18,8 +18,8 @@ function Get-VsVersion {
     process {
         $jsonContent = Get-Content -Path $jsonPath -Raw
         $versions = ConvertFrom-Json -InputObject $jsonContent
-        $majorMinor = $PhpVersion.Substring(0, 3)
-        return $($versions.$majorMinor)
+        if($PhpVersion -eq 'master') { $key = 'master'; } else { $key = $PhpVersion.Substring(0, 3); }
+        return $($versions.$key)
     }
     end {
     }

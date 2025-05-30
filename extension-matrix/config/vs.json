@@ -48,5 +48,11 @@
     "vs": "2022",
     "os": "windows-2022",
     "type": "github-hosted"
+  },
+  "master": {
+    "vs": "2022",
+    "os": "windows-2022",
+    "dev": true,
+    "type": "github-hosted"
   }
 }

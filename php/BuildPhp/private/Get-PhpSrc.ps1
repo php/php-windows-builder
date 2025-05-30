@@ -22,8 +22,10 @@ function Get-PhpSrc {
         $directory = "php-$PhpVersion-src"
 
         if ($PhpVersion.Contains(".")) {
+            $ref = "php-$PhpVersion"
             $url = "$baseUrl/refs/tags/php-$PhpVersion.zip"
         } else {
+            $ref = $PhpVersion
             $url = "$baseUrl/$PhpVersion.zip"
         }
 
@@ -34,7 +36,7 @@ function Get-PhpSrc {
 
         Invoke-WebRequest $url -Outfile $zipFile
         [System.IO.Compression.ZipFile]::ExtractToDirectory($zipFilePath, $currentDirectory)
-        Rename-Item -Path "php-src-php-$PhpVersion" -NewName $directory
+        Rename-Item -Path "php-src-$ref" -NewName $directory
         [System.IO.Compression.ZipFile]::CreateFromDirectory($directoryPath,  $srcZipFilePath)
     }
     end {

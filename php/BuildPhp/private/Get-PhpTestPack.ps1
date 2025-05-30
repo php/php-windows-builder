@@ -22,9 +22,13 @@ function Get-PhpTestPack {
     process {
         Add-Type -Assembly "System.IO.Compression.Filesystem"
 
-        $releaseState = if ($PhpVersion -match "[a-z]") {"qa"} else {"releases"}
-        $baseUrl = "https://downloads.php.net/~windows/$releaseState"
-        $fallbackBaseUrl = "https://downloads.php.net/~windows/$releaseState/archives"
+        if($PhpVersion -eq 'master') {
+            $fallbackBaseUrl = $baseUrl = "https://github.com/shivammathur/php-builder-windows/releases/download/master"
+        } else {
+            $releaseState = if ($PhpVersion -match "[a-z]") {"qa"} else {"releases"}
+            $baseUrl = "https://downloads.php.net/~windows/$releaseState"
+            $fallbackBaseUrl = "https://downloads.php.net/~windows/$releaseState/archives"
+        }
         $testZipFile = "php-test-pack-$PhpVersion.zip"
         $testUrl = "$baseUrl/$testZipFile"
         $fallBackUrl = "$fallbackBaseUrl/$testZipFile"

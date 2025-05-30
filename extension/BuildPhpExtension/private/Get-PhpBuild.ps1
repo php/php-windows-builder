@@ -20,12 +20,11 @@ function Get-PhpBuild {
         try {
             Add-StepLog "Adding release build for PHP $( $Config.php_version )"
             Add-Type -Assembly "System.IO.Compression.Filesystem"
-            $phpSemver, $baseUrl = $BuildDetails.phpSemver, $BuildDetails.baseUrl
+            $phpSemver, $baseUrl, $fallbackBaseUrl = $BuildDetails.phpSemver, $BuildDetails.baseUrl, $BuildDetails.fallbackBaseUrl
             $tsPart = if ($Config.ts -eq "nts") { "nts-Win32" } else { "Win32" }
             $binZipFile = "php-$phpSemver-$tsPart-$( $Config.vs_version )-$( $Config.arch ).zip"
             $binUrl = "$baseUrl/$binZipFile"
-
-            $fallBackUrl = "$baseUrl/archives/$binZipFile"
+            $fallBackUrl = "$fallbackBaseUrl/$binZipFile"
 
             if ($Config.php_version -lt '7.4') {
                 $fallBackUrl = $fallBackUrl.replace("vc", "VC")

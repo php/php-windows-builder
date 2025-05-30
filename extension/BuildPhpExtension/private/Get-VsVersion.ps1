@@ -18,7 +18,7 @@ function Get-VsVersion {
     process {
         $jsonContent = Get-Content -Path $jsonPath -Raw
         $VsConfig = ConvertFrom-Json -InputObject $jsonContent
-        $majorMinor = $PhpVersion.Substring(0, 3)
+        if($PhpVersion -eq 'master') { $majorMinor = 'master'; } else { $majorMinor = $PhpVersion.Substring(0, 3); }
         $VsVersion = $($VsConfig.php.$majorMinor)
         $selectedToolset = $null
         try {
