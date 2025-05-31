@@ -70,6 +70,7 @@
         'Add-Extension',
         'Add-ExtensionDependencies',
         'Add-Extensions',
+        'Add-OciDB',
         'Add-OciSdk',
         'Add-OdbcCli',
         'Add-Package',
