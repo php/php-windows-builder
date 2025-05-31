@@ -22,6 +22,11 @@ Function Invoke-Tests {
             $env:MAGICK_CONFIGURE_PATH = "$currentDirectory\..\deps\bin"
             $env:PHP_AMQP_HOST="rabbitmq"
             $env:PHP_AMQP_SSL_HOST="rabbitmq.example.org"
+            if($Config.name -eq 'pdo_oci') {
+                Get-PhpSrc -PhpVersion $Config.php_version
+                $env:PDO_TEST_DIR = "$currentDirectory\php-$($Config.php_version)-src\ext\pdo\tests"
+                $env:PDO_OCI_TEST_DIR = "$currentDirectory\tests"
+            }
             $tempOriginal = $env:TEMP
             Get-TempFiles
             $type='extension'

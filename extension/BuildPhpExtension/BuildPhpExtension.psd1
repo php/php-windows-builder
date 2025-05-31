@@ -90,6 +90,7 @@
         'Get-PhpBuildDetails',
         'Get-PhpDevelBuild',
         'Get-PhpSdk',
+        'Get-PhpSrc',
         'Get-TempFiles',
         'Get-VsVersionHelper',
         'Get-VsVersion',
