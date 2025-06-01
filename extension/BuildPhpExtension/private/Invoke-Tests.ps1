@@ -13,6 +13,7 @@ Function Invoke-Tests {
     begin {
     }
     process {
+        Add-StepLog "Running tests for $($Config.name) extension"
         try {
             $currentDirectory = (Get-Location).Path
             $php_dir = Join-Path $currentDirectory php-bin
@@ -34,9 +35,6 @@ Function Invoke-Tests {
                 $type='zend_extension'
             }
             $extensionPath = "$currentDirectory\$($Config.build_directory)\php_$($Config.name).dll"
-            if(-not(Test-Path $extensionPath)) {
-                throw "Extension was not built successfully. Cannot run tests."
-            }
             $php_args = @(
                 "-n",
                 "-d $type=$extensionPath"
