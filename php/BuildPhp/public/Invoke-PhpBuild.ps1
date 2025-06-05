@@ -27,8 +27,8 @@ function Invoke-PhpBuild {
     begin {
     }
     process {
-        $VsVersion = (Get-VsVersion -PhpVersion $PhpVersion)
-        if($null -eq $VsVersion) {
+        $VsConfig = (Get-VsVersion -PhpVersion $PhpVersion)
+        if($null -eq $VsConfig.vs) {
             throw "PHP version $PhpVersion is not supported."
         }
 
@@ -45,7 +45,7 @@ function Invoke-PhpBuild {
         Add-BuildRequirements -PhpVersion $PhpVersion -Arch $Arch
 
         Copy-Item -Path $PSScriptRoot\..\config -Destination . -Recurse
-        $buildPath = "$buildDirectory\config\$VsVersion\$Arch\php-$PhpVersion"
+        $buildPath = "$buildDirectory\config\$($VsConfig.vs)\$Arch\php-$PhpVersion"
         Move-Item "$buildDirectory\php-$PhpVersion-src" $buildPath
         Set-Location "$buildPath"
         New-Item "..\obj" -ItemType "directory" > $null 2>&1
@@ -53,7 +53,7 @@ function Invoke-PhpBuild {
 
         $task = "$PSScriptRoot\..\runner\task-$Ts.bat"
 
-        & "$buildDirectory\php-sdk\phpsdk-starter.bat" -c $VsVersion -a $Arch -t $task
+        & "$buildDirectory\php-sdk\phpsdk-starter.bat" -c $VsConfig.vs -a $Arch -s $VsConfig.toolset -t $task
         if (-not $?) {
             throw "build failed with errorlevel $LastExitCode"
         }

@@ -1,0 +1,1 @@
+cscript /nologo configure.js "--enable-snapshot-build" "--enable-debug-pack" "--disable-zts" "--enable-object-out-dir=../obj/" "--enable-com-dotnet=shared" "--without-analyzer" "--enable-pgi" %*

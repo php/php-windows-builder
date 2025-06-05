@@ -64,6 +64,7 @@
         # Private functions
         'Add-BuildRequirements',
         'Add-TestRequirements',
+        'Add-Vs',
         'Get-OciSdk',
         'Get-PhpBuild',
         'Get-PhpSdk',
@@ -71,6 +72,7 @@
         'Get-PhpTestPack',
         'Get-TestSettings',
         'Get-TestsList'
+        'Get-VsVersionHelper',
         'Get-VsVersion',
         'Set-PhpIniForTests'
 

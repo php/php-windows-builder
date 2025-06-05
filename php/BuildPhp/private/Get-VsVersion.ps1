@@ -17,9 +17,20 @@ function Get-VsVersion {
     }
     process {
         $jsonContent = Get-Content -Path $jsonPath -Raw
-        $versions = ConvertFrom-Json -InputObject $jsonContent
-        if($PhpVersion -eq 'master') { $key = 'master'; } else { $key = $PhpVersion.Substring(0, 3); }
-        return $($versions.$key)
+        $VsConfig = ConvertFrom-Json -InputObject $jsonContent
+        if($PhpVersion -eq 'master') { $majorMinor = 'master'; } else { $majorMinor = $PhpVersion.Substring(0, 3); }
+        $VsVersion = $($VsConfig.php.$majorMinor)
+        $selectedToolset = $null
+        try {
+            $selectedToolset = Get-VsVersionHelper -VsVersion $VsVersion -VsConfig $VsConfig
+        } catch {
+            Add-Vs -VsVersion $VsVersion -VsConfig $VsConfig
+            $selectedToolset = Get-VsVersionHelper -VsVersion $VsVersion -VsConfig $VsConfig
+        }
+        return [PSCustomObject]@{
+            vs = $VsVersion
+            toolset = $selectedToolset
+        }
     }
     end {
     }

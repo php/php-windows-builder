@@ -42,7 +42,13 @@ function Add-Vs {
 
             if ($vsInst) {
                 [string]$channel = $vsInst.installationVersion.Split('.')[0]
-                if ($vsInst.catalog.productId -match '(Enterprise|Professional|Community)$' ) {
+                $productId = $null
+                if ($vsInst.catalog -and $vsInst.catalog.PSObject.Properties['productId']) {
+                    $productId = $vsInst.catalog.productId
+                } elseif ($vsInst.PSObject.Properties['productId']) {
+                    $productId = $vsInst.productId
+                }
+                if ($productId -match '(Enterprise|Professional|Community)$' ) {
                     $exe = "vs_$($Matches[1].ToLower()).exe"
                 } else {
                     $exe = 'vs_buildtools.exe'
@@ -58,7 +64,7 @@ function Add-Vs {
                     --quiet --wait --norestart --nocache `
                     @componentArgs 2>&1 | ForEach-Object { Write-Host $_ }
             } else {
-                $channel = $VsVersion -replace '/D', ''
+                $channel = $VsVersion -replace '\D', ''
                 $exe = 'vs_buildtools.exe'
                 $installerUrl = "https://aka.ms/vs/$channel/release/$exe"
                 $installerPath = Join-Path $env:TEMP $exe
