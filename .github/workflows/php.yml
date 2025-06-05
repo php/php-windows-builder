@@ -6,6 +6,12 @@ on:
       php-version:
         description: 'PHP version to build'
         required: true
+      upload:
+        type: choice
+        options: ['true', 'false']
+        description: Upload artifacts to the downloads server
+        required: false
+        default: 'true'
 
 jobs:
   php:
@@ -40,6 +46,7 @@ jobs:
   upload:
     runs-on: ubuntu-latest
     needs: artifacts
+    if: ${{ github.event.inputs.upload == 'true' }}
     steps:
       - name: Upload to downloads server
         run: |
