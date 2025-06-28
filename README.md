@@ -17,7 +17,7 @@ Build a specific version of PHP, with the required architecture and thread safet
 
 ### Inputs
 
-- `php-version` (required) - The PHP version to build. It supports values in major.minor.patch format, e.g. 7.4.25, 8.0.12, etc.
+- `php-version` (required) - The PHP version to build. It supports values in major.minor.patch format, e.g. 7.4.25, 8.0.12, etc., or `master` for the master branch of `php-src`.
 - `arch` (required) - The architecture to build. It supports values `x64` and `x86`.
 - `ts` (required) - The thread safety to build. It supports values `ts` and `nts`.
 
@@ -138,6 +138,7 @@ It will also check if a GitHub hosted Windows runner is available with the requi
 | 8.2         | 2019 (vs16)           | windows-2022, github-hosted |
 | 8.3         | 2019 (vs16)           | windows-2022, github-hosted |
 | 8.4         | 2022 (vs17)           | windows-2022, github-hosted |
+| master      | 2022 (vs17)           | windows-2022, github-hosted |
 
 ## Release
 
