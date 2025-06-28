@@ -58,7 +58,7 @@ runs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Build PHP
+    - name: Build PHP Extension
       id: build
       shell: pwsh
       env:
