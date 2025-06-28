@@ -10,37 +10,37 @@
     "type": "self-hosted"
   },
   "7.2": {
-    "vs": "2019",
-    "os": "windows-2019",
+    "vs": "2022",
+    "os": "windows-2022",
     "type": "github-hosted"
   },
   "7.3": {
-    "vs": "2019",
-    "os": "windows-2019",
+    "vs": "2022",
+    "os": "windows-2022",
     "type": "github-hosted"
   },
   "7.4": {
-    "vs": "2019",
-    "os": "windows-2019",
+    "vs": "2022",
+    "os": "windows-2022",
     "type": "github-hosted"
   },
   "8.0": {
-    "vs": "2019",
+    "vs": "2022",
     "os": "windows-2022",
     "type": "github-hosted"
   },
   "8.1": {
-    "vs": "2019",
+    "vs": "2022",
     "os": "windows-2022",
     "type": "github-hosted"
   },
   "8.2": {
-    "vs": "2019",
+    "vs": "2022",
     "os": "windows-2022",
     "type": "github-hosted"
   },
   "8.3": {
-    "vs": "2019",
+    "vs": "2022",
     "os": "windows-2022",
     "type": "github-hosted"
   },

@@ -124,15 +124,15 @@ By default, the `extension-matrix` action will use the PHP versions defined in t
 
 If the `php-version-list` input is not provided, it will use the PHP versions required in the `composer.json` file.
 
-It will also check if a GitHub hosted Windows runner is available with the required Visual Studio version to build the extension for the PHP version. To override this for building the extension for older PHP versions, you will have to set the input `allow_old_php_versions` to `true` and add self-hosted Windows runners as specified in the table below.
+It will also check if a GitHub hosted Windows runner is available with the required Visual Studio version to build the extension for the PHP version or try to install it. To override this for building the extension for older PHP versions, you will have to set the input `allow_old_php_versions` to `true` and add self-hosted Windows runners as specified in the table below.
 
 | PHP Version | Visual Studio Version | Windows Runner Labels       |
 |-------------|-----------------------|-----------------------------|
 | 7.0         | 2015 (vc14)           | windows-2012, self-hosted   |
 | 7.1         | 2015 (vc14)           | windows-2012, self-hosted   |
-| 7.2         | 2017 (vc15)           | windows-2019, github-hosted |
-| 7.3         | 2017 (vc15)           | windows-2019, github-hosted |
-| 7.4         | 2017 (vc15)           | windows-2019, github-hosted |
+| 7.2         | 2017 (vc15)           | windows-2022, github-hosted |
+| 7.3         | 2017 (vc15)           | windows-2022, github-hosted |
+| 7.4         | 2017 (vc15)           | windows-2022, github-hosted |
 | 8.0         | 2019 (vs16)           | windows-2022, github-hosted |
 | 8.1         | 2019 (vs16)           | windows-2022, github-hosted |
 | 8.2         | 2019 (vs16)           | windows-2022, github-hosted |
