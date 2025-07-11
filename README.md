@@ -138,6 +138,7 @@ It will also check if a GitHub hosted Windows runner is available with the requi
 | 8.2         | 2019 (vs16)           | windows-2022, github-hosted |
 | 8.3         | 2019 (vs16)           | windows-2022, github-hosted |
 | 8.4         | 2022 (vs17)           | windows-2022, github-hosted |
+| 8.5         | 2022 (vs17)           | windows-2022, github-hosted |
 | master      | 2022 (vs17)           | windows-2022, github-hosted |
 
 ## Release

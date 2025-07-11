@@ -13,7 +13,7 @@ function Get-PhpBuildDetails {
     begin {
     }
     process {
-        if($Config.php_version -eq 'master') {
+        if($Config.php_version -eq 'master' -or $Config.php_version -eq '8.5') {
             $baseUrl = $fallbackBaseUrl = "https://github.com/shivammathur/php-builder-windows/releases/download/master"
             $PhpSemver = $PhpVersion
         } else {
