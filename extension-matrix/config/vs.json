@@ -49,7 +49,7 @@
     "os": "windows-2022",
     "type": "github-hosted"
   },
-  "8.5": {
+  "dev": {
     "vs": "2022",
     "os": "windows-2022",
     "type": "github-hosted"
