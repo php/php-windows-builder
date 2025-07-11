@@ -40,15 +40,17 @@ function Get-PhpBuild {
                 throw "PHP version $PhpVersion is not supported."
             }
         }
+        $versionInUrl = $PhpVersion
         if($PhpVersion -eq 'master' -or $PhpVersion -eq '8.5') {
             $fallbackBaseUrl = $baseUrl = "https://github.com/shivammathur/php-builder-windows/releases/download/master"
+            $versionInUrl = "master"
         } else {
             $releaseState = if ($PhpVersion -match "[a-z]") {"qa"} else {"releases"}
             $baseUrl = "https://downloads.php.net/~windows/$releaseState"
             $fallbackBaseUrl = "https://downloads.php.net/~windows/$releaseState/archives"
         }
         $tsPart = if ($Ts -eq "nts") {"nts-Win32"} else {"Win32"}
-        $binZipFile = "php-$PhpVersion-$tsPart-$VsVersion-$Arch.zip"
+        $binZipFile = "php-$versionInUrl-$tsPart-$VsVersion-$Arch.zip"
         $binUrl = "$baseUrl/$binZipFile"
         $fallBackUrl = "$fallbackBaseUrl/$binZipFile"
 
