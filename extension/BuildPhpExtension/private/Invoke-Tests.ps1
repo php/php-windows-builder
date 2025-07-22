@@ -76,7 +76,9 @@ Function Invoke-Tests {
                 if($env:TEST_OPCACHE_MODE -eq 'both') {
                     $suffix = " (opcache=$opcacheMode)"
                 }
-                Add-StepLog "Running tests for $($Config.name) extension$suffix"
+                if($suffix -ne "") {
+                    Add-StepLog "Running tests for $($Config.name) extension$suffix"
+                }
                 Set-GAGroup start
                 $tempDirectory = Get-BuildDirectory $currentDirectory
                 $env:TEMP=$tempDirectory
