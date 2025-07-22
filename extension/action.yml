@@ -39,6 +39,9 @@ inputs:
     description: Test runner to use
     required: false
     default: 'run-tests.php'
+  test-runner-args:
+    description: Test runner to use
+    required: false
   test-opcache-mode:
     description: Test opcache mode
     required: false
@@ -67,6 +70,7 @@ runs:
         ARTIFACT_NAMING_SCHEME: ${{env.artifact-naming-scheme}}
         RUN_TESTS: ${{inputs.run-tests}}
         TEST_RUNNER: ${{inputs.test-runner}}
+        TEST_RUNNER_ARGS: ${{inputs.test-runner-args}}
         TEST_OPCACHE_MODE: ${{inputs.test-opcache-mode}}
         TEST_WORKERS: ${{inputs.test-workers}}
         BUILD_DIRECTORY: ${{inputs.build-directory}}

@@ -78,6 +78,7 @@ Build a specific version of a PHP extension.
 - `build-directory` (optional) - The directory to build the extension in, defaults to the user's temporary directory.
 - `run-tests` (optional) - Run the extension tests. Defaults to `true`.
 - `test-runner` (optional) - The test runner to use. Defaults to `run-tests.php`.
+- `test-runner-args` (optional) - Arguments to pass to the test runner.
 - `test-opcache-mode` (optional) - Run tests with opcache `on`, `off` or `both`. Defaults to `off`.
 - `test-workers` (optional) - The number of workers to use when running tests. Defaults to `8`.
 - `auth-token` (optional) - Authentication token to use in case the extension is hosted on a private repository.

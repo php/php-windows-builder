@@ -45,19 +45,24 @@ Function Invoke-Tests {
             } elseif(-not(Test-Path $env:TEST_RUNNER)) {
                 throw "Test runner $env:TEST_RUNNER does not exist."
             }
-            $test_runner_args = @(
-                '-q',
-                '--offline',
-                '--show-diff',
-                '--show-slow 1000',
-                '--set-timeout 120',
-                '-g FAIL,XFAIL,BORK,WARN,LEAK,SKIP'
-            )
+
+            if($null -ne $env:TEST_RUNNER_ARGS -and $env:TEST_RUNNER_ARGS -ne '') {
+                $test_runner_args = $env:TEST_RUNNER_ARGS -split '\s+'
+            } else {
+                $test_runner_args = @(
+                    '-q',
+                    '--offline',
+                    '--show-diff',
+                    '--show-slow 1000',
+                    '--set-timeout 120',
+                    '-g FAIL,XFAIL,BORK,WARN,LEAK,SKIP'
+                )
+            }
             $test_workers = 8
             if($null -ne $env:TEST_WORKERS -and $env:TEST_WORKERS -ne '') {
                 $test_workers = $env:TEST_WORKERS
             }
-            if($Config.php_version -ge '7.4') {
+            if($Config.php_version -ge '7.4' -and $test_runner_args -notcontains '-j') {
                 $test_runner_args += ('-j' + $test_workers)
             }
 

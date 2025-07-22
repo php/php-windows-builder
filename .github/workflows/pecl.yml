@@ -40,6 +40,9 @@ on:
         description: 'Test runner to use'
         required: false
         default: 'run-tests.php'
+      test-runner-args:
+        description: 'Arguments for the test runner'
+        required: false
 jobs:
   get-extension-matrix:
     runs-on: ubuntu-latest
@@ -79,6 +82,7 @@ jobs:
           libs: ${{ inputs.libs }}
           run-tests: ${{ inputs.run-tests }}
           test-runner: ${{ inputs.test-runner }}
+          test-runner-args: ${{ inputs.test-runner-args }}
           build-directory: C:\build
         env:
           artifact-naming-scheme: pecl
