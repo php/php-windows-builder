@@ -38,6 +38,7 @@ function Invoke-PhpBuildExtension {
     }
     process {
         Set-StrictMode -Off
+        Set-NetSecurityProtocolType
         $VsData = (Get-VsVersion -PhpVersion $PhpVersion)
         if($null -eq $VsData.vs) {
             throw "PHP version $PhpVersion is not supported."

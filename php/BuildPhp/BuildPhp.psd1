@@ -74,6 +74,7 @@
         'Get-TestsList'
         'Get-VsVersionHelper',
         'Get-VsVersion',
+        'Set-NetSecurityProtocolType',
         'Set-PhpIniForTests'
 
         # Public functions

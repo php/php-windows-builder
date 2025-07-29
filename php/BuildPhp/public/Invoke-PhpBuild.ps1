@@ -27,6 +27,7 @@ function Invoke-PhpBuild {
     begin {
     }
     process {
+        Set-NetSecurityProtocolType
         $VsConfig = (Get-VsVersion -PhpVersion $PhpVersion)
         if($null -eq $VsConfig.vs) {
             throw "PHP version $PhpVersion is not supported."

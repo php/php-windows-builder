@@ -99,6 +99,7 @@
         'Invoke-CleanupTempFiles',
         'Invoke-Tests',
         'Set-GAGroup',
+        'Set-NetSecurityProtocolType',
 
         # Public functions
         'Invoke-PhpBuildExtension'

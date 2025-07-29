@@ -32,6 +32,7 @@ function Invoke-PhpTests {
     begin {
     }
     process {
+        Set-NetSecurityProtocolType
         $VsVersion = (Get-VsVersion -PhpVersion $PhpVersion)
         if($null -eq $VsVersion) {
             throw "PHP version $PhpVersion is not supported."
