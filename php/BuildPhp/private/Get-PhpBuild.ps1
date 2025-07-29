@@ -55,10 +55,10 @@ function Get-PhpBuild {
         $fallBackUrl = "$fallbackBaseUrl/$binZipFile"
 
         try {
-            Invoke-WebRequest $binUrl -OutFile $binZipFile
+            Get-File -Url $binUrl -OutFile $binZipFile
         } catch {
             try {
-                Invoke-WebRequest $fallBackUrl -OutFile $binZipFile
+                Get-File -Url $fallBackUrl -OutFile $binZipFile
             } catch {
                 throw "Failed to download the build for PHP version $PhpVersion."
             }

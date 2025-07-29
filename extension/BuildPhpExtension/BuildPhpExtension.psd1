@@ -83,7 +83,8 @@
         'Get-BuildDirectory',
         'Get-Extension',
         'Get-ExtensionConfig',
-        'Get-ExtensionSource',
+        'Get-ExtensionSource'
+        'Get-File',
         'Get-LibrariesFromConfig',
         'Get-OlderVsVersion',
         'Get-PeclLibraryZip',

@@ -32,7 +32,7 @@ function Add-Vs {
                 if (-not (Test-Path $installerDir)) {
                     New-Item -Path $installerDir -ItemType Directory -Force | Out-Null
                 }
-                Invoke-WebRequest -Uri $vsWhereUrl -OutFile $vswherePath -UseBasicParsing
+                Get-File -Url $vsWhereUrl -OutFile $vswherePath
             }
 
             $instances = & $vswherePath -products '*' -format json 2> $null | ConvertFrom-Json
@@ -57,7 +57,7 @@ function Add-Vs {
                 $installerUrl = "https://aka.ms/vs/$channel/release/$exe"
                 $installerPath = Join-Path $env:TEMP $exe
 
-                Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath -UseBasicParsing
+                Get-File -Url $installerUrl -OutFile $installerPath
 
                 & $installerPath modify `
                     --installPath $vsInst.installationPath `
@@ -69,7 +69,7 @@ function Add-Vs {
                 $installerUrl = "https://aka.ms/vs/$channel/release/$exe"
                 $installerPath = Join-Path $env:TEMP $exe
 
-                Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath -UseBasicParsing
+                Get-File -Url $installerUrl -OutFile $installerPath
                 & $installerPath `
                     --quiet --wait --norestart --nocache `
                     @componentArgs 2>&1 | ForEach-Object { Write-Host $_ }

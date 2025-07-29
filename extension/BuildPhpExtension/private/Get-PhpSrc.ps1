@@ -34,7 +34,7 @@ function Get-PhpSrc {
         $directoryPath = Join-Path $currentDirectory $directory
         $srcZipFilePath = Join-Path $currentDirectory "php-$PhpVersion-src.zip"
 
-        Invoke-WebRequest $url -Outfile $zipFile
+        Get-File -Url $url -Outfile $zipFile
         [System.IO.Compression.ZipFile]::ExtractToDirectory($zipFilePath, $currentDirectory)
         Rename-Item -Path "php-src-$ref" -NewName $directory
         [System.IO.Compression.ZipFile]::CreateFromDirectory($directoryPath,  $srcZipFilePath)

@@ -30,11 +30,11 @@ function Get-Extension {
                 if ($ExtensionUrl -like "*pecl.php.net*") {
                     $extension = Split-Path -Path $ExtensionUrl -Leaf
                     try {
-                        Invoke-WebRequest -Uri "https://pecl.php.net/get/$extension-$ExtensionRef.tgz" -OutFile "$extension-$ExtensionRef.tgz" -UseBasicParsing
+                        Get-File -Url "https://pecl.php.net/get/$extension-$ExtensionRef.tgz" -OutFile "$extension-$ExtensionRef.tgz"
                     } catch {}
                     if(-not(Test-Path "$extension-$ExtensionRef.tgz")) {
                         try {
-                            Invoke-WebRequest -Uri "https://pecl.php.net/get/$($extension.ToUpper())-$ExtensionRef.tgz" -OutFile "$extension-$ExtensionRef.tgz" -UseBasicParsing
+                            Get-File -Url "https://pecl.php.net/get/$($extension.ToUpper())-$ExtensionRef.tgz" -OutFile "$extension-$ExtensionRef.tgz"
                         } catch {}
                     }
                     & tar -xzf "$extension-$ExtensionRef.tgz" -C $currentDirectory

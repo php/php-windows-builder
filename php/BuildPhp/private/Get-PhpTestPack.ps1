@@ -36,10 +36,10 @@ function Get-PhpTestPack {
         $fallBackUrl = "$fallbackBaseUrl/$testZipFile"
 
         try {
-            Invoke-WebRequest $testUrl -OutFile $testZipFile
+            Get-File -Url $testUrl -OutFile $testZipFile
         } catch {
             try {
-                Invoke-WebRequest $fallBackUrl -OutFile $testZipFile
+                Get-File -Url $fallBackUrl -OutFile $testZipFile
             } catch {
                 throw "Failed to download the test pack for PHP version $PhpVersion."
             }

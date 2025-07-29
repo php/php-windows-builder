@@ -20,10 +20,10 @@ function Get-PhpBuildDetails {
             foreach($releaseState in @("releases", "qa")) {
                 $baseUrl = "https://downloads.php.net/~windows/$releaseState"
                 $fallbackBaseUrl = "https://downloads.php.net/~windows/$releaseState/archives"
-                $releases = Invoke-WebRequest "$baseUrl/releases.json" | ConvertFrom-Json
+                $releases = Get-File -Url "$baseUrl/releases.json" | ConvertFrom-Json
                 $phpSemver = $releases.$($Config.php_version).version
                 if($null -eq $phpSemver) {
-                    $phpSemver = (Invoke-WebRequest $fallbackBaseUrl).Links |
+                    $phpSemver = (Get-File -Url $fallbackBaseUrl).Links |
                             Where-Object { $_.href -match "php-($($Config.php_version).[0-9]+).*" } |
                             ForEach-Object { $matches[1] } |
                             Sort-Object { [System.Version]$_ } -Descending |

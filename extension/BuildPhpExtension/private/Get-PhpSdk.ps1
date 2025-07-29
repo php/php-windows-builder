@@ -16,7 +16,7 @@ function Get-PhpSdk {
         {
             Add-Type -Assembly "System.IO.Compression.Filesystem"
 
-            Invoke-WebRequest $url -OutFile php-sdk.zip
+            Get-File -Url $url -OutFile php-sdk.zip
             $currentDirectory = (Get-Location).Path
             $sdkZipFilePath = Join-Path $currentDirectory php-sdk.zip
             [System.IO.Compression.ZipFile]::ExtractToDirectory($sdkZipFilePath, $currentDirectory)

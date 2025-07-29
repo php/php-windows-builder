@@ -11,7 +11,7 @@ function Get-PhpSdk {
         $url = "https://github.com/php/php-sdk-binary-tools/archive/php-sdk-$sdkVersion.zip"
     }
     process {
-        Invoke-WebRequest $url -OutFile php-sdk.zip
+        Get-File -Url $url -OutFile php-sdk.zip
         Expand-Archive -Path php-sdk.zip -DestinationPath .
         Rename-Item -Path php-sdk-binary-tools-php-sdk-$sdkVersion php-sdk
     }

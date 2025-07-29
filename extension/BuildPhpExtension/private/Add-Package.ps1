@@ -50,7 +50,7 @@ function Add-Package {
             }
 
             if(Test-Path ..\deps\bin) {
-                $dllMap = Invoke-WebRequest -Uri "https://downloads.php.net/~windows/pecl/deps/dllmapping.json"
+                $dllMap = Get-File -Url "https://downloads.php.net/~windows/pecl/deps/dllmapping.json"
                 Get-ChildItem -Path ..\deps\bin -Recurse -Include "*.dll" | ForEach-Object {
                     if($dllMap.content.Contains($_.Name)) {
                         if(-not(Test-Path "php-bin\$($_.Name)")) {

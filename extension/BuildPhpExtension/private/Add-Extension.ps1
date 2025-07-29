@@ -22,7 +22,7 @@ Function Add-Extension {
     }
     process {
         Set-GAGroup start
-        Invoke-WebRequest -Uri "https://pecl.php.net/get/$Extension" -OutFile "$Extension.tgz"
+        Get-File -Url "https://pecl.php.net/get/$Extension" -OutFile "$Extension.tgz"
         $currentDirectory = (Get-Location).Path
         & tar -xzf "$Extension.tgz" -C $currentDirectory
         Set-Location "$Extension-*"

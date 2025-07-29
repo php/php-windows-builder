@@ -11,7 +11,7 @@ Function Add-OciDB {
     process {
         $dbUrl = 'https://download.oracle.com/otn-pub/otn_software/db-express/OracleXE213_Win64.zip'
         $dbZipFile = 'OracleXE213_Win64.zip'
-        Invoke-WebRequest $dbUrl -OutFile $dbZipFile -UseBasicParsing -Verbose
+        Get-File -Url $dbUrl -OutFile $dbZipFile
         New-Item -ItemType Directory -Path C:\tools\oracle-setup -Force | Out-Null
         New-Item -ItemType Directory -Path C:\tools\oracle -Force | Out-Null
         Expand-Archive -Path $dbZipFile -DestinationPath C:\tools\oracle-setup -Force

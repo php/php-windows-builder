@@ -15,7 +15,7 @@ Function Add-OdbcCli {
     process {
         $prefix = if ($Config.arch -eq "x64") {"ntx64"} else {"nt32"}
         $url = "https://public.dhe.ibm.com/ibmdl/export/pub/software/data/db2/drivers/odbc_cli/${prefix}_odbc_cli.zip"
-        Invoke-WebRequest $url -OutFile "odbc_cli.zip"
+        Get-File -Url $url -OutFile "odbc_cli.zip"
         Expand-Archive -Path "odbc_cli.zip" -DestinationPath "../deps"
         Copy-Item ../deps/clidriver/* -Destination "../deps" -Recurse -Force
     }
