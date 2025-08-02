@@ -71,14 +71,17 @@ Function Get-LibrariesFromConfig {
 
         $foundItems = @()
         $libraryFilesFound = @()
-        [regex]::Matches($ConfigW32Content, 'CHECK_LIB\(["'']([^"'']+)["'']|["'']([^"'']+\.lib)["'']|(\w+\.lib)') | ForEach-Object {
-            $_.Groups[1].Value.Split(';') + ($_.Groups[2].Value -Split '[^\w\.]') + ($_.Groups[3].Value -Split '[^\w\.]') | ForEach-Object {
+        [regex]::Matches($ConfigW32Content, 'CHECK_LIB\(["'']([^"'']+)["'']|["'']([^"'']+\.lib)["'']|(\w+\.lib)|(SETUP_\w+)') | ForEach-Object {
+            $_.Groups[1].Value.Split(';') + ($_.Groups[2].Value -Split '[^\w\.]') + ($_.Groups[3].Value -Split '[^\w\.]') + ($_.Groups[4].Value) | ForEach-Object {
                 $libraryFilesFound += $_
             }
         }
         $libraryFilesFound | Select-Object -Unique | ForEach-Object {
             if($_) {
                 switch ($_) {
+                    SETUP_ZLIB_LIB { $library = "zlib" }
+                    SETUP_OPENSSL { $library = "openssl" }
+                    SETUP_SQLITE3 { $library = "sqlite" }
                     libeay32.lib { $library = "openssl" }
                     ssleay32.lib { $library = "openssl" }
                     Default { $library = Find-Library $_ $VsVersions }
