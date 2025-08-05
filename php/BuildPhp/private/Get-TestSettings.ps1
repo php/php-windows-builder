@@ -30,6 +30,5 @@ function Get-TestSettings {
         return $settings
     }
     end {
-        $settings
     }
 }

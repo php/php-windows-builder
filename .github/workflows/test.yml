@@ -1,0 +1,40 @@
+name: Test PHP
+run-name: Test PHP ${{ inputs.php-version }}
+on:
+  workflow_dispatch:
+    inputs:
+      php-version:
+        description: 'PHP version to test'
+        required: true
+
+jobs:
+  php:
+    strategy:
+      matrix:
+        arch: [x64, x86]
+        ts: [nts, ts]
+        opcache: [opcache, nocache]
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MySQL
+        uses: ankane/setup-mysql@v1
+        with:
+          database: test
+
+      - name: Test PHP
+        shell: pwsh
+        run: |
+          Import-Module (Join-Path $(pwd).Path '\php\BuildPhp') -Force
+          Invoke-PhpTests -PhpVersion ${{inputs.php-version}} `
+                          -Arch ${{matrix.arch}} `
+                          -Ts ${{matrix.ts}} `
+                          -Opcache ${{matrix.opcache}}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{matrix.arch}}-${{matrix.ts}}-${{matrix.opcache}}
+          path: test-${{matrix.arch}}-${{matrix.ts}}-${{matrix.opcache}}.xml
