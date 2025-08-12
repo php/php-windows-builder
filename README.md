@@ -1,8 +1,32 @@
 # php-windows-builder
 
-This project provides actions to build PHP and its extensions on Windows.
+This project provides PowerShell packages and GitHub Actions to build PHP and its extensions on Windows.
 
-## Build PHP
+## Index
+
+- [GitHub Actions](#github-actions)
+    - [Build PHP](#build-php)
+        - [Inputs](#inputs)
+        - [Example workflow to build PHP](#example-workflow-to-build-php)
+    - [Build a PHP extension](#build-a-php-extension)
+        - [Inputs](#inputs-1)
+    - [Get the job matrix to build a PHP extension](#get-the-job-matrix-to-build-a-php-extension)
+        - [Inputs](#inputs-2)
+        - [Outputs](#outputs)
+        - [PHP Version Support](#php-version-support)
+    - [Release](#release)
+        - [Inputs](#inputs-3)
+        - [Example workflow to build and release an extension](#example-workflow-to-build-and-release-an-extension)
+
+- [Local Setup](#local-setup)
+    - [PHP](#php)
+    - [PHP Extensions](#php-extensions)
+
+- [License](#license)
+
+## GitHub Actions
+
+### Build PHP
 
 Build a specific version of PHP, with the required architecture and thread safety.
 
@@ -15,13 +39,13 @@ Build a specific version of PHP, with the required architecture and thread safet
     ts: nts
 ```
 
-### Inputs
+#### Inputs
 
 - `php-version` (required) - The PHP version to build. It supports values in major.minor.patch format, e.g. 7.4.25, 8.0.12, etc., or `master` for the master branch of `php-src`.
 - `arch` (required) - The architecture to build. It supports values `x64` and `x86`.
 - `ts` (required) - The thread safety to build. It supports values `ts` and `nts`.
 
-### Example workflow to build PHP
+#### Example workflow to build PHP
 
 ```yaml
 jobs:
@@ -49,7 +73,7 @@ The above workflow will produce the following builds for the PHP version `8.4.1`
 - debug-pack and devel-pack for each the above configurations.
 - test pack
 
-## Build a PHP extension
+### Build a PHP extension
 
 Build a specific version of a PHP extension.
 
@@ -66,7 +90,7 @@ Build a specific version of a PHP extension.
     libs: zlib
 ```
 
-### Inputs
+#### Inputs
 
 - `extension-url` (optional) - URL of the extension's git repository, defaults to the current repository.
 - `extension-ref` (required) - The git reference to build the extension, defaults to the GitHub reference that triggered the workflow.
@@ -85,7 +109,7 @@ Build a specific version of a PHP extension.
 
 Instead of having to configure all the inputs for the extension action, you can use the `extension-matrix` action to get the matrix of jobs with different input configurations.
 
-## Get the job matrix to build a PHP extension
+### Get the job matrix to build a PHP extension
 
 ```yaml
 jobs:
@@ -105,7 +129,7 @@ jobs:
           ts-list: 'nts, ts'
 ```
 
-### Inputs
+#### Inputs
 
 - `extension-url` (optional) - URL of the extension's git repository, defaults to the current repository.
 - `extension-ref` (optional) - The git reference to build the extension, defaults to the GitHub reference that triggered the workflow.
@@ -115,11 +139,11 @@ jobs:
 - `allow-old-php-versions` (optional) - Allow building the extension for older PHP versions. Defaults to `false`.
 - `auth-token` (optional) - Authentication token to use in case the extension is hosted on a private repository.
 
-### Outputs
+#### Outputs
 
 - `matrix` - The matrix of jobs with different input configurations.
 
-### PHP Version Support
+#### PHP Version Support
 
 By default, the `extension-matrix` action will use the PHP versions defined in the `php-version-list` input.
 
@@ -142,7 +166,7 @@ It will also check if a GitHub hosted Windows runner is available with the requi
 | 8.5         | 2022 (vs17)           | windows-2022, github-hosted |
 | master      | 2022 (vs17)           | windows-2022, github-hosted |
 
-## Release
+### Release
 
 Upload the artifacts to a release.
 
@@ -154,12 +178,12 @@ Upload the artifacts to a release.
     token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-### Inputs
+#### Inputs
 
 - `release` (required) - The release to upload the artifacts.
 - `token` (required) - The GitHub token to authenticate with.
 
-### Example workflow to build and release an extension
+#### Example workflow to build and release an extension
 
 ```yaml
 name: Build extension
@@ -210,6 +234,84 @@ jobs:
           release: ${{ github.event.release.tag_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
 ```
+
+## Local Setup
+
+### PHP
+
+To build PHP locally, you can install the `BuildPhp` powershell module from the PowerShell Gallery:
+
+You'll need at least PowerShell version 5, which is available by default on Windows 10 and later. It is recommended to use PowerShell 7 or later.
+If you have an older version, you can install the latest version [following these instructions](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows).
+
+Open an elevated PowerShell session (Run as Administrator) and run the following command to install the module:
+
+```powershell
+Install-Module -Name BuildPhp -Repository PSGallery -Force
+```
+
+To install this module for the current user only:
+
+```powershell
+Install-Module -Name BuildPhp -Repository PSGallery -Force -Scope CurrentUser
+```
+
+Next, make sure you have the required Visual Studio version installed to build the PHP version you want. You can find the required Visual Studio version in the [PHP Version Support table](#php-version-support) above.
+If the required Visual Studio version is not installed, for the first time you try to build PHP, the module will try to install the required Visual Studio components automatically.
+
+Then, you can build PHP by using the `Invoke-PhpBuild` command.
+- To build a specific version, use the `Version` input. It supports values in major.minor.patch format, e.g., 7.4.25, 8.0.12, etc., or `master` for the master branch of `php-src`.
+- To build a 32-bit or a 64-bit version, use the `Arch` input. It supports values `x64` and `x86`.
+- To build a thread-safe or non-thread-safe version, use the `Ts` input. It supports values `ts` and `nts`.
+
+```powershell
+Invoke-PhpBuild -Version '8.4.1' -Arch x64 -Ts nts
+```
+
+It should produce the PGO optimized builds for the input PHP version and configuration in a directory named `artifacts` in the current directory.
+
+### PHP Extensions
+
+To build a PHP extension locally, you can install the `BuildPhpExtension` powershell module from the PowerShell Gallery:
+Again, You'll need at least PowerShell version 5, which is available by default on Windows 10 and later. It is recommended to use PowerShell 7 or later.
+If you have an older version, you can install the latest version [following these instructions](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows).
+
+Open an elevated PowerShell session (Run as Administrator) and run the following command to install the module:
+
+```powershell
+Install-Module -Name BuildPhpExtension -Repository PSGallery -Force
+```
+
+To install this module for the current user only:
+
+```powershell
+Install-Module -Name BuildPhpExtension -Repository PSGallery -Force -Scope CurrentUser
+```
+
+Next, make sure you have the required Visual Studio version installed to build the PHP version you want. You can find the required Visual Studio version in the [PHP Version Support table](#php-version-support) above.
+If the required Visual Studio version is not installed, for the first time you try to build PHP, the module will try to install the required Visual Studio components automatically.
+
+Then, you can build the PHP extension by using the `Invoke-PhpBuildExtension` command.
+- To build a php extension, use the `ExtensionUrl` input. It supports a git repository URL as value.
+- To build a specific version of the extension, use the `ExtensionRef` input. It supports a git reference, e.g., a tag or a branch as value.
+- To build the extension for a specific PHP version, use the `PhpVersion` input. It supports values in major.minor format, e.g., 7.4, 8.0, etc.
+- To build the extension for a 32-bit or a 64-bit version, use the `Arch` input. It supports values `x64` and `x86`.
+- To build the extension for a thread-safe or non-thread-safe version, use the `Ts` input. It supports values `ts` and `nts`.
+
+If your extension requires additional libraries, you can set the Libraries environment variable to a list of libraries separated by comma.
+If your extension requires additional arguments to pass to the `configure` script, you can set the `Args` environment variable to the additional arguments.
+
+```powershell
+$env:LIBRARIES = 'zlib'
+$env:CONFIGURE_ARGS = '--with-xdebug'
+Invoke-PhpBuildExtension -ExtensionUrl https://github.com/xdebug/xdebug `
+                         -ExtensionRef 3.3.2 `
+                         -PhpVersion 8.4 `
+                         -Arch x64 `
+                         -Ts nts
+```
+
+It should produce the extension builds in a directory named `artifacts` in the current directory.
 
 ## License
 
