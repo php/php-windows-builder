@@ -297,18 +297,17 @@ Then, you can build the PHP extension by using the `Invoke-PhpBuildExtension` co
 - To build the extension for a specific PHP version, use the `PhpVersion` input. It supports values in major.minor format, e.g., 7.4, 8.0, etc.
 - To build the extension for a 32-bit or a 64-bit version, use the `Arch` input. It supports values `x64` and `x86`.
 - To build the extension for a thread-safe or non-thread-safe version, use the `Ts` input. It supports values `ts` and `nts`.
-
-If your extension requires additional libraries, you can set the Libraries environment variable to a list of libraries separated by comma.
-If your extension requires additional arguments to pass to the `configure` script, you can set the `Args` environment variable to the additional arguments.
+- To specify the libraries required for the extension, use the `Libraries` input. It supports a comma-separated list of library names.
+- To specify additional arguments to pass to the `configure` script, use the `Args` input. It supports a string value.
 
 ```powershell
-$env:LIBRARIES = 'zlib'
-$env:CONFIGURE_ARGS = '--with-xdebug'
 Invoke-PhpBuildExtension -ExtensionUrl https://github.com/xdebug/xdebug `
                          -ExtensionRef 3.3.2 `
                          -PhpVersion 8.4 `
                          -Arch x64 `
-                         -Ts nts
+                         -Ts nts `
+                         -Libraries "zlib" `
+                         -Args "--with-xdebug"
 ```
 
 It should produce the extension builds in a directory named `artifacts` in the current directory.
