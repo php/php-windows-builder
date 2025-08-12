@@ -3,7 +3,7 @@
     RootModule = 'BuildPhp'
 
     # Version number of this module.
-    ModuleVersion = '1.1.2.0'
+    ModuleVersion = '1.1.3.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
