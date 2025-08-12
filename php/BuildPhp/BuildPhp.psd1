@@ -64,6 +64,7 @@
         # Private functions
         'Add-BuildRequirements',
         'Add-TestRequirements',
+        'Add-Path',
         'Add-Vs',
         'Get-File',
         'Get-OciSdk',

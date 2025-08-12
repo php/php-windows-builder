@@ -33,6 +33,7 @@ function Add-Vs {
                     New-Item -Path $installerDir -ItemType Directory -Force | Out-Null
                 }
                 Get-File -Url $vsWhereUrl -OutFile $vswherePath
+                Add-Path $installerDir
             }
 
             $instances = & $vswherePath -products '*' -format json 2> $null | ConvertFrom-Json
