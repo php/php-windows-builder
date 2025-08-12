@@ -36,7 +36,7 @@ Function Add-PhpDependencies {
                 }
                 $file = $matchesFound.Matches[0].Value.Trim()
                 Get-File -Url "$phpBaseUrl/$($Config.vs_version)/$($Config.arch)/$file" -OutFile $library
-                Expand-Archive $library "../deps"
+                Expand-Archive $library "../deps" -Force
                 Add-BuildLog tick "$library" "Added $($file -replace '\.zip$')"
             } catch {
                 Add-BuildLog cross "$library" "Failed to download $library"
