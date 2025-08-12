@@ -1,0 +1,26 @@
+name: Publish PowerShell Modules
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Publish Php Module
+        shell: pwsh
+        run: |
+          Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+          cd php
+          Publish-Module -Path BuildPhp -NuGetApiKey ${{ secrets.NUGET_TOKEN }} -ErrorAction Stop
+
+      - name: Publish Php Extension Module
+        shell: pwsh
+        run: |
+          Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+          cd extension
+          Publish-Module -Path BuildPhpExtension -NuGetApiKey ${{ secrets.NUGET_TOKEN }} -ErrorAction Stop
