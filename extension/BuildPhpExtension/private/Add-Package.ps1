@@ -108,13 +108,15 @@ function Add-Package {
                 Add-Content "artifact=$artifact.zip" -Path $env:GITHUB_OUTPUT -Encoding utf8
             }
 
-            7z a -sdel "$artifact.zip" *
+            Compress-Archive -Path * -DestinationPath "$artifact.zip"
+            Remove-Item * -Recurse -Force -Exclude *.zip
 
             Set-Location $currentDirectory
             New-Item -Path $currentDirectory\artifacts\logs -ItemType Directory -Force | Out-Null
             Copy-Item -Path build-*.txt -Destination artifacts\logs\ -Force
             Set-Location $currentDirectory\artifacts\logs
-            7z a -sdel "$artifact.zip" *
+            Compress-Archive -Path * -DestinationPath "$artifact.zip"
+            Remove-Item * -Recurse -Force -Exclude *.zip
             Set-GAGroup end
             Add-BuildLog tick "Packaging" "Extension $($Config.name) packaged successfully"
         } catch {
