@@ -24,7 +24,7 @@ Function Invoke-Build {
             if ($Config.debug_symbols) {
                 $options += " --enable-debug-pack"
             }
-            Set-Content -Path $task -Value (Get-Content -Path $task -Raw).Replace("OPTIONS", $options)
+            Set-Content -Path task.bat -Value (Get-Content -Path $task -Raw).Replace("OPTIONS", $options)
 
             $ref = $Config.ref
             if($env:ARTIFACT_NAMING_SCHEME -eq 'pecl') {
@@ -38,7 +38,7 @@ Function Invoke-Build {
                 $Config.vs_version,
                 $Config.arch
             ) -join "-")
-            & $builder -c $Config.vs_version -a $Config.Arch -s $Config.vs_toolset -t $task | Tee-Object -FilePath "build-$suffix.txt"
+            & $builder -c $Config.vs_version -a $Config.Arch -s $Config.vs_toolset -t task.bat | Tee-Object -FilePath "build-$suffix.txt"
             Set-GAGroup end
             if(-not(Test-Path "$((Get-Location).Path)\$($Config.build_directory)\php_$($Config.name).dll")) {
                 throw "Failed to build the extension"
