@@ -34,7 +34,7 @@ Build a specific version of PHP, with the required architecture and thread safet
 - name: Build PHP
   uses: php/php-windows-builder/php@v1
   with:
-    php-version: '8.4.1'
+    php-version: '8.4.11'
     arch: x64
     ts: nts
 ```
@@ -62,7 +62,7 @@ jobs:
       - name: Build
         uses: php/php-windows-builder/php@v1
         with:
-          php-version: '8.4.1'
+          php-version: '8.4.11'
           arch: ${{ matrix.arch }}
           ts: ${{ matrix.ts }}
 ```
@@ -82,7 +82,7 @@ Build a specific version of a PHP extension.
   uses: php/php-windows-builder/extension@v1
   with:
     extension-url: https://github.com/xdebug/xdebug
-    extension-ref: '3.3.2'
+    extension-ref: '3.4.5'
     php-version: '8.3'
     ts: nts
     arch: x64
@@ -123,7 +123,7 @@ jobs:
         uses: php/php-windows-builder/extension-matrix@v1
         with:
           extension-url: https://github.com/xdebug/xdebug
-          extension-ref: '3.3.2'
+          extension-ref: '3.4.5'
           php-version-list: '8.2, 8.3'
           arch-list: 'x64, x86'
           ts-list: 'nts, ts'
@@ -260,12 +260,12 @@ Next, make sure you have the required Visual Studio version installed to build t
 If the required Visual Studio version is not installed, for the first time you try to build PHP, the module will try to install the required Visual Studio components automatically.
 
 Then, you can build PHP by using the `Invoke-PhpBuild` command.
-- To build a specific version, use the `Version` input. It supports values in major.minor.patch format, e.g., 7.4.25, 8.0.12, etc., or `master` for the master branch of `php-src`.
-- To build a 32-bit or a 64-bit version, use the `Arch` input. It supports values `x64` and `x86`.
-- To build a thread-safe or non-thread-safe version, use the `Ts` input. It supports values `ts` and `nts`.
+- To build a specific version, you can use the `Version` input. It supports values in major.minor.patch format, e.g., 7.4.25, 8.0.12, etc., or `master` for the master branch of `php-src`.
+- To build a 32-bit or a 64-bit version, you can use the `Arch` input. It supports values `x64` and `x86`.
+- To build a thread-safe or non-thread-safe version, you can use the `Ts` input. It supports values `ts` and `nts`.
 
 ```powershell
-Invoke-PhpBuild -Version '8.4.1' -Arch x64 -Ts nts
+Invoke-PhpBuild -Version '8.4.11' -Arch x64 -Ts nts
 ```
 
 It should produce the PGO optimized builds for the input PHP version and configuration in a directory named `artifacts` in the current directory.
@@ -288,21 +288,21 @@ To install this module for the current user only:
 Install-Module -Name BuildPhpExtension -Repository PSGallery -Force -Scope CurrentUser
 ```
 
-Next, make sure you have the required Visual Studio version installed to build the PHP version you want. You can find the required Visual Studio version in the [PHP Version Support table](#php-version-support) above.
-If the required Visual Studio version is not installed, for the first time you try to build PHP, the module will try to install the required Visual Studio components automatically.
+Next, make sure you have the required Visual Studio version installed to build the PHP extension you want. You can find the required Visual Studio version in the [PHP Version Support table](#php-version-support) above based on the PHP version you are building the PHP extension for.
+If the required Visual Studio version is not installed, for the first time you try to build the PHP extension, the module will try to install the required Visual Studio components automatically.
 
 Then, you can build the PHP extension by using the `Invoke-PhpBuildExtension` command.
-- To build a php extension, use the `ExtensionUrl` input. It supports a git repository URL as value.
-- To build a specific version of the extension, use the `ExtensionRef` input. It supports a git reference, e.g., a tag or a branch as value.
-- To build the extension for a specific PHP version, use the `PhpVersion` input. It supports values in major.minor format, e.g., 7.4, 8.0, etc.
-- To build the extension for a 32-bit or a 64-bit version, use the `Arch` input. It supports values `x64` and `x86`.
-- To build the extension for a thread-safe or non-thread-safe version, use the `Ts` input. It supports values `ts` and `nts`.
-- To specify the libraries required for the extension, use the `Libraries` input. It supports a comma-separated list of library names.
-- To specify additional arguments to pass to the `configure` script, use the `Args` input. It supports a string value.
+- To build a php extension, you can use the `ExtensionUrl` input. It supports a git repository URL as value.
+- To build a specific version of the extension, you can use the `ExtensionRef` input. It supports a git reference, e.g., a tag or a branch as value.
+- To build the extension for a specific PHP version, you can use the `PhpVersion` input. It supports values in major.minor format, e.g., 7.4, 8.0, etc.
+- To build the extension for a 32-bit or a 64-bit PHP version, you can use the `Arch` input. It supports values `x64` and `x86`.
+- To build the extension for a thread-safe or non-thread-safe PHP version, you can use the `Ts` input. It supports values `ts` and `nts`.
+- To specify the libraries required for the extension, you can use the `Libraries` input. It supports a comma-separated list of library names.
+- To specify additional arguments to pass to the `configure` script, you can use the `Args` input. It supports a string value.
 
 ```powershell
 Invoke-PhpBuildExtension -ExtensionUrl https://github.com/xdebug/xdebug `
-                         -ExtensionRef 3.3.2 `
+                         -ExtensionRef 3.4.5 `
                          -PhpVersion 8.4 `
                          -Arch x64 `
                          -Ts nts `
