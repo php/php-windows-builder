@@ -93,7 +93,7 @@ Build a specific version of a PHP extension.
 #### Inputs
 
 - `extension-url` (optional) - URL of the extension's git repository, defaults to the current repository.
-- `extension-ref` (required) - The git reference to build the extension, defaults to the GitHub reference that triggered the workflow.
+- `extension-ref` (optional) - The git reference to build the extension, defaults to the GitHub reference that triggered the workflow.
 - `php-version` (required) - The PHP versions to build the extension for.
 - `arch` (required) - The architecture to build the extension for.
 - `ts` (required) - The thread safety to build the extension for.
