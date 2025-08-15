@@ -260,12 +260,18 @@ Next, make sure you have the required Visual Studio version installed to build t
 If the required Visual Studio version is not installed, for the first time you try to build PHP, the module will try to install the required Visual Studio components automatically.
 
 Then, you can build PHP by using the `Invoke-PhpBuild` command.
-- To build a specific version, you can use the `Version` input. It supports values in major.minor.patch format, e.g., 7.4.25, 8.0.12, etc., or `master` for the master branch of `php-src`.
+- To build a specific PHP version, you can use the `PhpVersion` input. It supports values in major.minor.patch format, e.g., 7.4.25, 8.0.12, etc., or `master` for the master branch of `php-src`.
 - To build a 32-bit or a 64-bit version, you can use the `Arch` input. It supports values `x64` and `x86`.
 - To build a thread-safe or non-thread-safe version, you can use the `Ts` input. It supports values `ts` and `nts`.
 
 ```powershell
-Invoke-PhpBuild -Version '8.4.11' -Arch x64 -Ts nts
+Invoke-PhpBuild -PhpVersion '8.4.11' -Arch x64 -Ts nts
+```
+
+To build PHP from a local source, run `Invoke-PhpBuild` from the source directory and omit `PhpVersion` input.
+
+```powershell
+Invoke-PhpBuild -Arch x64 -Ts nts
 ```
 
 It should produce the PGO optimized builds for the input PHP version and configuration in a directory named `artifacts` in the current directory.
@@ -292,7 +298,7 @@ Next, make sure you have the required Visual Studio version installed to build t
 If the required Visual Studio version is not installed, for the first time you try to build the PHP extension, the module will try to install the required Visual Studio components automatically.
 
 Then, you can build the PHP extension by using the `Invoke-PhpBuildExtension` command.
-- To build a php extension, you can use the `ExtensionUrl` input. It supports a git repository URL as value.
+- To build a php extension from a git repository, you can use the `ExtensionUrl` input. It supports a git repository URL as value.
 - To build a specific version of the extension, you can use the `ExtensionRef` input. It supports a git reference, e.g., a tag or a branch as value.
 - To build the extension for a specific PHP version, you can use the `PhpVersion` input. It supports values in major.minor format, e.g., 7.4, 8.0, etc.
 - To build the extension for a 32-bit or a 64-bit PHP version, you can use the `Arch` input. It supports values `x64` and `x86`.
@@ -308,6 +314,13 @@ Invoke-PhpBuildExtension -ExtensionUrl https://github.com/xdebug/xdebug `
                          -Ts nts `
                          -Libraries "zlib" `
                          -Args "--with-xdebug"
+```
+
+To build an extension from a local source, run `Invoke-PhpBuildExtension` from the extension’s source directory and omit `ExtensionUrl` and `ExtensionRef` inputs.
+
+```powershell
+# cd to xdebug source directory, and then run
+Invoke-PhpBuildExtension -PhpVersion 8.4 -Arch x64 -Ts nts -Libraries "zlib" -Args "--with-xdebug"
 ```
 
 It should produce the extension builds in a directory named `artifacts` in the current directory.

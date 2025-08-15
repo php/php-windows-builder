@@ -6,6 +6,8 @@ function Add-BuildRequirements {
         PHP Version
     .PARAMETER Arch
         PHP Architecture
+    .PARAMETER FetchSrc
+        Fetch PHP source code
     #>
     [OutputType()]
     param (
@@ -16,14 +18,19 @@ function Add-BuildRequirements {
         [Parameter(Mandatory = $true, Position=1, HelpMessage='PHP Architecture')]
         [ValidateNotNull()]
         [ValidateSet('x86', 'x64')]
-        [string] $Arch
+        [string] $Arch,
+        [Parameter(Mandatory = $false, Position=2, HelpMessage='Fetch PHP source code')]
+        [ValidateNotNull()]
+        [bool] $FetchSrc = $True
     )
     begin {
     }
     process {
         Get-OciSdk -Arch $Arch
         Get-PhpSdk
-        Get-PhpSrc -PhpVersion $PhpVersion
+        if($FetchSrc) {
+            Get-PhpSrc -PhpVersion $PhpVersion
+        }
     }
     end {
     }

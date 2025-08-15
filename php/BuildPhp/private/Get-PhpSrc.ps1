@@ -8,8 +8,6 @@ function Get-PhpSrc {
     [OutputType()]
     param (
         [Parameter(Mandatory = $true, Position=0, HelpMessage='PHP Version')]
-        [ValidateNotNull()]
-        [ValidateLength(1, [int]::MaxValue)]
         [string] $PhpVersion
     )
     begin {
@@ -21,10 +19,13 @@ function Get-PhpSrc {
         $zipFile = "php-$PhpVersion.zip"
         $directory = "php-$PhpVersion-src"
 
-        if ($PhpVersion.Contains(".")) {
+        if ( $PhpVersion.Contains("."))
+        {
             $ref = "php-$PhpVersion"
             $url = "$baseUrl/refs/tags/php-$PhpVersion.zip"
-        } else {
+        }
+        else
+        {
             $ref = $PhpVersion
             $url = "$baseUrl/$PhpVersion.zip"
         }
@@ -37,7 +38,7 @@ function Get-PhpSrc {
         Get-File -Url $url -Outfile $zipFile
         [System.IO.Compression.ZipFile]::ExtractToDirectory($zipFilePath, $currentDirectory)
         Rename-Item -Path "php-src-$ref" -NewName $directory
-        [System.IO.Compression.ZipFile]::CreateFromDirectory($directoryPath,  $srcZipFilePath)
+        [System.IO.Compression.ZipFile]::CreateFromDirectory($directoryPath, $srcZipFilePath)
     }
     end {
     }

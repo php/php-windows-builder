@@ -72,6 +72,7 @@
         'Get-PhpSdk',
         'Get-PhpSrc',
         'Get-PhpTestPack',
+        'Get-SourcePhpVersion',
         'Get-TestSettings',
         'Get-TestsList'
         'Get-VsVersionHelper',

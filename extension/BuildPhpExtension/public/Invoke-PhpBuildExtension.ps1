@@ -62,11 +62,11 @@ function Invoke-PhpBuildExtension {
 
         $buildDirectory = Get-BuildDirectory
 
-        Set-Location "$buildDirectory"
-
         $source = Get-ExtensionSource -ExtensionUrl $ExtensionUrl -ExtensionRef $ExtensionRef
 
-        $extension = Get-Extension -ExtensionUrl $source.url -ExtensionRef $source.ref
+        $extension = Get-Extension -ExtensionUrl $source.url -ExtensionRef $source.ref -BuildDirectory $buildDirectory -LocalSrc $source.local
+
+        Set-Location "$buildDirectory"
 
         $config = Add-BuildRequirements -Extension $extension `
                                         -ExtensionRef $source.ref `
