@@ -19,10 +19,12 @@ function Get-VsVersionHelper {
     begin {
     }
     process {
-        if($null -eq (Get-Command vswhere -ErrorAction SilentlyContinue)) {
+        $installerDir = Join-Path "${env:ProgramFiles(x86)}\Microsoft Visual Studio" 'Installer'
+        $vswherePath = Join-Path $installerDir 'vswhere.exe'
+        if (-not (Test-Path $vswherePath)) {
             throw "vswhere is not available"
         }
-        $MSVCDirectory = vswhere -latest -products * -find "VC\Tools\MSVC"
+        $MSVCDirectory = & $vswherePath -latest -products * -find "VC\Tools\MSVC"
         $selectedToolset = $null
         $minor = $null
         foreach ($toolset in (Get-ChildItem $MSVCDirectory)) {
