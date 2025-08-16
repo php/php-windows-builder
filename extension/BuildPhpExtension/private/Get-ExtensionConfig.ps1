@@ -95,7 +95,7 @@ Function Get-ExtensionConfig {
             if(Test-Path composer.json) {
                 $composerJson = Get-Content composer.json -Raw | ConvertFrom-Json
             }
-            if($null -ne $composerJson -and $null -ne $composerJson."php-ext") {
+            if($null -ne $composerJson -and $null -ne $composerJson."php-ext" -and $null -ne $composerJson."php-ext"."configure-options") {
                 $composerJson."php-ext"."configure-options" | ForEach-Object {
                     $config.options += "--$( $_.name )"
                 }
