@@ -268,7 +268,7 @@ Then, you can build PHP by using the `Invoke-PhpBuild` command.
 Invoke-PhpBuild -PhpVersion '8.4.11' -Arch x64 -Ts nts
 ```
 
-To build PHP from a local source, run `Invoke-PhpBuild` from the source directory and omit `PhpVersion` input.
+To build PHP from a local source, run `Invoke-PhpBuild` from the source directory and omit the `PhpVersion` input.
 
 ```powershell
 Invoke-PhpBuild -Arch x64 -Ts nts
@@ -316,7 +316,7 @@ Invoke-PhpBuildExtension -ExtensionUrl https://github.com/xdebug/xdebug `
                          -Args "--with-xdebug"
 ```
 
-To build an extension from a local source, run `Invoke-PhpBuildExtension` from the extension’s source directory and omit `ExtensionUrl` and `ExtensionRef` inputs.
+To build an extension from a local source, run `Invoke-PhpBuildExtension` from the extension’s source directory and omit the `ExtensionUrl` and `ExtensionRef` inputs.
 
 ```powershell
 # cd to xdebug source directory, and then run
