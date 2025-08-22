@@ -21,6 +21,8 @@ Function Get-BuildDirectory {
             }
         }
 
+        $ParentBuildDirectory = [System.IO.Path]::GetFullPath($ParentBuildDirectory)
+
         $buildDirectory = [System.Guid]::NewGuid().ToString().substring(0, 8)
 
         $buildDirectoryPath = [System.IO.Path]::Combine($ParentBuildDirectory, $buildDirectory)
