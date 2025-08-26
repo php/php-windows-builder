@@ -54,7 +54,7 @@ function Invoke-PhpBuild {
         if(-not($fetchSrc)) {
             $sourcePath = $currentDirectory
         }
-        New-Item -ItemType SymbolicLink -Path $buildPath -Target $sourcePath -Force > $null 2>&1
+        Move-Item $sourcePath $buildPath
         Set-Location "$buildPath"
         New-Item "..\obj" -ItemType "directory" > $null 2>&1
         Copy-Item "..\config.$Ts.bat"
