@@ -16,7 +16,7 @@ Function Add-OciSdk {
         $suffix = if ($Config.arch -eq "x64") {"windows"} else {"nt"}
         @('sdk', 'basic') | ForEach-Object {
             $url = "https://download.oracle.com/otn_software/nt/instantclient/instantclient-$_-$suffix.zip"
-            Get-File -Url -OutFile "instantclient-$_.zip"
+            Get-File -Url $url -OutFile "instantclient-$_.zip"
             Expand-Archive -Path "instantclient-$_.zip" -DestinationPath "../deps" -Force
         }
         Copy-Item ../deps/instantclient_*/sdk/* -Destination "../deps" -Recurse -Force
