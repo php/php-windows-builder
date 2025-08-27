@@ -75,7 +75,7 @@ function Get-Extension {
             }
         }
 
-        $configW32 = Get-ChildItem (Get-Location).Path -Recurse -Filter "config.w32" -ErrorAction SilentlyContinue
+        $configW32 = Get-ChildItem (Get-Location).Path -Recurse -Filter "config.w32" -ErrorAction SilentlyContinue | Select-Object -First 1
         if($null -eq $configW32) {
             if($LocalSrc) {
                 throw "No config.w32 found, please make sure you are in the extension source directory and it supports Windows."
