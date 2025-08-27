@@ -199,7 +199,7 @@ Function Get-ExtensionConfig {
             }
 
             # TODO: This should be implemented using composer.json once implemented
-            $packageXml = Get-ChildItem (Get-Location).Path -Recurse -Filter "package.xml" -ErrorAction SilentlyContinue
+            $packageXml = Get-ChildItem (Get-Location).Path -Recurse -Filter "package.xml" -ErrorAction SilentlyContinue | Select-Object -First 1
             if($null -ne $packageXml) {
                 $xml = [xml](Get-Content $packageXml.FullName)
                 $config.docs = $xml.SelectNodes("//*[@role='doc']") | ForEach-Object {
