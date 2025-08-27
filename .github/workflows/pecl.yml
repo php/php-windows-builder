@@ -114,7 +114,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ls -l artifacts
-          extension=$(basename "${{ inputs.extension-url }}")
+          extension=$(basename "${{ inputs.extension-url }}" | tr '[:upper:]' '[:lower:]')
           mkdir -p /tmp/$extension/${{ inputs.extension-ref }}/
           cp -a artifacts/* /tmp/$extension/${{ inputs.extension-ref }}/
           cd /tmp || exit 1
