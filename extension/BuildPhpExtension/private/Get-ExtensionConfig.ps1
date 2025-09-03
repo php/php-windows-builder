@@ -97,10 +97,12 @@ Function Get-ExtensionConfig {
             }
             if($null -ne $composerJson -and $null -ne $composerJson."php-ext" -and $null -ne $composerJson."php-ext"."configure-options") {
                 $composerJson."php-ext"."configure-options" | ForEach-Object {
-                    if($null -ne $_."needs-value" -and $_."needs-value" -eq $true -and $_.name -eq "with-$($Extension.ToLower())") {
-                        $config.options += "--$($_.name)=shared"
-                    } else {
-                        $config.options += "--$( $_.name )"
+                    if($_.name -eq "enable-$($Extension.ToLower())" -or $_.name -eq "with-$($Extension.ToLower())") {
+                        if($null -ne $_."needs-value" -and $_."needs-value" -eq $true -and $_.name -eq "with-$($Extension.ToLower())") {
+                            $config.options += "--$($_.name)=shared"
+                        } else {
+                            $config.options += "--$( $_.name )"
+                        }
                     }
                 }
             }
