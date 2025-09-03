@@ -188,8 +188,10 @@ Upload the artifacts to a release.
 ```yaml
 name: Build extension
 on:
+  # When a new release is created, we can build, and upload the DLLs to it.
   release:
-    types: [published]
+    types: [created]
+  # push: # Uncomment this to run on push to a branch
   # create: # Uncomment this to run on tag/branch creation
   # pull_request: # Uncomment this to run on pull requests  
 
@@ -199,16 +201,22 @@ on:
 #  contents: write
 
 jobs:
+  # This job generates a matrix of PHP versions, architectures, and thread safety options
+  # This is done by reading the constraints from composer.json or the package.xml file.
+  # Please refer to https://github.com/php/php-windows-builder#get-the-job-matrix-to-build-a-php-extension
   get-extension-matrix:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.extension-matrix.outputs.matrix }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+
       - name: Get the extension matrix
         id: extension-matrix
         uses: php/php-windows-builder/extension-matrix@v1
+
+  # This job builds the extension on Windows using the matrix generated from the previous job.      
   build:
     needs: get-extension-matrix
     runs-on: ${{ matrix.os }}
@@ -216,13 +224,18 @@ jobs:
       matrix: ${{fromJson(needs.get-extension-matrix.outputs.matrix)}}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+
       - name: Build the extension
         uses: php/php-windows-builder/extension@v1
         with:
+          # Always specify the php-version, arch, and ts as they are required inputs.
+          # Please refer to https://github.com/php/php-windows-builder#build-a-php-extension
           php-version: ${{ matrix.php-version }}
           arch: ${{ matrix.arch }}
           ts: ${{ matrix.ts }}
+          
+  # This job uploads the built artifacts to the GitHub release.
   release:
     runs-on: ubuntu-latest
     needs: build
@@ -234,6 +247,8 @@ jobs:
           release: ${{ github.event.release.tag_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
 ```
+
+For more example workflows, please refer to the [examples](./examples) directory.
 
 ## Local Setup
 

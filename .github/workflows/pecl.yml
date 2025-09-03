@@ -1,3 +1,7 @@
+# Caution: This workflow is internal to the php-windows-builder repository.
+# Do not copy this workflow to your repository.
+# Instead, refer to the workflows in the examples/ directory.
+
 name: Build PHP Extension From PECL
 run-name: Build PHP Extension ${{ inputs.extension-url }}, ${{ inputs.extension-ref }}
 on:
