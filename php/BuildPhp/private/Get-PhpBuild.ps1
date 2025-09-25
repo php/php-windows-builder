@@ -41,11 +41,11 @@ function Get-PhpBuild {
             }
         }
         $versionInUrl = $PhpVersion
-        if($PhpVersion -eq 'master' -or $PhpVersion -eq '8.5') {
+        if($PhpVersion -eq 'master') {
             $fallbackBaseUrl = $baseUrl = "https://github.com/shivammathur/php-builder-windows/releases/download/master"
             $versionInUrl = "master"
         } else {
-            $releaseState = if ($PhpVersion -match "[a-z]") {"qa"} else {"releases"}
+            $releaseState = if ($PhpVersion -match "[a-z]" -or $PhpVersion -eq '8.5') {"qa"} else {"releases"}
             $baseUrl = "https://downloads.php.net/~windows/$releaseState"
             $fallbackBaseUrl = "https://downloads.php.net/~windows/$releaseState/archives"
         }
