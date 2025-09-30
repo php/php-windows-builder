@@ -32,13 +32,29 @@ function Add-TestRequirements {
         [string] $VsVersion,
         [Parameter(Mandatory = $false, Position=4, HelpMessage='Tests Directory')]
         [ValidateLength(1, [int]::MaxValue)]
-        [string] $TestsDirectory
+        [string] $TestsDirectory,
+        [Parameter(Mandatory = $true, Position=5, HelpMessage='Artifacts Directory')]
+        [ValidateNotNull()]
+        [string] $ArtifactsDirectory
     )
     begin {
     }
     process {
-        Get-PhpBuild -PhpVersion $PhpVersion -Arch $Arch -Ts $Ts -VsVersion $VsVersion
-        Get-PhpTestPack -PhpVersion $PhpVersion -TestsDirectory $TestsDirectory
+        $versionInUrl = $PhpVersion
+        if($PhpVersion -eq 'master') {
+            $versionInUrl = "master"
+        }
+        $tsPart = if ($Ts -eq "nts") {"nts-Win32"} else {"Win32"}
+        $binZipFile = "php-$versionInUrl-$tsPart-$VsVersion-$Arch.zip"
+        $testZipFile = "php-test-pack-$versionInUrl.zip"
+        if(-not(Test-Path "$ArtifactsDirectory\$binZipFile")) {
+            Write-Host "Downloading PHP build $binZipFile..."
+            Get-PhpBuild -PhpVersion $PhpVersion -Arch $Arch -Ts $Ts -VsVersion $VsVersion
+        }
+        if(-not(Test-Path "$ArtifactsDirectory\$testZipFile")) {
+            Write-Host "Downloading PHP test pack $testZipFile..."
+            Get-PhpTestPack -PhpVersion $PhpVersion -TestsDirectory $TestsDirectory
+        }
     }
     end {
     }
