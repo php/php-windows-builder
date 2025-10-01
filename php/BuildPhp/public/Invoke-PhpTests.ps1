@@ -50,7 +50,7 @@ function Invoke-PhpTests {
 
         Set-Location "$buildDirectory"
 
-        Add-TestRequirements -PhpVersion $PhpVersion -Arch $Arch -Ts $Ts -VsVersion $VsData.vs -TestsDirectory $testsDirectory
+        Add-TestRequirements -PhpVersion $PhpVersion -Arch $Arch -Ts $Ts -VsVersion $VsData.vs -TestsDirectory $testsDirectory -ArtifactsDirectory $currentDirectory\artifacts
 
         Set-PhpIniForTests -BuildDirectory $buildDirectory -Opcache $Opcache
 
