@@ -70,6 +70,9 @@ Function Get-ExtensionConfig {
             if($Extension.Contains("ddtrace")) {
                 $packageName = "datadog_trace"
             }
+            if($Extension -eq "http") {
+                $packageName = "pecl_http"
+            }
             $config = [PSCustomObject]@{
                 name = $Extension
                 package_name = $packageName
