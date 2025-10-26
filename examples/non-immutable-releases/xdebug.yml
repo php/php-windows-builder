@@ -1,0 +1,67 @@
+# This workflow assumes that it is in a repository that contains the Xdebug extension source code.
+name: Build and Test Xdebug on Windows
+on:
+  push:
+  pull_request:
+  # When a new release is created, we can build, and upload the DLLs to it.
+  release:
+    types: [created]
+permissions:
+  contents: write
+jobs:
+  # This job generates a matrix of PHP versions, architectures, and thread safety options
+  # This is done by reading the constraints from composer.json or the package.xml file.
+  # Please refer to https://github.com/php/php-windows-builder#get-the-job-matrix-to-build-a-php-extension
+  get-extension-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.extension-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Get the extension matrix
+        id: extension-matrix
+        uses: php/php-windows-builder/extension-matrix@v1
+
+  # This job builds the extension on Windows using the matrix generated from the previous job.
+  build:
+    needs: get-extension-matrix
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix: ${{fromJson(needs.get-extension-matrix.outputs.matrix)}}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Build the extension
+        uses: php/php-windows-builder/extension@v1
+        with:
+          # Always specify the php-version, arch, and ts as they are required inputs.
+          # Please refer to https://github.com/php/php-windows-builder#build-a-php-extension
+          php-version: ${{ matrix.php-version }}
+          arch: ${{ matrix.arch }}
+          ts: ${{ matrix.ts }}
+
+          # Refer to your config.w32 file to find the libraries you need.
+          # Refer to the following directories to see if we support the libraries you need.
+          # https://downloads.php.net/~windows/pecl/deps
+          # https://downloads.php.net/~windows/php-sdk/deps
+          libs: zlib
+
+          # Refer to your config.w32 file to find the arguments you need to pass to the ./configure step.
+          # It will add the --enable-<extension> or --with-<extension> argument if configured in the composer.json file.
+          # In this case, we need to add the --with-xdebug argument manually.
+          args: --with-xdebug
+
+  # This job uploads the built artifacts to the GitHub release.
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    if: ${{ github.event_name == 'release' }}
+    steps:
+      - name: Upload artifact to the release
+        uses: php/php-windows-builder/release@v1
+        with:
+          release: ${{ github.event.release.tag_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}

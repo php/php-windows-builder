@@ -12,7 +12,12 @@ inputs:
     required: true
   token:
     description: 'GitHub token'
-    required: true
+    required: false
+    default: ${{ github.token }}
+  draft:
+    description: 'Whether the release is a draft'
+    required: false
+    default: 'false'
 
 runs:
   using: composite
@@ -20,14 +25,56 @@ runs:
     - name: Checkout
       uses: actions/checkout@v5
 
+    - name: Get Ref
+      id: ref
+      env:
+        REF: ${{ inputs.release }}
+      shell: bash
+      run: |
+        REF="${REF#refs/tags/}"
+        echo "ref=$REF" >> "$GITHUB_OUTPUT"
+
     - name: Get artifacts
       uses: actions/download-artifact@v5
       with:
         path: artifacts
         merge-multiple: true
 
+    - name:  Create release
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        REF: ${{ steps.ref.outputs.ref }}
+      run: |
+        if ! gh release view "$REF" >/dev/null 2>&1; then
+          gh release create "$REF" --draft --title "${{ steps.ref.outputs.ref }}" --notes ""
+        else
+          echo "Release $REF already exists"
+        fi
+
     - name: Upload artifacts
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ inputs.token }}
-      run: gh release upload ${{ inputs.release }} artifacts/php* --clobber
+        GH_TOKEN: ${{ inputs.token }}
+        REF: ${{ steps.ref.outputs.ref }}
+      run: |
+        if gh release verify $REF > /dev/null 2>&1; then
+          link="https://github.com/php/php-windows-builder#example-workflow-for-immutable-releases"
+          error="Release $REF already exists, and it is immutable. For using immutable releases please refer to $link"
+          [[ "${GITHUB_ACTIONS:-}" == "true" ]] && echo "::error::$error" || echo "$error"
+          exit 1
+        else
+          gh release upload $REF artifacts/php* --clobber
+        fi
+
+    - name: Publish release
+      if: ${{ inputs.draft == 'false' }}
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        REF: ${{ steps.ref.outputs.ref }}
+      run: |
+        IS_DRAFT="$(gh release view "$REF" --json isDraft --jq '.isDraft' || echo true)"
+        if [[ "$IS_DRAFT" == "true" ]]; then
+          gh release edit "$REF" --draft=false
+        fi

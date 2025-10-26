@@ -2,10 +2,11 @@
 name: Build and Test Xdebug on Windows
 on:
   push:
+    tags: ['*']
+    branches: ['**']
   pull_request:
-  # When a new release is created, we can build, and upload the DLLs to it.
-  release:
-    types: [created]
+permissions:
+  contents: write
 jobs:
   # This job generates a matrix of PHP versions, architectures, and thread safety options
   # This is done by reading the constraints from composer.json or the package.xml file.
@@ -52,14 +53,16 @@ jobs:
           # In this case, we need to add the --with-xdebug argument manually.
           args: --with-xdebug
 
-  # This job uploads the built artifacts to the GitHub release.
+  # This job uploads the build artifacts to the immutable GitHub release it creates.
   release:
     runs-on: ubuntu-latest
     needs: build
-    if: ${{ github.event_name == 'release' }}
+    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') }}
     steps:
       - name: Upload artifact to the release
         uses: php/php-windows-builder/release@v1
         with:
-          release: ${{ github.event.release.tag_name }}
+          release: ${{ github.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
+          # Uncomment the line below to create a draft release
+          # draft: 'true'

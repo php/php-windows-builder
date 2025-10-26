@@ -16,7 +16,8 @@ This project provides PowerShell packages and GitHub Actions to build PHP and it
         - [PHP Version Support](#php-version-support)
     - [Release](#release)
         - [Inputs](#inputs-3)
-        - [Example workflow to build and release an extension](#example-workflow-to-build-and-release-an-extension)
+        - [Example workflow for non-immutable releases](#example-workflow-for-non-immutable-releases)
+        - [Example workflow for immutable releases](#example-workflow-for-immutable-releases)
 
 - [Local Setup](#local-setup)
     - [PHP](#php)
@@ -180,10 +181,15 @@ Upload the artifacts to a release.
 
 #### Inputs
 
-- `release` (required) - The release to upload the artifacts.
-- `token` (required) - The GitHub token to authenticate with.
+- `release` (required) - The release/tag to upload the artifacts.
+- `token` (optional) - The GitHub token to authenticate with. Defaults to `GITHUB_TOKEN` secret.
+- `draft` (optional) - Whether to create a draft release if the release does not exist. Defaults to `false`.
 
-#### Example workflow to build and release an extension
+#### Example workflow for non-immutable releases
+
+Follow this if you are creating the release and they are not immutable (This is the default).
+
+For non-immutable releases, you can publish them, and the workflow will upload the extension builds to the release.
 
 ```yaml
 name: Build extension
@@ -195,10 +201,8 @@ on:
   # create: # Uncomment this to run on tag/branch creation
   # pull_request: # Uncomment this to run on pull requests  
 
-# This may be needed to be able to upload the assets to the release
-# See: https://docs.github.com/en/actions/security-guides/automatic-token-authentication#modifying-the-permissions-for-the-github_token
-#permissions:
-#  contents: write
+permissions:
+  contents: write
 
 jobs:
   # This job generates a matrix of PHP versions, architectures, and thread safety options
@@ -246,6 +250,77 @@ jobs:
         with:
           release: ${{ github.event.release.tag_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+#### Example workflow for immutable releases
+
+Follow this if you are using immutable releases.
+
+For immutable releases, please do not create a new release using the GitHub UI, you can push a new tag, and the workflow will create a new release, build the extension, and upload the builds to the release.
+
+It publishes the release by default, and then you can edit the release notes as needed, If you want to create a draft release, set the `draft` input to `true` in the `release` job.
+
+```yaml
+name: Build extension
+on:
+  # When a new tag is pushed, we can build, and upload the DLLs to it.
+  push:
+    # branches: ['**'] # Uncomment this to run on push to a branch
+    tags: ['*']
+  # create: # Uncomment this to run on tag/branch creation
+  # pull_request: # Uncomment this to run on pull requests  
+
+permissions:
+  contents: write
+
+jobs:
+  # This job generates a matrix of PHP versions, architectures, and thread safety options
+  # This is done by reading the constraints from composer.json or the package.xml file.
+  # Please refer to https://github.com/php/php-windows-builder#get-the-job-matrix-to-build-a-php-extension
+  get-extension-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.extension-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Get the extension matrix
+        id: extension-matrix
+        uses: php/php-windows-builder/extension-matrix@v1
+
+  # This job builds the extension on Windows using the matrix generated from the previous job.      
+  build:
+    needs: get-extension-matrix
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix: ${{fromJson(needs.get-extension-matrix.outputs.matrix)}}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Build the extension
+        uses: php/php-windows-builder/extension@v1
+        with:
+          # Always specify the php-version, arch, and ts as they are required inputs.
+          # Please refer to https://github.com/php/php-windows-builder#build-a-php-extension
+          php-version: ${{ matrix.php-version }}
+          arch: ${{ matrix.arch }}
+          ts: ${{ matrix.ts }}
+          
+  # This job uploads the build artifacts to the immutable GitHub release it creates.
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') }}
+    steps:
+      - name: Upload artifact to the release
+        uses: php/php-windows-builder/release@v1
+        with:
+          release: ${{ github.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # Uncomment the line below to create a draft release
+          # draft: 'true' 
 ```
 
 For more example workflows, please refer to the [examples](./examples) directory.

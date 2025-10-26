@@ -6,6 +6,8 @@ on:
   # When a new release is created, we can build, and upload the DLLs to it.
   release:
     types: [created]
+permissions:
+  contents: write
 jobs:
   # This job generates a matrix of PHP versions, architectures, and thread safety options
   # This is done by reading the constraints from composer.json or the package.xml file.
