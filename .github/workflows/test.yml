@@ -34,7 +34,7 @@ jobs:
                           -Opcache ${{matrix.opcache}}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: test-results-${{matrix.arch}}-${{matrix.ts}}-${{matrix.opcache}}
           path: test-${{matrix.arch}}-${{matrix.ts}}-${{matrix.opcache}}.xml

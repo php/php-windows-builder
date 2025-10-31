@@ -86,7 +86,7 @@ runs:
                                  -Ts ${{inputs.ts}}
 
     - name: Upload the build artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: ${{ steps.build.outputs.artifact }}
         path: artifacts/*
