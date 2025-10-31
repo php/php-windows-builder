@@ -27,7 +27,7 @@ jobs:
       - name: Build
         uses: ./php
         with:
-          php-version: ${{ github.event.inputs.php-version }}
+          php-version: ${{ inputs.php-version }}
           arch: ${{ matrix.arch }}
           ts: ${{ matrix.ts }}
 
@@ -38,14 +38,48 @@ jobs:
       artifact-id: ${{ steps.artifacts.outputs.artifact-id }}
     steps:
       - name: Upload artifacts
-        uses: actions/upload-artifact/merge@v4
+        uses: actions/upload-artifact/merge@v5
         id: artifacts
         with:
           name: artifacts
           delete-merged: true
+  tests:
+    strategy:
+      matrix:
+        arch: [x64, x86]
+        ts: [nts, ts]
+        opcache: [opcache, nocache]
+    runs-on: windows-2022
+    needs: artifacts
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v5
+        id: artifacts
+        with:
+          name: artifacts
+
+      - name: Test PHP
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          Import-Module (Join-Path $(pwd).Path '\php\BuildPhp') -Force          
+          Invoke-PhpTests -PhpVersion ${{inputs.php-version}} `
+                          -Arch ${{matrix.arch}} `
+                          -Ts ${{matrix.ts}} `
+                          -Opcache ${{matrix.opcache}}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v5
+        continue-on-error: true
+        with:
+          name: test-results-${{matrix.arch}}-${{matrix.ts}}-${{matrix.opcache}}
+          path: test-${{matrix.arch}}-${{matrix.ts}}-${{matrix.opcache}}.xml
   upload:
     runs-on: ubuntu-latest
-    needs: artifacts
+    needs: tests
     if: ${{ github.event.inputs.upload == 'true' }}
     steps:
       - name: Upload to downloads server

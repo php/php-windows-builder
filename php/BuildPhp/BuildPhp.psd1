@@ -61,10 +61,10 @@
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
     FunctionsToExport = @(
-        # Private functions
+        # Private functions (sorted)
         'Add-BuildRequirements',
-        'Add-TestRequirements',
         'Add-Path',
+        'Add-TestRequirements',
         'Add-Vs',
         'Get-File',
         'Get-OciSdk',
@@ -74,11 +74,18 @@
         'Get-PhpTestPack',
         'Get-SourcePhpVersion',
         'Get-TestSettings',
-        'Get-TestsList'
-        'Get-VsVersionHelper',
+        'Get-TestsList',
         'Get-VsVersion',
+        'Get-VsVersionHelper',
+        'Set-EnchantTestEnvironment',
+        'Set-FirebirdTestEnvironment',
+        'Set-MsSqlTestEnvironment',
+        'Set-MySqlTestEnvironment',
         'Set-NetSecurityProtocolType',
-        'Set-PhpIniForTests'
+        'Set-OdbcTestEnvironment',
+        'Set-PgSqlTestEnvironment',
+        'Set-PhpIniForTests',
+        'Set-SnmpTestEnvironment',
 
         # Public functions
         'Invoke-PhpBuild',
@@ -139,4 +146,3 @@
     # DefaultCommandPrefix = ''
 
 }
-

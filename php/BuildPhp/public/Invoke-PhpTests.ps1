@@ -40,6 +40,8 @@ function Invoke-PhpTests {
 
         $currentDirectory = (Get-Location).Path
 
+        Get-ChildItem $currentDirectory
+
         $tempDirectory = [System.IO.Path]::GetTempPath()
 
         $buildDirectory = [System.IO.Path]::Combine($tempDirectory, [System.Guid]::NewGuid().ToString())
@@ -48,9 +50,11 @@ function Invoke-PhpTests {
 
         New-Item "$buildDirectory" -ItemType "directory" -Force > $null 2>&1
 
+        New-Item "$buildDirectory\tmp" -ItemType "directory" -Force > $null 2>&1
+
         Set-Location "$buildDirectory"
 
-        Add-TestRequirements -PhpVersion $PhpVersion -Arch $Arch -Ts $Ts -VsVersion $VsData.vs -TestsDirectory $testsDirectory
+        Add-TestRequirements -PhpVersion $PhpVersion -Arch $Arch -Ts $Ts -VsVersion $VsData.vs -TestsDirectory $testsDirectory -ArtifactsDirectory $currentDirectory
 
         Set-PhpIniForTests -BuildDirectory $buildDirectory -Opcache $Opcache
 
@@ -61,22 +65,24 @@ function Invoke-PhpTests {
 
         $Env:OPENSSL_CONF = "$buildDirectory\phpbin\extras\ssl\openssl.cnf"
 
-        $env:MYSQL_TEST_PORT = "3306"
-        $Env:MYSQL_TEST_USER = "root"
-        $Env:MYSQL_TEST_PASSWD = ""
-        $Env:MYSQL_TEST_DB = "test"
-
-        $Env:PDO_MYSQL_TEST_DSN = "mysql:host=localhost;dbname=test"
-        $Env:PDO_MYSQL_TEST_USER = "root"
-        $Env:PDO_MYSQL_TEST_PASS = ""
-
         Set-Location "$testsDirectory"
 
         Get-TestsList -OutputFile "tests-to-run.txt"
 
         $settings = Get-TestSettings -PhpVersion $PhpVersion
 
-        php $settings.runner $settings.progress "-g" "FAIL,BORK,WARN,LEAK" "-r" "tests-to-run.txt"
+        php `
+            $settings.runner `
+            $settings.progress `
+            "-g" "FAIL,BORK,WARN,LEAK" `
+            "-q" `
+            "--offline" `
+            "--show-diff" `
+            "--show-slow" "1000" `
+            "--set-timeout" "120" `
+            "--temp-source" "$buildDirectory\tmp" `
+            "--temp-target" "$buildDirectory\tmp" `
+            "-r" "tests-to-run.txt"
 
         Copy-Item "$buildDirectory\test-$Arch-$Ts-$Opcache.xml" $currentDirectory
 
