@@ -48,6 +48,8 @@ function Invoke-PhpTests {
 
         New-Item "$buildDirectory" -ItemType "directory" -Force > $null 2>&1
 
+        New-Item "$buildDirectory\tmp" -ItemType "directory" -Force > $null 2>&1
+
         Set-Location "$buildDirectory"
 
         Add-TestRequirements -PhpVersion $PhpVersion -Arch $Arch -Ts $Ts -VsVersion $VsData.vs -TestsDirectory $testsDirectory -ArtifactsDirectory $currentDirectory\artifacts
@@ -76,7 +78,18 @@ function Invoke-PhpTests {
 
         $settings = Get-TestSettings -PhpVersion $PhpVersion
 
-        php $settings.runner $settings.progress "-g" "FAIL,BORK,WARN,LEAK" "-r" "tests-to-run.txt"
+        php `
+            $settings.runner `
+            $settings.progress `
+            "-g" "FAIL,BORK,WARN,LEAK" `
+            "-q" `
+            "--offline" `
+            "--show-diff" `
+            "--show-slow" "1000" `
+            "--set-timeout" "120" `
+            "--temp-source" "$buildDirectory\tmp" `
+            "--temp-target" "$buildDirectory\tmp" `
+            "-r" "tests-to-run.txt"
 
         Copy-Item "$buildDirectory\test-$Arch-$Ts-$Opcache.xml" $currentDirectory
 
