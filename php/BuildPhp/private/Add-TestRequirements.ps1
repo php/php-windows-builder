@@ -40,6 +40,7 @@ function Add-TestRequirements {
     begin {
     }
     process {
+        Add-Type -Assembly "System.IO.Compression.Filesystem"
         $versionInUrl = $PhpVersion
         if($PhpVersion -eq 'master') {
             $versionInUrl = "master"
@@ -47,13 +48,26 @@ function Add-TestRequirements {
         $tsPart = if ($Ts -eq "nts") {"nts-Win32"} else {"Win32"}
         $binZipFile = "php-$versionInUrl-$tsPart-$VsVersion-$Arch.zip"
         $testZipFile = "php-test-pack-$versionInUrl.zip"
-        if(-not(Test-Path "$ArtifactsDirectory\$binZipFile")) {
+
+        $currentDirectory = (Get-Location).Path
+        $binZipFilePath = Join-Path $ArtifactsDirectory $binZipFile
+        $binDirectoryPath = Join-Path $currentDirectory phpbin
+
+        $testZipFilePath = Join-Path $ArtifactsDirectory $testZipFile
+        $testsDirectoryPath = Join-Path $currentDirectory $TestsDirectory
+
+        if(-not(Test-Path $binZipFilePath)) {
             Write-Host "Downloading PHP build $binZipFile..."
             Get-PhpBuild -PhpVersion $PhpVersion -Arch $Arch -Ts $Ts -VsVersion $VsVersion
+        } else {
+            [System.IO.Compression.ZipFile]::ExtractToDirectory($binZipFilePath, $binDirectoryPath)
         }
-        if(-not(Test-Path "$ArtifactsDirectory\$testZipFile")) {
+
+        if(-not(Test-Path $testZipFilePath)) {
             Write-Host "Downloading PHP test pack $testZipFile..."
             Get-PhpTestPack -PhpVersion $PhpVersion -TestsDirectory $TestsDirectory
+        } else {
+            [System.IO.Compression.ZipFile]::ExtractToDirectory($testZipFilePath, $testsDirectoryPath)
         }
     }
     end {

@@ -32,7 +32,7 @@ runs:
                         -Ts ${{inputs.ts}}
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: artifacts-${{inputs.php-version}}-${{inputs.arch}}-${{inputs.ts}}
         path: artifacts/*
