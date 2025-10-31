@@ -61,11 +61,6 @@ jobs:
         with:
           name: artifacts
 
-      - name: Setup MySQL
-        uses: ankane/setup-mysql@v1
-        with:
-          database: test
-
       - name: Test PHP
         shell: pwsh
         continue-on-error: true
