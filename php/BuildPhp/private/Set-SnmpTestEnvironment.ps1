@@ -42,6 +42,9 @@ function Set-SnmpTestEnvironment {
         if (-not (Test-Path -LiteralPath $snmpd)) {
             throw "snmpd.exe not found at $snmpd"
         }
-        Start-Process -FilePath $snmpd -ArgumentList @('-C','-c', $confPath, '-Ln') -WindowStyle Hidden | Out-Null
+        if(-not(Test-Path snmpd_running)) {
+            Start-Process -FilePath $snmpd -ArgumentList @('-C','-c', $confPath, '-Ln') -WindowStyle Hidden
+            Set-Content -Path snmpd_running -Value "running" -Encoding ASCII
+        }
     }
 }

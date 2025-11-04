@@ -6,7 +6,7 @@ function Set-MsSqlTestEnvironment {
     [CmdletBinding()]
     param ()
     process {
-        & choco install sql-server-express -y --no-progress --install-arguments="/SECURITYMODE=SQL /SAPWD=Password12!" | Out-Null
+        & choco install sql-server-express -y --no-progress --install-arguments="/SECURITYMODE=SQL /SAPWD=Password12!"
     }
 }
 

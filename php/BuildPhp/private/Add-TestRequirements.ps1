@@ -70,29 +70,19 @@ function Add-TestRequirements {
             [System.IO.Compression.ZipFile]::ExtractToDirectory($testZipFilePath, $testsDirectoryPath)
         }
 
-        $ldapDll = Join-Path $binDirectoryPath 'php_ldap.dll'
-        Remove-Item -LiteralPath $ldapDll -Force -ErrorAction SilentlyContinue
-
-        $phpExePath = Join-Path $binDirectoryPath 'php.exe'
-        $phpCgiPath = Join-Path $binDirectoryPath 'php-cgi.exe'
-        try { & editbin "/stack:8388608" $phpExePath | Out-Null } catch {}
-        try { & editbin "/stack:8388608" $phpCgiPath | Out-Null } catch {}
-
-        $Env:TEST_PHPDBG_EXECUTABLE = (Join-Path $binDirectoryPath 'phpdbg.exe')
-
         Get-PhpSdk
         $env:DEPS_DIR = "$currentDirectory/../deps"
         New-Item "$env:DEPS_DIR" -ItemType "directory" -Force > $null 2>&1
         $branch = if ($PhpVersion -eq 'master') {'master'} else {($PhpVersion -split '\.')[0..1] -join '.'}
-        & "$currentDirectory\php-sdk\bin\phpsdk_deps.bat" --update --no-backup --branch $branch --stability staging --deps $env:DEPS_DIR --crt $VsVersion --arch $Arch
-
-        Set-MySqlTestEnvironment
-        Set-PgSqlTestEnvironment
-        Set-OdbcTestEnvironment
-        Set-MsSqlTestEnvironment
-        Set-FirebirdTestEnvironment
-        Set-EnchantTestEnvironment
-        Set-SnmpTestEnvironment -TestsDirectoryPath $testsDirectoryPath
+        $env:PHP_SDK_VS = $VsVersion
+        $env:PHP_SDK_ARCH = $Arch
+        $bat_content = @()
+        $bat_content += "cmd /c phpsdk_deps --update --force --no-backup --branch $branch --stability staging --deps $env:DEPS_DIR"
+        $bat_content += "editbin /stack:8388608 $binDirectoryPath\php.exe"
+        $bat_content += "editbin /stack:8388608 $binDirectoryPath\php-cgi.exe"
+        Set-Content -Encoding "ASCII" -Path vs.bat -Value $bat_content
+        & "$currentDirectory\php-sdk\phpsdk-starter.bat" -c $VsVersion -a $Arch -t vs.bat
+        Add-Path "$env:DEPS_DIR\bin"
     }
     end {
     }

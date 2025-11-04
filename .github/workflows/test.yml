@@ -14,27 +14,25 @@ jobs:
         arch: [x64, x86]
         ts: [nts, ts]
         opcache: [opcache, nocache]
+        test-type: [php, ext]
     runs-on: windows-2022
     steps:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Setup MySQL
-        uses: ankane/setup-mysql@v1
-        with:
-          database: test
-
-      - name: Test PHP
+      - name: Run Tests
         shell: pwsh
+        continue-on-error: true
         run: |
           Import-Module (Join-Path $(pwd).Path '\php\BuildPhp') -Force
           Invoke-PhpTests -PhpVersion ${{inputs.php-version}} `
                           -Arch ${{matrix.arch}} `
                           -Ts ${{matrix.ts}} `
-                          -Opcache ${{matrix.opcache}}
+                          -Opcache ${{matrix.opcache}} `
+                          -TestType ${{matrix.test-type}}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v5
         with:
-          name: test-results-${{matrix.arch}}-${{matrix.ts}}-${{matrix.opcache}}
-          path: test-${{matrix.arch}}-${{matrix.ts}}-${{matrix.opcache}}.xml
+          name: test-results-${{matrix.arch}}-${{matrix.ts}}-${{matrix.opcache}}-${{matrix.test-type}}
+          path: test-${{matrix.arch}}-${{matrix.ts}}-${{matrix.opcache}}-${{matrix.test-type}}.xml

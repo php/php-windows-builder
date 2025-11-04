@@ -25,7 +25,3 @@ ext\xmlwriter\tests
 ext\xml\tests
 ext\zip\tests
 ext\zlib\tests
-Sapi\cgi\tests
-Sapi\cli\tests
-tests
-Zend\tests

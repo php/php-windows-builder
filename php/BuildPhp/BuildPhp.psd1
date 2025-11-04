@@ -83,6 +83,7 @@
         'Set-MySqlTestEnvironment',
         'Set-NetSecurityProtocolType',
         'Set-OdbcTestEnvironment',
+        'Set-OpenSslTestEnvironment',
         'Set-PgSqlTestEnvironment',
         'Set-PhpIniForTests',
         'Set-SnmpTestEnvironment',

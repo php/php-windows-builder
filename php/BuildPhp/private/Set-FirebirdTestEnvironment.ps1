@@ -39,11 +39,13 @@ function Set-FirebirdTestEnvironment {
 
         $setupSql = Join-Path $destDir 'setup.sql'
         Set-Content -Path $setupSql -Value "create database '$($env:PDO_FIREBIRD_TEST_DATABASE)' user '$($env:PDO_FIREBIRD_TEST_USER)' password '$($env:PDO_FIREBIRD_TEST_PASS)';" -Encoding ASCII
-
-        & (Join-Path $destDir 'instsvc.exe') install -n TestInstance | Out-Null
-        & (Join-Path $destDir 'isql') -q -i $setupSql | Out-Null
-        & (Join-Path $destDir 'isql') -q -i $createUserSql -user sysdba $env:PDO_FIREBIRD_TEST_DATABASE | Out-Null
-        & (Join-Path $destDir 'instsvc.exe') start -n TestInstance | Out-Null
+        if(-not(Test-Path pdo_firebird_db_created)) {
+            & (Join-Path $destDir 'instsvc.exe') install -n TestInstance | Out-Null
+            & (Join-Path $destDir 'isql') -q -i $setupSql | Out-Null
+            & (Join-Path $destDir 'isql') -q -i $createUserSql -user sysdba $env:PDO_FIREBIRD_TEST_DATABASE | Out-Null
+            & (Join-Path $destDir 'instsvc.exe') start -n TestInstance | Out-Null
+            Set-Content -Path pdo_firebird_db_created -Value "db_created" -Encoding ASCII
+        }
 
         Add-Path $destDir
     }

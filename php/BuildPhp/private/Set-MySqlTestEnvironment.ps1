@@ -12,10 +12,13 @@ function Set-MySqlTestEnvironment {
         $User = 'root'
         $Password = 'Password12!'
         $Port = 3306
-        & mysqld --initialize-insecure | Out-Null
-        & mysqld --install | Out-Null
-        & net start "MySQL" | Out-Null
-        & mysql --port=$Port --user=root --password="" -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$($Password)'; FLUSH PRIVILEGES;" | Out-Null
+        if(-not(Test-Path mysql_init)) {
+            & mysqld --initialize-insecure
+            & mysqld --install
+            & net start "MySQL"
+            & mysql --port=$Port --user=root --password="" -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$( $Password )'; FLUSH PRIVILEGES;" 2> $null
+            Set-Content -Path mysql_init -Value "initialized" -Encoding ASCII
+        }
 
         $env:MYSQL_PWD = $Password
         $env:MYSQL_TEST_PASSWD = $env:MYSQL_PWD
@@ -38,6 +41,9 @@ function Set-MySqlTestEnvironment {
             "-e", "CREATE DATABASE IF NOT EXISTS $Database"
         )
 
-        & mysql @params | Out-Null
+        if(-not(Test-Path mysql_db_created)) {
+            & mysql @params 2>$null
+            Set-Content -Path mysql_db_created -Value "db_created" -Encoding ASCII
+        }
     }
 }

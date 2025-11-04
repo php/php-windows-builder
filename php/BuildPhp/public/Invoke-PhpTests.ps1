@@ -10,6 +10,8 @@ function Invoke-PhpTests {
         PHP Build Type
     .PARAMETER Opcache
         Specify Cache
+    .PARAMETER TestType
+        Test Type
     #>
     [OutputType()]
     param (
@@ -27,7 +29,10 @@ function Invoke-PhpTests {
         [string] $Ts,
         [Parameter(Mandatory = $true, Position=3, HelpMessage='Specify Cache')]
         [ValidateSet('nocache', 'opcache')]
-        [string] $Opcache
+        [string] $Opcache,
+        [Parameter(Mandatory = $true, Position=4, HelpMessage='Test Type')]
+        [ValidateSet('ext', 'php')]
+        [string] $TestType
     )
     begin {
     }
@@ -39,8 +44,6 @@ function Invoke-PhpTests {
         }
 
         $currentDirectory = (Get-Location).Path
-
-        Get-ChildItem $currentDirectory
 
         $tempDirectory = [System.IO.Path]::GetTempPath()
 
@@ -60,31 +63,50 @@ function Invoke-PhpTests {
 
         $Env:Path = "$buildDirectory\phpbin;$Env:Path"
         $Env:TEST_PHP_EXECUTABLE = "$buildDirectory\phpbin\php.exe"
-        $Env:TEST_PHP_JUNIT = "$buildDirectory\test-$Arch-$Ts-$opcache.xml"
+        $Env:TEST_PHPDBG_EXECUTABLE = "$buildDirectory\phpbin\phpdbg.exe"
+        $Env:TEST_PHP_JUNIT = "$buildDirectory\test-$Arch-$Ts-$opcache-$TestType.xml"
         $Env:SKIP_IO_CAPTURE_TESTS = 1
-
-        $Env:OPENSSL_CONF = "$buildDirectory\phpbin\extras\ssl\openssl.cnf"
+        $Env:NO_INTERACTION = 1
+        $Env:REPORT_EXIT_STATUS = 1
 
         Set-Location "$testsDirectory"
 
-        Get-TestsList -OutputFile "tests-to-run.txt"
+        Get-TestsList -OutputFile "$TestType-tests-to-run.txt" -Type $TestType
 
         $settings = Get-TestSettings -PhpVersion $PhpVersion
 
-        php `
-            $settings.runner `
-            $settings.progress `
-            "-g" "FAIL,BORK,WARN,LEAK" `
-            "-q" `
-            "--offline" `
-            "--show-diff" `
-            "--show-slow" "1000" `
-            "--set-timeout" "120" `
-            "--temp-source" "$buildDirectory\tmp" `
-            "--temp-target" "$buildDirectory\tmp" `
-            "-r" "tests-to-run.txt"
+        if($TestType -eq "ext") {
+            Set-MySqlTestEnvironment
+            Set-PgSqlTestEnvironment
+            Set-OdbcTestEnvironment
+            Set-MsSqlTestEnvironment
+            Set-FirebirdTestEnvironment
+            Set-OpenSslTestEnvironment
+            Set-EnchantTestEnvironment
+            Set-SnmpTestEnvironment -TestsDirectoryPath "$buildDirectory\$testsDirectory"
+        }
 
-        Copy-Item "$buildDirectory\test-$Arch-$Ts-$Opcache.xml" $currentDirectory
+        $params = @(
+            $settings.runner,
+            $settings.progress,
+            "-g", "FAIL,BORK,WARN,LEAK",
+            "-q",
+            "--offline",
+            "--show-diff",
+            "--show-slow", "1000",
+            "--set-timeout", "120",
+            "--temp-source", "$buildDirectory\tmp",
+            "--temp-target", "$buildDirectory\tmp",
+            "-r", "$TestType-tests-to-run.txt"
+        )
+
+        if($settings.workers -ne "") {
+            $params += $settings.workers
+        }
+
+        & $buildDirectory\phpbin\php.exe @params
+
+        Copy-Item "$buildDirectory\test-$Arch-$Ts-$Opcache-$TestType.xml" $currentDirectory
 
         Set-Location "$currentDirectory"
     }
