@@ -20,9 +20,32 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Get Cache Key
+        id: cache-key
+        run: |
+          $pv = '${{inputs.php-version}}'
+          if('${{inputs.php-version}}' -ne 'master') {
+            $pv = '${{inputs.php-version}}'.Split('.')[0..1] -join '.'
+          }
+          $vsVersion = (Get-Content -Raw -Path (Join-Path $(pwd).Path '\php\BuildPhp\config\vs.json') | ConvertFrom-Json).php.$pv
+          $packagesListUrl = "https://downloads.php.net/~windows/php-sdk/deps/series/packages-$pv-$vsVersion-${{ matrix.arch }}-staging.txt"
+          Invoke-WebRequest -OutFile packages.txt -Uri $packagesListUrl
+          Add-Content -Value "cache-key=deps-$pv-${{ matrix.arch }}" -Path $env:GITHUB_OUTPUT
+          Add-Content -Value "cache-dir=C:\deps-$pv-${{ matrix.arch }}" -Path $env:GITHUB_OUTPUT
+
+      - name: Cache Deps
+        id: cache-deps
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.cache-key.outputs.cache-dir }}
+          key: ${{ steps.cache-key.outputs.cache-key }}-${{ hashFiles('packages.txt') }}
+
       - name: Run Tests
         shell: pwsh
         continue-on-error: true
+        env:
+          DEPS_DIR: ${{ steps.cache-key.outputs.cache-dir }}
+          DEPS_CACHE_HIT: ${{ steps.cache-deps.outputs.cache-hit }}
         run: |
           Import-Module (Join-Path $(pwd).Path '\php\BuildPhp') -Force
           Invoke-PhpTests -PhpVersion ${{inputs.php-version}} `
