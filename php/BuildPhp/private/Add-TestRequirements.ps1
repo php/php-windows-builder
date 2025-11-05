@@ -70,27 +70,17 @@ function Add-TestRequirements {
             [System.IO.Compression.ZipFile]::ExtractToDirectory($testZipFilePath, $testsDirectoryPath)
         }
 
-        Get-PhpSdk
         $FetchDeps = $False
+        $majorMinorVersion = ($PhpVersion -split '\.')[0..1] -join '.'
         if($null -eq $env:DEPS_DIR) {
-            $majorMinorVersion = ($PhpVersion -split '\.')[0..1] -join '.'
             $env:DEPS_DIR = "C:\deps-$majorMinorVersion-$Arch"
             $FetchDeps = $True
         }
-        if(-not(Test-Path $env:DEPS_DIR)) {
-            New-Item "$env:DEPS_DIR" -ItemType "directory" -Force > $null 2>&1
-        }
-        $branch = if ($PhpVersion -eq 'master') {'master'} else {($PhpVersion -split '\.')[0..1] -join '.'}
-        $env:PHP_SDK_VS = $VsVersion
-        $env:PHP_SDK_ARCH = $Arch
-        $bat_content = @()
         if($FetchDeps -eq $True -or $null -eq $Env:DEPS_CACHE_HIT -or $Env:DEPS_CACHE_HIT -ne 'true') {
-            $bat_content += "cmd /c phpsdk_deps --update --force --no-backup --branch $branch --stability staging --deps $env:DEPS_DIR"
+            Get-PhpDeps -PhpVersion $majorMinorVersion -VsVersion $VsVersion -Arch $Arch -Destination $env:DEPS_DIR
         }
-        $bat_content += "editbin /stack:8388608 $binDirectoryPath\php.exe"
-        $bat_content += "editbin /stack:8388608 $binDirectoryPath\php-cgi.exe"
-        Set-Content -Encoding "ASCII" -Path vs.bat -Value $bat_content
-        & "$currentDirectory\php-sdk\phpsdk-starter.bat" -c $VsVersion -a $Arch -t vs.bat
+        Invoke-EditBin -Exe "$binDirectoryPath\php.exe" -StackSize 8388608 -Arch $Arch
+        Invoke-EditBin -Exe "$binDirectoryPath\php-cgi.exe" -StackSize 8388608 -Arch $Arch
         Add-Path "$env:DEPS_DIR\bin"
     }
     end {
