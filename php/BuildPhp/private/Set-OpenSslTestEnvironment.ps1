@@ -2,9 +2,17 @@ function Set-OpenSslTestEnvironment {
     <#
     .SYNOPSIS
         Prepare OpenSSL config directory for tests and unset OPENSSL_CONF.
+    .PARAMETER
+        PhpBinDirectory
+        PHP bin directory
     #>
     [CmdletBinding()]
-    param ()
+    param (
+        [Parameter(Mandatory = $true, Position=0, HelpMessage='PHP bin directory')]
+        [ValidateNotNull()]
+        [ValidateLength(1, [int]::MaxValue)]
+        [string] $PhpBinDirectory
+    )
     process {
         foreach ($dir in @('C:\OpenSSL-Win32','C:\OpenSSL-Win64')) {
             Remove-Item -LiteralPath $dir -Recurse -Force -ErrorAction SilentlyContinue
@@ -34,6 +42,6 @@ function Set-OpenSslTestEnvironment {
             throw "openssl.cnf not found at $source"
         }
         Copy-Item -LiteralPath $source -Destination $opensslDir -Force
-        $env:OPENSSL_CONF = ''
+        $Env:OPENSSL_CONF = "$PhpBinDirectory\extras\ssl\openssl.cnf"
     }
 }

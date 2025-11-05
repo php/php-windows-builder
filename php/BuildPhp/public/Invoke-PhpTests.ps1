@@ -83,7 +83,7 @@ function Invoke-PhpTests {
             Set-OdbcTestEnvironment
             Set-MsSqlTestEnvironment
             Set-FirebirdTestEnvironment
-            Set-OpenSslTestEnvironment
+            Set-OpenSslTestEnvironment -PhpBinDirectory "$buildDirectory\phpbin"
             Set-EnchantTestEnvironment
             Set-SnmpTestEnvironment -TestsDirectoryPath "$buildDirectory\$testsDirectory"
         }
