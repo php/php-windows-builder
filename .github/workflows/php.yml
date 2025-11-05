@@ -105,7 +105,7 @@ jobs:
 
   upload:
     runs-on: ubuntu-latest
-    needs: tests
+    needs: [artifacts, tests]
     if: ${{ github.event.inputs.upload == 'true' }}
     steps:
       - name: Upload to downloads server
