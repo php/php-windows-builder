@@ -69,6 +69,8 @@ function Invoke-PhpTests {
         $Env:NO_INTERACTION = 1
         $Env:REPORT_EXIT_STATUS = 1
 
+        Add-Path -Path "$Env:SystemRoot\System32"
+
         Set-Location "$testsDirectory"
 
         Get-TestsList -OutputFile "$TestType-tests-to-run.txt" -Type $TestType
