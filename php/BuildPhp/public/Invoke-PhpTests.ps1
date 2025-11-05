@@ -47,7 +47,7 @@ function Invoke-PhpTests {
 
         $tempDirectory = [System.IO.Path]::GetTempPath()
 
-        $buildDirectory = [System.IO.Path]::Combine($tempDirectory, [System.Guid]::NewGuid().ToString())
+        $buildDirectory = [System.IO.Path]::Combine($tempDirectory, ("php-" + [System.Guid]::NewGuid().ToString()))
 
         $testsDirectory = "tests"
 
