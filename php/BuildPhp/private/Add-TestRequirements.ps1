@@ -60,14 +60,22 @@ function Add-TestRequirements {
             Write-Host "Downloading PHP build $binZipFile..."
             Get-PhpBuild -PhpVersion $PhpVersion -Arch $Arch -Ts $Ts -VsVersion $VsVersion
         } else {
-            [System.IO.Compression.ZipFile]::ExtractToDirectory($binZipFilePath, $binDirectoryPath)
+            try {
+                [System.IO.Compression.ZipFile]::ExtractToDirectory($binZipFilePath, $binDirectoryPath)
+            } catch {
+                7z x $binZipFilePath "-o$binDirectoryPath" -y | Out-Null
+            }
         }
 
         if(-not(Test-Path $testZipFilePath)) {
             Write-Host "Downloading PHP test pack $testZipFile..."
             Get-PhpTestPack -PhpVersion $PhpVersion -TestsDirectory $TestsDirectory
         } else {
-            [System.IO.Compression.ZipFile]::ExtractToDirectory($testZipFilePath, $testsDirectoryPath)
+            try {
+                [System.IO.Compression.ZipFile]::ExtractToDirectory($testZipFilePath, $testsDirectoryPath)
+            } catch {
+                7z x $testZipFilePath "-o$testsDirectoryPath" -y | Out-Null
+            }
         }
 
         $FetchDeps = $False

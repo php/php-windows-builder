@@ -68,7 +68,11 @@ function Get-PhpBuild {
         $binZipFilePath = Join-Path $currentDirectory $binZipFile
         $binDirectoryPath = Join-Path $currentDirectory phpbin
 
-        [System.IO.Compression.ZipFile]::ExtractToDirectory($binZipFilePath, $binDirectoryPath)
+        try {
+            [System.IO.Compression.ZipFile]::ExtractToDirectory($binZipFilePath, $binDirectoryPath)
+        } catch {
+            7z x $binZipFilePath "-o$binDirectoryPath" -y | Out-Null
+        }
     }
     end {
     }

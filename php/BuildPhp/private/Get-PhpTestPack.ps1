@@ -49,7 +49,11 @@ function Get-PhpTestPack {
         $testZipFilePath = Join-Path $currentDirectory $testZipFile
         $testsDirectoryPath = Join-Path $currentDirectory $TestsDirectory
 
-        [System.IO.Compression.ZipFile]::ExtractToDirectory($testZipFilePath, $testsDirectoryPath)
+        try {
+            [System.IO.Compression.ZipFile]::ExtractToDirectory($testZipFilePath, $testsDirectoryPath)
+        } catch {
+            7z x $testZipFilePath "-o$testsDirectoryPath" -y | Out-Null
+        }
     }
     end {
     }
