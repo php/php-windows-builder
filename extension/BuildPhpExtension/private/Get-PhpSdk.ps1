@@ -7,8 +7,8 @@ function Get-PhpSdk {
     param (
     )
     begin {
-        $sdkVersion = "2.5.0"
-        $url = "https://github.com/php/php-sdk-binary-tools/archive/php-sdk-$sdkVersion.zip"
+        $sdkVersion = "php-sdk-2.6.0"
+        $url = "https://github.com/php/php-sdk-binary-tools/archive/$sdkVersion.zip"
     }
     process {
         Add-StepLog "Adding PHP SDK"
@@ -20,7 +20,7 @@ function Get-PhpSdk {
             $currentDirectory = (Get-Location).Path
             $sdkZipFilePath = Join-Path $currentDirectory php-sdk.zip
             [System.IO.Compression.ZipFile]::ExtractToDirectory($sdkZipFilePath, $currentDirectory)
-            Rename-Item -Path php-sdk-binary-tools-php-sdk-$sdkVersion php-sdk
+            Rename-Item -Path php-sdk-binary-tools-$sdkVersion php-sdk
 
             $sdkDirectoryPath = Join-Path $currentDirectory php-sdk
             $sdkBinDirectoryPath = Join-Path $sdkDirectoryPath bin
