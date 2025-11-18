@@ -17,7 +17,7 @@ function Get-PhpBuildDetails {
             $baseUrl = $fallbackBaseUrl = "https://github.com/shivammathur/php-builder-windows/releases/download/master"
             $PhpSemver = 'master'
         } else {
-            $releaseState = if ($Config.php_version -match "[a-z]" -or $Config.php_version -eq '8.5') {"qa"} else {"releases"}
+            $releaseState = if ($Config.php_version -match "[a-z]") {"qa"} else {"releases"}
             $baseUrl = "https://downloads.php.net/~windows/$releaseState"
             $fallbackBaseUrl = "https://downloads.php.net/~windows/$releaseState/archives"
             $releases = Get-File -Url "$baseUrl/releases.json" | ConvertFrom-Json
