@@ -85,7 +85,7 @@ function Get-Extension {
         }
         $subDirectory = $configW32.DirectoryName
         if((Get-Location).Path -ne $subDirectory) {
-            Copy-Item -Path "${subDirectory}\*" -Destination $currentDirectory -Recurse -Force
+            Copy-Item -Path "${subDirectory}\*" -Destination $BuildDirectory -Recurse -Force
             Remove-Item -Path $subDirectory -Recurse -Force
         }
         $configW32Content = Get-Content -Path "config.w32"
