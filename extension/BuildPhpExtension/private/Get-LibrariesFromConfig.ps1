@@ -97,9 +97,23 @@ Function Get-LibrariesFromConfig {
         if($Extension -eq "mongodb") {
             $foundItems = $foundItems | Where-Object {$_ -notmatch "libsasl.*"}
         }
-        # Add zlib if the extension is memcached
-        if($Extension -eq "memcached") {
+
+        # Custom mappings which are not in config.w32
+        if($Extension -eq "memcached" -or $Extension -eq "xlswriter") {
             $foundItems += "zlib"
+        }
+        if($Extension -eq "oci8_19" -or $Extension -eq "pdo_oci") {
+            $foundItems += "instantclient"
+        }
+        if($Extension -eq 'ibm_db2' -or $Extension -eq 'pdo_ibm') {
+            $foundItems += 'odbc_cli'
+        }
+        if($Extension -eq 'xmlrpc') {
+            $foundItems += 'libiconv'
+            $foundItems += 'libxml2'
+        }
+        if($Extension -eq 'parallel') {
+            $foundItems += 'pthreads'
         }
 
         $highestVersions = @{}

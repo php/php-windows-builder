@@ -35,6 +35,9 @@ Function Get-ArgumentFromConfig {
         if($ConfigW32Content.Contains("PHP_$($Extension.ToUpper())_SHARED")) {
             $argValue = "shared"
         }
+        if($Extension -eq "oci8_19" -or $Extension -eq "pdo_oci" -or $Extension -eq 'ibm_db2' -or $Extension -eq 'pdo_ibm') {
+            $argValue = "../deps,shared"
+        }
 
         $arg=''
         if($null -ne $buildArgPrefix) {
