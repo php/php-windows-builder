@@ -40,7 +40,12 @@ function Set-SnmpTestEnvironment {
 
         $snmpd = Join-Path $env:DEPS_DIR 'bin\snmpd.exe'
         if (-not (Test-Path -LiteralPath $snmpd)) {
-            throw "snmpd.exe not found at $snmpd"
+            # We have net-snmp builds without snmpd.exe
+            Get-File -Url 'https://downloads.php.net/~windows/php-sdk/deps/vs16/x64/net-snmp-5.7.3-3-vs16-x64.zip' -OutFile "net-snmp-5.7.3-3-vs16-x64.zip"
+            Expand-Archive -Path "net-snmp-5.7.3-3-vs16-x64.zip" -DestinationPath $env:DEPS_DIR -Force
+            if (-not (Test-Path -LiteralPath $snmpd)) {
+                throw "snmpd.exe not found at $snmpd"
+            }
         }
         if(-not(Test-Path snmpd_running)) {
             Start-Process -FilePath $snmpd -ArgumentList @('-C','-c', $confPath, '-Ln') -WindowStyle Hidden
