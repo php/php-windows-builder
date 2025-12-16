@@ -1,0 +1,1 @@
+(Get-Content alloc.c) | ForEach-Object { $_.Replace('nptr + osize', '((char*)nptr) + osize') } | Set-Content alloc.c
