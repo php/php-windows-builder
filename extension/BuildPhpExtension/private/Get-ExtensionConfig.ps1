@@ -147,6 +147,11 @@ Function Get-ExtensionConfig {
                 $config.build_tools += "python"
             }
 
+            if($Extension -eq "oci8_19" -or $Extension -eq "pdo_oci" -or $Extension -eq 'ibm_db2' -or $Extension -eq 'pdo_ibm') {
+                $env:AUTO_DETECT_ARGS = 'true'
+                $env:AUTO_DETECT_LIBS = 'true'
+            }
+
             if($env:AUTO_DETECT_ARGS -eq 'true') {
                 $argument = Get-ArgumentFromConfig $Extension $configW32Content
                 $argumentKey = $argument.Split("=")[0]
