@@ -87,7 +87,10 @@ Function Invoke-Tests {
                 $test_runner_args += '--temp-target ' + $tempDirectory;
                 $opcache_args = @()
                 if($opcacheMode -eq 'on') {
-                    $opcache_args += "-d zend_extension=$php_dir\ext\php_opcache.dll"
+                    # Only use the DLL for PHP < 8.5.0 – from 8.5.0 it's built-in
+                    if ([version]$Config.php_version -lt [version]'8.5.0') {
+                        $opcache_args += "-d zend_extension=$php_dir\ext\php_opcache.dll"
+                    }
                     $opcache_args += "-d opcache.enable=1"
                     $opcache_args += "-d opcache.enable_cli=1"
                     $opcache_args += "-d opcache.optimization_level=1"
