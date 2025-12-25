@@ -42,9 +42,9 @@ Build a specific version of PHP, with the required architecture and thread safet
 
 #### Inputs
 
-- `php-version` (required) - The PHP version to build. It supports values in major.minor.patch format, e.g. 7.4.25, 8.0.12, etc., or `master` for the master branch of `php-src`.
-- `arch` (required) - The architecture to build. It supports values `x64` and `x86`.
-- `ts` (required) - The thread safety to build. It supports values `ts` and `nts`.
+- `php-version` (required): The PHP version to build. It supports values in major.minor.patch format, e.g., 7.4.25, 8.0.12, etc., or `master` for the master branch of `php-src`.
+- `arch` (required): The architecture to build. It supports values `x64` and `x86`.
+- `ts` (required): The thread safety to build. It supports values `ts` and `nts`.
 
 #### Example workflow to build PHP
 
@@ -68,10 +68,10 @@ jobs:
           ts: ${{ matrix.ts }}
 ```
 
-The above workflow will produce the following builds for the PHP version `8.4.1` as artifacts.
+The above workflow will produce the following builds for the PHP version `8.4.11` as artifacts.
 
 - nts-x64, nts-x64-AVX, ts-x64, nts-x86, ts-x86.
-- debug-pack and devel-pack for each the above configurations.
+- debug-pack and devel-pack for each of the above configurations.
 - test pack
 
 ### Build a PHP extension
@@ -93,20 +93,20 @@ Build a specific version of a PHP extension.
 
 #### Inputs
 
-- `extension-url` (optional) - URL of the extension's git repository, defaults to the current repository.
-- `extension-ref` (optional) - The git reference to build the extension, defaults to the GitHub reference that triggered the workflow.
-- `php-version` (required) - The PHP versions to build the extension for.
-- `arch` (required) - The architecture to build the extension for.
-- `ts` (required) - The thread safety to build the extension for.
-- `args` (optional) - Additional arguments to pass to the `configure` script.
-- `libs` (optional) - Libraries required for the extension.
-- `build-directory` (optional) - The directory to build the extension in, defaults to the user's temporary directory.
-- `run-tests` (optional) - Run the extension tests. Defaults to `true`.
-- `test-runner` (optional) - The test runner to use. Defaults to `run-tests.php`.
-- `test-runner-args` (optional) - Arguments to pass to the test runner.
-- `test-opcache-mode` (optional) - Run tests with opcache `on`, `off` or `both`. Defaults to `off`.
-- `test-workers` (optional) - The number of workers to use when running tests. Defaults to `8`.
-- `auth-token` (optional) - Authentication token to use in case the extension is hosted on a private repository.
+- `extension-url` (optional): URL of the extension's git repository, defaults to the current repository.
+- `extension-ref` (optional): The git reference to build the extension, defaults to the GitHub reference that triggered the workflow.
+- `php-version` (required): The PHP versions to build the extension for.
+- `arch` (required): The architecture to build the extension for.
+- `ts` (required): The thread safety to build the extension for.
+- `args` (optional): Additional arguments to pass to the `configure` script.
+- `libs` (optional): Libraries required for the extension.
+- `build-directory` (optional): The directory to build the extension in, defaults to the user's temporary directory.
+- `run-tests` (optional): Run the extension tests. Defaults to `true`.
+- `test-runner` (optional): The test runner to use. Defaults to `run-tests.php`.
+- `test-runner-args` (optional): Arguments to pass to the test runner.
+- `test-opcache-mode` (optional): Run tests with opcache `on`, `off` or `both`. Defaults to `off`.
+- `test-workers` (optional): The number of workers to use when running tests. Defaults to `8`.
+- `auth-token` (optional): Authentication token to use in case the extension is hosted on a private repository.
 
 Instead of having to configure all the inputs for the extension action, you can use the `extension-matrix` action to get the matrix of jobs with different input configurations.
 
@@ -132,13 +132,13 @@ jobs:
 
 #### Inputs
 
-- `extension-url` (optional) - URL of the extension's git repository, defaults to the current repository.
-- `extension-ref` (optional) - The git reference to build the extension, defaults to the GitHub reference that triggered the workflow.
-- `php-version-list` (optional) - The PHP versions to build the extension for. Defaults to the PHP versions required in the `composer.json` file.
-- `arch-list` (optional) - The architectures to build the extension for. Defaults to `x64, x86`.
-- `ts-list` (optional) - The thread safety to build the extension for. Defaults to `nts, ts`.
-- `allow-old-php-versions` (optional) - Allow building the extension for older PHP versions. Defaults to `false`.
-- `auth-token` (optional) - Authentication token to use in case the extension is hosted on a private repository.
+- `extension-url` (optional): URL of the extension's git repository, defaults to the current repository.
+- `extension-ref` (optional): The git reference to build the extension, defaults to the GitHub reference that triggered the workflow.
+- `php-version-list` (optional): The PHP versions to build the extension for. Defaults to the PHP versions required in the `composer.json` file.
+- `arch-list` (optional): The architectures to build the extension for. Defaults to `x64, x86`.
+- `ts-list` (optional): The thread safety to build the extension for. Defaults to `nts, ts`.
+- `allow-old-php-versions` (optional): Allow building the extension for older PHP versions. Defaults to `false`.
+- `auth-token` (optional): Authentication token to use in case the extension is hosted on a private repository.
 
 #### Outputs
 
@@ -150,7 +150,7 @@ By default, the `extension-matrix` action will use the PHP versions defined in t
 
 If the `php-version-list` input is not provided, it will use the PHP versions required in the `composer.json` file.
 
-It will also check if a GitHub hosted Windows runner is available with the required Visual Studio version to build the extension for the PHP version or try to install it. To override this for building the extension for older PHP versions, you will have to set the input `allow_old_php_versions` to `true` and add self-hosted Windows runners as specified in the table below.
+It will also check if a GitHub hosted Windows runner is available with the required Visual Studio version to build the extension for the PHP version or try to install it. To override this for building the extension for older PHP versions, you will have to set the input `allow-old-php-versions` to `true` and add self-hosted Windows runners as specified in the table below.
 
 | PHP Version | Visual Studio Version | Windows Runner Labels       |
 |-------------|-----------------------|-----------------------------|
@@ -181,13 +181,13 @@ Upload the artifacts to a release.
 
 #### Inputs
 
-- `release` (required) - The release/tag to upload the artifacts.
-- `token` (optional) - The GitHub token to authenticate with. Defaults to `GITHUB_TOKEN` secret.
-- `draft` (optional) - Whether to create a draft release if the release does not exist. Defaults to `false`.
+- `release` (required): The release/tag to upload the artifacts.
+- `token` (optional): The GitHub token to authenticate with. Defaults to `GITHUB_TOKEN` secret.
+- `draft` (optional): Whether to create a draft release if the release does not exist. Defaults to `false`.
 
 #### Example workflow for non-immutable releases
 
-Follow this if you are creating the release and they are not immutable (This is the default).
+Follow this if you are creating the release, and they are not immutable (This is the default).
 
 For non-immutable releases, you can publish them, and the workflow will upload the extension builds to the release.
 
@@ -390,7 +390,7 @@ If the required Visual Studio version is not installed, for the first time you t
 Then, you can build the PHP extension by using the `Invoke-PhpBuildExtension` command.
 - To build a php extension from a git repository, you can use the `ExtensionUrl` input. It supports a git repository URL as value.
 - To build a specific version of the extension, you can use the `ExtensionRef` input. It supports a git reference, e.g., a tag or a branch as value.
-- To build the extension for a specific PHP version, you can use the `PhpVersion` input. It supports values in major.minor format, e.g., 7.4, 8.0, etc.
+- To build the extension for a specific PHP version, you can use the `PhpVersion` input. It supports values in the `major.minor` format, e.g., 7.4, 8.0, etc.
 - To build the extension for a 32-bit or a 64-bit PHP version, you can use the `Arch` input. It supports values `x64` and `x86`.
 - To build the extension for a thread-safe or non-thread-safe PHP version, you can use the `Ts` input. It supports values `ts` and `nts`.
 - To specify the libraries required for the extension, you can use the `Libraries` input. It supports a comma-separated list of library names.
