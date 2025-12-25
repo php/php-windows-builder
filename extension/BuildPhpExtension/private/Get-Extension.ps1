@@ -36,7 +36,21 @@ function Get-Extension {
     process {
         if($LocalSrc) {
             $currentDirectory = (Get-Location).Path
-            Copy-Item -Path "$currentDirectory\*" -Destination $BuildDirectory -Recurse -Force
+            $src = (Resolve-Path $currentDirectory).Path.TrimEnd('\')
+            $dst = (Resolve-Path $BuildDirectory).Path.TrimEnd('\')
+            if (Get-Command robocopy -ErrorAction SilentlyContinue) {
+                & robocopy $src $dst /E /XD $dst "$src\.git" /XJ /MT:16 /R:2 /W:1 /NFL /NDL /NJH /NJS /NP *> $null
+                if ($LASTEXITCODE -ge 8) { throw "robocopy failed with exit code $LASTEXITCODE" }
+            } else {
+                $excludeChild = $null
+                if ($dst.StartsWith($src + '\', [StringComparison]::OrdinalIgnoreCase)) {
+                    $rel = $dst.Substring($src.Length + 1)
+                    $excludeChild = ($rel -split '\\', 2)[0]
+                }
+                Get-ChildItem -LiteralPath $src -Force |
+                    Where-Object { $_.Name -ne '.git' -and ($null -eq $excludeChild -or $_.Name -ne $excludeChild) } |
+                    Copy-Item -Destination $dst -Recurse -Force
+            }
         } else {
             Add-StepLog "Fetching extension from $ExtensionUrl"
             try {
