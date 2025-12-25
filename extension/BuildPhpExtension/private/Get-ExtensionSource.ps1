@@ -18,13 +18,19 @@ function Get-ExtensionSource {
     }
     process {
         if($env:GITHUB_ACTIONS -eq "true") {
-            if($null -eq $ExtensionUrl -or $ExtensionUrl -eq '') {
-                $ExtensionUrl = "https://github.com/$env:GITHUB_REPOSITORY"
+            if ($null -eq $ExtensionUrl -or $ExtensionUrl -eq '') {
+                $configW32 = $null
+                try {
+                    $configW32 = [System.IO.Directory]::EnumerateFiles((Get-Location).Path, 'config.w32', [System.IO.SearchOption]::AllDirectories) | Select-Object -First 1
+                } catch { }
+                if($null -eq $configW32) {
+                    $ExtensionUrl = "https://github.com/$env:GITHUB_REPOSITORY"
+                }
             }
             if($null -eq $ExtensionRef -or $ExtensionRef -eq '') {
-                if($env:GITHUB_EVENT_NAME -contains "pull_request") {
+                if($env:GITHUB_EVENT_NAME -match '^pull_request') {
                     $ExtensionRef = $env:GITHUB_REF
-                } elseif($null -ne $env:GITHUB_REF_NAME) {
+                } elseif($null -ne $env:GITHUB_REF_NAME -and $env:GITHUB_REF_NAME -ne '') {
                     $ExtensionRef = $env:GITHUB_REF_NAME
                 } else {
                     $ExtensionRef = $env:GITHUB_SHA
