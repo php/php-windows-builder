@@ -189,7 +189,7 @@ Function Get-ExtensionConfig {
             }
             $thirdPartyLibraries = @("boost", "instantclient", "odbc_cli")
             $Libraries | Select-Object -Unique | ForEach-Object {
-                if($thirdPartyLibraries.Contains($_)) {
+                if($thirdPartyLibraries.Contains($_) -and $config.extension_libraries -notcontains $_) {
                     $config.extension_libraries += $_
                 } elseif($null -ne $_ -and -not([string]::IsNullOrWhiteSpace($_))) {
                     if ($phpSeries.Content.ToLower().Contains($_) -and -not($config.php_libraries.Contains($_))) {
@@ -197,11 +197,15 @@ Function Get-ExtensionConfig {
                     } elseif (($extensionSeries.Content + $extensionArchivesSeries.Content).ToLower().Contains($_.ToLower()) -and -not($config.extension_libraries.Contains($_))) {
                         $lib = Get-PeclLibraryZip -Library $_ -PhpVersion $PhpVersion -VsVersion $VsVersion -Arch $Arch -ExtensionSeries $extensionSeries
                         if($null -ne $lib) {
-                            $config.extension_libraries += $lib
+                            if($config.extension_libraries -notcontains $lib) {
+                                $config.extension_libraries += $lib
+                            }
                         } else {
                             $lib = Get-PeclLibraryZip -Library $_ -PhpVersion $PhpVersion -VsVersion $VsVersion -Arch $Arch -ExtensionSeries $extensionArchivesSeries
                             if($null -ne $lib) {
-                                $config.extension_libraries += $lib
+                                if($config.extension_libraries -notcontains $lib) {
+                                    $config.extension_libraries += $lib
+                                }
                             } else {
                                 throw "Library $_ not found for the PHP version $PhpVersion and Visual Studio version $VsVersion"
                             }
