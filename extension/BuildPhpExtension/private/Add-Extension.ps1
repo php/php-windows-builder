@@ -2,7 +2,7 @@ Function Add-Extension {
     <#
     .SYNOPSIS
         Build a PHP extension.
-    .PAMAETER Extension
+    .PARAMETER Extension
         Extension name.
     .PARAMETER Config
         Configuration for the extension.
