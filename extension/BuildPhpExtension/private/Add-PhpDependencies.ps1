@@ -1,7 +1,7 @@
 Function Add-PhpDependencies {
     <#
     .SYNOPSIS
-        Add a directory to PATH environment variable.
+        Add PHP dependencies.
     .PARAMETER Config
         Configuration for the extension.
     #>

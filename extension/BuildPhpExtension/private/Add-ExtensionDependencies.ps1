@@ -1,7 +1,7 @@
 Function Add-ExtensionDependencies {
     <#
     .SYNOPSIS
-        Add a directory to PATH environment variable.
+        Add extension dependencies.
     .PARAMETER Config
         Configuration for the extension.
     #>

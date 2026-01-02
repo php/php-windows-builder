@@ -1,7 +1,7 @@
 Function Add-Dependencies {
     <#
     .SYNOPSIS
-        Add a directory to PATH environment variable.
+        Add dependencies for building PHP extensions.
     .PARAMETER Config
         Configuration for the extension.
     .PARAMETER Prefix
