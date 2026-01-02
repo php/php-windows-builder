@@ -83,6 +83,7 @@
         'Get-BuildDirectory',
         'Get-Extension',
         'Get-ExtensionConfig',
+        'Get-ExtensionName',
         'Get-ExtensionSource',
         'Get-File',
         'Get-LibrariesFromConfig',
