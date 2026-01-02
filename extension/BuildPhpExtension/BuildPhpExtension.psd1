@@ -79,7 +79,7 @@
         'Add-PhpDependencies',
         'Add-StepLog',
         'Add-Vs',
-        'Get-ArgumentFromConfig',
+        'Get-ArgumentsFromConfig',
         'Get-BuildDirectory',
         'Get-Extension',
         'Get-ExtensionConfig',
