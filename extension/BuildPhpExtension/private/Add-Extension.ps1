@@ -25,7 +25,7 @@ Function Add-Extension {
         $currentDirectory = (Get-Location).Path
         $extensionList = & "$currentDirectory\php-bin\php.exe" -m
         if(-not($extensionList -contains $Extension)) {
-            if(-not(Test-Path $currentDirectory\php-bin\ext\$php_$Extension.dll)) {
+            if(-not(Test-Path $currentDirectory\php-bin\ext\php_$Extension.dll)) {
                 Get-File -Url "https://pecl.php.net/get/$Extension" -OutFile "$Extension.tgz"
                 & tar -xzf "$Extension.tgz" -C $currentDirectory
                 Set-Location "$Extension-*"
