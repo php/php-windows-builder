@@ -58,6 +58,8 @@ Function Invoke-Tests {
                 $test_runner_args = $env:TEST_RUNNER_ARGS -split '\s+'
             } else {
                 $test_runner_args = @(
+                    '-d open_basedir=',
+                    '-d output_buffering=0',
                     '-q',
                     '--offline',
                     '--show-diff',

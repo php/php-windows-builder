@@ -89,6 +89,8 @@ function Invoke-PhpTests {
         }
 
         $params = @(
+            "-d", "open_basedir=",
+            "-d", "output_buffering=0",
             $settings.runner,
             $settings.progress,
             "-g", "FAIL,BORK,WARN,LEAK",
