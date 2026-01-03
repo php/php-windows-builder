@@ -36,6 +36,10 @@ Function Add-BuildTools {
                         git {
                             choco install git.install --params "'/GitAndUnixToolsOnPath /WindowsTerminal /NoAutoCrlf'" -y --force
                         }
+                        oci_db {
+                            $tool = "Oracle Database XE"
+                            Add-OciDB
+                        }
                         Default {
                             $program = $_
                             $resultLines = (choco search $_ --limit-output) -split "\`r?\`n"

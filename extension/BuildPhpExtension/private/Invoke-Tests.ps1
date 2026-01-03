@@ -27,6 +27,14 @@ Function Invoke-Tests {
                 Get-PhpSrc -PhpVersion $Config.php_version
                 $env:PDO_TEST_DIR = "$currentDirectory\php-$($Config.php_version)-src\ext\pdo\tests"
                 $env:PDO_OCI_TEST_DIR = "$currentDirectory\tests"
+                $env:PDO_OCI_TEST_USER = "system"
+                $env:PDO_OCI_TEST_PASS = "oracle"
+                $env:PDO_OCI_TEST_DSN = "oci:dbname=localhost:1521/XEPDB1.localdomain;charset=AL32UTF8"
+            }
+            if($Config.name -eq 'oci8_19'){
+                $env:PHP_OCI8_TEST_USER = "system"
+                $env:PHP_OCI8_TEST_PASS = "oracle"
+                $env:PHP_OCI8_TEST_DB = "localhost:1521/XEPDB1.localdomain"
             }
             $tempOriginal = $env:TEMP
             Get-TempFiles
