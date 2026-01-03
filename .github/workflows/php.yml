@@ -30,6 +30,8 @@ jobs:
           php-version: ${{ inputs.php-version }}
           arch: ${{ matrix.arch }}
           ts: ${{ matrix.ts }}
+        env:
+          PHP_BUILD_PROVIDER: "The PHP Group"
 
   artifacts:
     runs-on: ubuntu-latest
