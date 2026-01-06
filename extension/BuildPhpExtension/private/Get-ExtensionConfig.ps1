@@ -167,7 +167,7 @@ Function Get-ExtensionConfig {
             }
 
             if($env:AUTO_DETECT_LIBS -eq 'true') {
-                $detectedLibraries = Get-LibrariesFromConfig $Extension $VsVersion $Arch $configW32Content
+                $detectedLibraries = Get-LibrariesFromConfig $PhpVersion $Extension $VsVersion $Arch $configW32Content
                 if($null -ne $detectedLibraries) {
                     $LibrariesList = $Libraries
                     $Libraries = $detectedLibraries.Split(" ")
