@@ -100,8 +100,13 @@
         'Invoke-Build',
         'Invoke-CleanupTempFiles',
         'Invoke-Tests',
+        'Set-AmqpTestEnvironment',
         'Set-GAGroup',
+        'Set-ImagickTestEnvironment',
         'Set-NetSecurityProtocolType',
+        'Set-Oci819TestEnvironment',
+        'Set-PdoOciTestEnvironment',
+        'Set-XdebugTestEnvironment',
 
         # Public functions
         'Invoke-PhpBuildExtension'

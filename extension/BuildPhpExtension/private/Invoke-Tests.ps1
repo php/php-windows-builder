@@ -19,31 +19,15 @@ Function Invoke-Tests {
             $php_dir = Join-Path $currentDirectory php-bin
             $env:TEST_PHP_EXECUTABLE = "$php_dir\php.exe"
             $env:REPORT_EXIT_STATUS = 1
-            $env:XDEBUG_MODE = ""
-            $env:MAGICK_CONFIGURE_PATH = "$currentDirectory\..\deps\bin"
-            $env:PHP_AMQP_HOST="rabbitmq"
-            $env:PHP_AMQP_SSL_HOST="rabbitmq.example.org"
-            if($Config.name -eq 'pdo_oci') {
-                $env:TEST_WORKERS = 1
-                Get-PhpSrc -PhpVersion $Config.php_version
 
-                # This test is not compatible with Oracle XE
-                $testPath = "$currentDirectory\php-$($Config.php_version)-src\ext\pdo\tests\gh20553.phpt"
-                if (Test-Path $testPath) {
-                    Remove-Item $testPath -Force
-                }
+            # Set up extension-specific test environment
+            $extensionName = ($Config.name -replace '_(.)', { $_.Groups[1].Value.ToUpper() })
+            $extensionName = $extensionName.Substring(0,1).ToUpper() + $extensionName.Substring(1)
+            $cmdletName = "Set-${extensionName}TestEnvironment"
+            if (Get-Command $cmdletName -ErrorAction SilentlyContinue) {
+                & $cmdletName -Config $Config
+            }
 
-                $env:PDO_TEST_DIR = "$currentDirectory\php-$($Config.php_version)-src\ext\pdo\tests"
-                $env:PDO_OCI_TEST_DIR = "$currentDirectory\tests"
-                $env:PDO_OCI_TEST_USER = "system"
-                $env:PDO_OCI_TEST_PASS = "oracle"
-                $env:PDO_OCI_TEST_DSN = "oci:dbname=localhost:1521/XEPDB1.localdomain;charset=AL32UTF8"
-            }
-            if($Config.name -eq 'oci8_19'){
-                $env:PHP_OCI8_TEST_USER = "system"
-                $env:PHP_OCI8_TEST_PASS = "oracle"
-                $env:PHP_OCI8_TEST_DB = "localhost:1521/XEPDB1.localdomain"
-            }
             $tempOriginal = $env:TEMP
             Get-TempFiles
             $type='extension'
