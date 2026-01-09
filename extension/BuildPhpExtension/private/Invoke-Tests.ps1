@@ -24,7 +24,15 @@ Function Invoke-Tests {
             $env:PHP_AMQP_HOST="rabbitmq"
             $env:PHP_AMQP_SSL_HOST="rabbitmq.example.org"
             if($Config.name -eq 'pdo_oci') {
+                $env:TEST_WORKERS = 1
                 Get-PhpSrc -PhpVersion $Config.php_version
+
+                # This test is not compatible with Oracle XE
+                $testPath = "$currentDirectory\php-$($Config.php_version)-src\ext\pdo\tests\gh20553.phpt"
+                if (Test-Path $testPath) {
+                    Remove-Item $testPath -Force
+                }
+
                 $env:PDO_TEST_DIR = "$currentDirectory\php-$($Config.php_version)-src\ext\pdo\tests"
                 $env:PDO_OCI_TEST_DIR = "$currentDirectory\tests"
                 $env:PDO_OCI_TEST_USER = "system"
@@ -72,6 +80,7 @@ Function Invoke-Tests {
             if($null -ne $env:TEST_WORKERS -and $env:TEST_WORKERS -ne '') {
                 $test_workers = $env:TEST_WORKERS
             }
+
             if($Config.php_version -ge '7.4' -and $test_runner_args -notcontains '-j') {
                 $test_runner_args += ('-j' + $test_workers)
             }
