@@ -69,7 +69,10 @@ Function Get-LibrariesFromConfig {
                 [Parameter(Mandatory=$true, Position=0)]
                 [string]$library
             )
-            if($jsonDataContent.Contains("`"$library-") -or $phpSeries.Contains("`"$library-") -or $jsonDataContent.Contains("`"lib$library-") -or $phpSeries.Contains("`"lib$library-")) {
+            if($jsonDataContent -match "`"lib$library-\d" -or $phpSeries -match "`"lib$library-\d") {
+                return "lib$library"
+            }
+            if($jsonDataContent -match "`"$library-\d" -or $phpSeries -match "`"$library-\d") {
                 return $library
             }
             return $null
