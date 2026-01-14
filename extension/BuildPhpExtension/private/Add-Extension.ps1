@@ -27,8 +27,9 @@ Function Add-Extension {
         if(-not($extensionList -contains $Extension)) {
             if(-not(Test-Path $currentDirectory\php-bin\ext\php_$Extension.dll)) {
                 Get-File -Url "https://pecl.php.net/get/$Extension" -OutFile "$Extension.tgz"
-                & tar -xzf "$Extension.tgz" -C $currentDirectory
-                Set-Location "$Extension-*"
+                & tar -xzf "$Extension.tgz" -C $currentDirectory\..
+                Rename-Item -Path "$currentDirectory\..\$Extension-*" -NewName $Extension
+                Set-Location "..\$Extension"
                 $extensionBuildDirectory = Join-Path -Path (Get-Location).Path -ChildPath $config.build_directory
                 # Apply patches only for php/php-windows-builder and shivammathur/php-windows-builder
                 if ($null -ne $env:GITHUB_REPOSITORY)
@@ -42,11 +43,18 @@ Function Add-Extension {
                     }
                 }
                 $configW32Content = [string](Get-Content -Path "config.w32")
-                $argument = Get-ArgumentFromConfig $Extension $configW32Content
+                $arguments = Get-ArgumentsFromConfig $Extension $configW32Content
+                $argumentString = ''
+                foreach ($argument in $arguments) {
+                    $argumentKey = $argument.Split("=")[0]
+                    if ($null -ne $argument -and -not ($argumentString.contains($argumentKey))) {
+                        $argumentString += " $argument"
+                    }
+                }
                 $bat_content = @()
                 $bat_content += ""
                 $bat_content += "call phpize 2>&1"
-                $bat_content += "call configure --with-php-build=`"..\deps`" $argument --with-mp=`"disable`" --with-prefix=$Prefix 2>&1"
+                $bat_content += "call configure --with-php-build=`"..\deps`" $argumentString --with-mp=`"disable`" --with-prefix=$Prefix 2>&1"
                 $bat_content += "nmake /nologo 2>&1"
                 $bat_content += "exit %errorlevel%"
                 Set-Content -Encoding "ASCII" -Path $Extension-task.bat -Value $bat_content
@@ -64,9 +72,12 @@ Function Add-Extension {
                 Write-Host (Get-Content "build-$suffix.txt" -Raw)
                 $includePath = "$currentDirectory\php-dev\include"
                 New-Item -Path $includePath\ext -Name $Extension -ItemType "directory" | Out-Null
+                New-Item -Path "$currentDirectory\$($Config.build_directory)" -ItemType "directory" -Force | Out-Null
                 Get-ChildItem -Path (Get-Location).Path -Recurse -Include '*.h', '*.c' | Copy-Item -Destination "$includePath\ext\$Extension"
                 Copy-Item -Path "$extensionBuildDirectory\*.dll" -Destination "$currentDirectory\php-bin\ext" -Force
                 Copy-Item -Path "$extensionBuildDirectory\*.lib" -Destination "$currentDirectory\php-dev\lib" -Force
+                Copy-Item -Path "$extensionBuildDirectory\*.dll" -Destination "$currentDirectory\$($Config.build_directory)" -Force
+                Copy-Item -Path "$extensionBuildDirectory\*.pdb" -Destination "$currentDirectory\$($Config.build_directory)" -Force
             }
             Add-Content -Path "$currentDirectory\php-bin\php.ini" -Value "extension=$Extension"
             Set-Location $currentDirectory

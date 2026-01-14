@@ -162,6 +162,32 @@ Function Get-ExtensionConfig {
                 }
             }
 
+            if($configW32Content.contains('ADD_EXTENSION_DEP')) {
+                [regex]::Matches($configW32Content, 'ADD_EXTENSION_DEP\([''"][^''"]+[''"]\s*,\s*[''"]([^''"]+)[''"]') | ForEach-Object {
+                    $requiredExtension = $_.Groups[1].Value
+                    $dashedDep = $requiredExtension -replace "_", "-"
+
+                    $conditionalArgName = $null
+                    $argMatches = [regex]::Matches($configW32Content, "ARG_(?:ENABLE|WITH)\s*\(\s*['""]([^'""]*$dashedDep[^'""]*)['""]\s*,")
+                    if ($argMatches.Count -gt 0) {
+                        $conditionalArgName = $argMatches[0].Groups[1].Value
+                    }
+
+                    $shouldAddExtension = $true
+                    if ($null -ne $conditionalArgName) {
+                        $enableArg = "--enable-$conditionalArgName"
+                        $withArg = "--with-$conditionalArgName"
+                        $shouldAddExtension = $config.options.Contains($enableArg) -or $config.options.Contains($withArg)
+                    }
+
+                    if ($shouldAddExtension) {
+                        if(-not($config.extensions.Contains($requiredExtension))) {
+                            $config.extensions += $requiredExtension
+                        }
+                    }
+                }
+            }
+
             if ([System.Environment]::GetEnvironmentVariable("no-debug-symbols-$Extension") -eq 'true') {
                 $config.debug_symbols = $False
             }
