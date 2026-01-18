@@ -16,8 +16,9 @@ This project provides PowerShell packages and GitHub Actions to build PHP and it
         - [PHP Version Support](#php-version-support)
     - [Release](#release)
         - [Inputs](#inputs-3)
-        - [Example workflow for non-immutable releases](#example-workflow-for-non-immutable-releases)
-        - [Example workflow for immutable releases](#example-workflow-for-immutable-releases)
+    - [Examples](#examples)    
+        - [Workflow for releases](#workflow-for-releases)
+        - [Workflow for tags](#workflow-for-tags)
 
 - [Local Setup](#local-setup)
     - [PHP](#php)
@@ -185,11 +186,14 @@ Upload the artifacts to a release.
 - `token` (optional): The GitHub token to authenticate with. Defaults to `GITHUB_TOKEN` secret.
 - `draft` (optional): Whether to create a draft release if the release does not exist. Defaults to `false`.
 
-#### Example workflow for non-immutable releases
 
-Follow this if you are creating the release, and they are not immutable (This is the default).
+### Examples
 
-For non-immutable releases, you can publish them, and the workflow will upload the extension builds to the release.
+#### Workflow for releases
+
+Follow this if you are creating the release for publishing new versions, and they are not immutable (This is the default). For creating immutable releases follow the [workflow for tags](#workflow-for-tags).
+
+After you create the release, the following workflow will build and upload the extension builds to the release.
 
 ```yaml
 name: Build extension
@@ -252,13 +256,13 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-#### Example workflow for immutable releases
+#### Workflow for tags
 
-Follow this if you are using immutable releases.
+Follow this workflow if you are using tags to release new versions. 
 
-For immutable releases, please do not create a new release using the GitHub UI, you can push a new tag, and the workflow will create a new release, build the extension, and upload the builds to the release.
+For this, please do not create a new release using the GitHub UI, you can push a new tag, and the workflow will create a new release, build the extension, and upload the builds to the release. This also supports creating [immutable releases](https://docs.github.com/en/code-security/concepts/supply-chain-security/immutable-releases).
 
-It publishes the release by default, and then you can edit the release notes as needed, If you want to create a draft release, set the `draft` input to `true` in the `release` job.
+It publishes the release by default for tag, and then you can edit the release notes as needed, If you want to create a draft release, set the `draft` input to `true` in the `release` job.
 
 ```yaml
 name: Build extension
