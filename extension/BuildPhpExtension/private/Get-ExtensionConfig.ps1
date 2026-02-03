@@ -99,9 +99,11 @@ Function Get-ExtensionConfig {
                 $composerJson = Get-Content composer.json -Raw | ConvertFrom-Json
             }
             if($null -ne $composerJson -and $null -ne $composerJson."php-ext" -and $null -ne $composerJson."php-ext"."configure-options") {
+                $normalizedExtension = $Extension.ToLower().Replace("_", "-")
                 $composerJson."php-ext"."configure-options" | ForEach-Object {
-                    if($_.name -eq "enable-$($Extension.ToLower())" -or $_.name -eq "with-$($Extension.ToLower())") {
-                        if($null -ne $_."needs-value" -and $_."needs-value" -eq $true -and $_.name -eq "with-$($Extension.ToLower())") {
+                    $normalizedName = $_.name.ToLower().Replace("_", "-")
+                    if($normalizedName -eq "enable-$normalizedExtension" -or $normalizedName -eq "with-$normalizedExtension") {
+                        if($null -ne $_."needs-value" -and $_."needs-value" -eq $true -and $normalizedName -eq "with-$normalizedExtension") {
                             $config.options += "--$($_.name)=shared"
                         } else {
                             $config.options += "--$( $_.name )"
