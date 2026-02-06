@@ -1,0 +1,19 @@
+(Get-Content src\Appender.c -Raw) | ForEach-Object { $_ -replace '#include "ExceptionHook\.h"', "#include `"ExceptionHook.h`"`n#include `"ext/standard/basic_functions.h`"" } | Set-Content src\Appender.c -Encoding utf8 -NoNewline
+(Get-Content src\Appender.c -Raw) | ForEach-Object { $_ -replace [regex]::Escape('log_file_path_len = spprintf(&log_file_path, 0, "%s%s%s%s.%s.log", logger->logger_path, SEASLOG_G(slash_or_underline), SEASLOG_G(file_prefix),real_date, level);'), 'log_file_path_len = spprintf(&log_file_path, 0, "%s%s%s.%s.log", logger->logger_path, SEASLOG_G(slash_or_underline), real_date, level);' } | Set-Content src\Appender.c -Encoding utf8 -NoNewline
+(Get-Content src\Appender.c -Raw) | ForEach-Object { $_ -replace [regex]::Escape('log_file_path_len = spprintf(&log_file_path, 0, "%s%s%s%s.log", logger->logger_path, SEASLOG_G(slash_or_underline), SEASLOG_G(file_prefix),real_date);'), 'log_file_path_len = spprintf(&log_file_path, 0, "%s%s%s.log", logger->logger_path, SEASLOG_G(slash_or_underline), real_date);' } | Set-Content src\Appender.c -Encoding utf8 -NoNewline
+(Get-Content src\Appender.c -Raw) | ForEach-Object { $_ -replace [regex]::Escape('ret = php_mkdir_ex(dir, SEASLOG_DIR_MODE, PHP_STREAM_MKDIR_RECURSIVE TSRMLS_CC);'), 'ret = php_stream_mkdir(dir, SEASLOG_DIR_MODE, PHP_STREAM_MKDIR_RECURSIVE,NULL);' } | Set-Content src\Appender.c -Encoding utf8 -NoNewline
+(Get-Content src\Appender.c -Raw) | ForEach-Object { $_ -replace [regex]::Escape('if (!(ret = php_mkdir_ex(buf, SEASLOG_DIR_MODE, PHP_STREAM_MKDIR_RECURSIVE TSRMLS_CC)))'), 'if (!(ret = php_stream_mkdir(buf, SEASLOG_DIR_MODE, PHP_STREAM_MKDIR_RECURSIVE,NULL)))' } | Set-Content src\Appender.c -Encoding utf8 -NoNewline
+(Get-Content src\ErrorHook.c -Raw) | ForEach-Object { $_ -replace '(?m)^#else(?=\r?\nvoid \(\*old_error_cb\))', "#elif PHP_VERSION_ID<80400`nvoid (*old_error_cb)(int type, const zend_string *error_filename, const SEASLOG_UINT error_lineno, zend_string *message);`n#else" } | Set-Content src\ErrorHook.c -Encoding utf8 -NoNewline
+(Get-Content src\ErrorHook.c -Raw) | ForEach-Object { $_ `
+  -replace 'void \(\*old_error_cb\)\(int type, const char \*error_filename, const SEASLOG_UINT error_lineno, zend_string \*message\);', 'void (*old_error_cb)(int type, zend_string *error_filename, const uint32_t error_lineno, zend_string *message);' `
+  -replace 'void \(\*old_error_cb\)\(int type, zend_string \*error_filename, const SEASLOG_UINT error_lineno, zend_string \*message\);',      'void (*old_error_cb)(int type, zend_string *error_filename, const uint32_t error_lineno, zend_string *message);'
+} | Set-Content src\ErrorHook.c -Encoding utf8 -NoNewline
+(Get-Content src\ErrorHook.c -Raw) | ForEach-Object { $_ -replace '(?m)^#else(?=\r?\nvoid seaslog_error_cb\()', "#elif PHP_VERSION_ID <80400`nvoid seaslog_error_cb(int type, const char *error_filename, const SEASLOG_UINT error_lineno,zend_string *message)`n#else" } | Set-Content src\ErrorHook.c -Encoding utf8 -NoNewline
+(Get-Content src\ErrorHook.c -Raw) | ForEach-Object { $_ `
+  -replace 'void seaslog_error_cb\(int orig_type, const char \*error_filename, const SEASLOG_UINT error_lineno,zend_string \*message\)', 'void seaslog_error_cb(int type,zend_string *error_filename,const uint32_t error_lineno,zend_string *message)' `
+  -replace 'void seaslog_error_cb\(int orig_type, zend_string \*error_filename, const SEASLOG_UINT error_lineno,zend_string \*message\)',  'void seaslog_error_cb(int type,zend_string *error_filename,const uint32_t error_lineno,zend_string *message)'
+} | Set-Content src\ErrorHook.c -Encoding utf8 -NoNewline
+(Get-Content src\ErrorHook.c -Raw) | ForEach-Object { $_ `
+  -replace 'old_error_cb\(\s*orig_type\s*,', 'old_error_cb(type,' `
+  -replace '(?m)^\s*int type = orig_type & E_ALL;\s*\r?\n', ''
+} | Set-Content src\ErrorHook.c -Encoding utf8 -NoNewline
