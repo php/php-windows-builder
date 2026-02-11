@@ -1,0 +1,1 @@
+(Get-Content config.w32) | ForEach-Object { $_.Replace("  PHP_MONGODB_CFLAGS = PHP_MONGODB_CFLAGS.replace(/\s+/g, ' ');", "  PHP_MONGODB_CFLAGS = PHP_MONGODB_CFLAGS.replace(/\s+/g, ' ');`r`n  if (!X64) {`r`n    PHP_MONGODB_CFLAGS += `" /Zm1000`";`r`n    ADD_FLAG(`"CFLAGS`", `"/Od /Ob0 /Oy- /Z7 /Zc:preprocessor- /bigobj`");`r`n  }") } | Set-Content config.w32
