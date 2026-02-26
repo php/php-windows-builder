@@ -16,6 +16,13 @@ inputs:
   ts:
     description: Thread safety to build
     required: true
+  libs-build-runs:
+    description: Comma-separated list of GitHub Actions run IDs from winlibs/winlib-builder to download artifacts from
+    required: false
+  github-token:
+    description: GitHub token for accessing private repositories
+    required: false
+    default: ${{ github.token }}  
 
 runs:
   using: composite
@@ -25,6 +32,9 @@ runs:
 
     - name: Build PHP
       shell: pwsh
+      env:
+        LIBS_BUILD_RUNS: ${{ inputs.libs-build-runs }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
       run: |
         Import-Module ${{ github.action_path }}\BuildPhp -Force
         Invoke-PhpBuild -PhpVersion ${{inputs.php-version}} `

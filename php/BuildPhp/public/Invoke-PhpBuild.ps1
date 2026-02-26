@@ -59,7 +59,12 @@ function Invoke-PhpBuild {
         New-Item "..\obj" -ItemType "directory" > $null 2>&1
         Copy-Item "..\config.$Ts.bat"
 
-        $task = "$PSScriptRoot\..\runner\task-$Ts.bat"
+        if($null -ne $env:LIBS_BUILD_RUNS) {
+            Add-PhpDeps -PhpVersion $PhpVersion -VsVersion $VsConfig.vs -Arch $Arch -Destination "$buildPath\..\deps"
+            $task = "$PSScriptRoot\..\runner\task-$Ts.bat"
+        } else {
+            $task = "$PSScriptRoot\..\runner\task-$Ts-with-deps.bat"
+        }
 
         & "$buildDirectory\php-sdk\phpsdk-starter.bat" -c $VsConfig.vs -a $Arch -s $VsConfig.toolset -t $task
         if (-not $?) {

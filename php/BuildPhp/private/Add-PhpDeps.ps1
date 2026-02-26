@@ -1,9 +1,9 @@
-function Get-PhpDeps {
+function Add-PhpDeps {
     <#
     .SYNOPSIS
-        Fetch specified PHP SDK deps zip packages and extract them to a destination directory.
-    .PARAMETER Version
-        PHP version series (e.g., 8.3 or master).
+        Add PHP dependencies, optionally fetching from GitHub Actions workflow runs first.
+    .PARAMETER PhpVersion
+        PHP version (e.g., 8.4.18, 8.4, or master).
     .PARAMETER VsVersion
         Visual Studio toolset version (e.g., vs16, vs17).
     .PARAMETER Arch
@@ -30,19 +30,42 @@ function Get-PhpDeps {
     begin {
         $baseurl = 'https://downloads.php.net/~windows/php-sdk/deps'
     }
+
     process {
         if (-not (Test-Path -LiteralPath $Destination)) {
             New-Item -ItemType Directory -Force -Path $Destination | Out-Null
         }
 
-        $seriesUrl = "$baseurl/series/packages-$PhpVersion-$VsVersion-$Arch-staging.txt"
-        Write-Verbose "Fetching series listing: $seriesUrl"
+        $depsPhpVersion = $PhpVersion
+        if ($PhpVersion -ne 'master') {
+            $versionParts = $PhpVersion.Split('.')
+            if ($versionParts.Count -ge 2) {
+                $depsPhpVersion = $versionParts[0..1] -join '.'
+            }
+        }
+
+        $downloadedLibs = @()
+        if ($env:LIBS_BUILD_RUNS) {
+            $downloadedLibs = Get-LibsBuildDeps -Arch $Arch -Destination $Destination
+        }
+
+        $seriesUrl = "$baseurl/series/packages-$depsPhpVersion-$VsVersion-$Arch-staging.txt"
+        Write-Host "Fetching series listing: $seriesUrl"
         $series = Invoke-WebRequest -Uri $seriesUrl -UseBasicParsing -ErrorAction Stop
         $lines = @()
         if ($series -and $series.Content) {
             $lines = $series.Content -split "[\r\n]+" | Where-Object { $_ -and $_.Trim().Length -gt 0 }
         }
+
         foreach ($line in $lines) {
+            # Extract library name from package filename (e.g., "net-snmp-5.7.3-vs17-x64.zip" -> "net-snmp")
+            $libName = $line -replace '-\d.*$', ''
+
+            if ($downloadedLibs -contains $libName) {
+                Write-Host "Skipping package $line (already downloaded from workflow run)"
+                continue
+            }
+
             Write-Host "Processing package $line"
             $temp = New-TemporaryFile | Rename-Item -NewName { $_.Name + '.zip' } -PassThru
             $url = "$baseurl/$VsVersion/$Arch/$line"

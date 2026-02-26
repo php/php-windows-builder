@@ -1,4 +1,4 @@
-name: Build PHP
+name: Build PHP with custom library builds from winlibs/winlib-builder
 run-name: Build PHP ${{ inputs.php-version }}
 on:
   workflow_dispatch:
@@ -6,12 +6,9 @@ on:
       php-version:
         description: 'PHP version to build'
         required: true
-      upload:
-        type: choice
-        options: ['true', 'false']
-        description: Upload artifacts to the downloads server
+      libs-build-runs:
+        description: 'Comma-separated list of GitHub Actions run IDs from winlibs/winlib-builder'
         required: false
-        default: 'true'
 
 jobs:
   php:
@@ -30,6 +27,7 @@ jobs:
           php-version: ${{ inputs.php-version }}
           arch: ${{ matrix.arch }}
           ts: ${{ matrix.ts }}
+          libs-build-runs: ${{ inputs.libs-build-runs }}
         env:
           PHP_BUILD_PROVIDER: "The PHP Group"
 
@@ -74,7 +72,7 @@ jobs:
           $vsVersion = (Get-Content -Raw -Path (Join-Path $(pwd).Path '\php\BuildPhp\config\vs.json') | ConvertFrom-Json).php.$pv
           $packagesListUrl = "https://downloads.php.net/~windows/php-sdk/deps/series/packages-$pv-$vsVersion-${{ matrix.arch }}-staging.txt"
           Invoke-WebRequest -OutFile packages.txt -Uri $packagesListUrl
-          Add-Content -Value "cache-key=deps-$pv-${{ matrix.arch }}" -Path $env:GITHUB_OUTPUT
+          Add-Content -Value "cache-key=deps-$pv-${{ matrix.arch }}-${{ inputs.libs-build-runs }}" -Path $env:GITHUB_OUTPUT
           Add-Content -Value "cache-dir=C:\deps-$pv-${{ matrix.arch }}" -Path $env:GITHUB_OUTPUT
 
       - name: Cache Deps
@@ -90,6 +88,8 @@ jobs:
         env:
           DEPS_DIR: ${{ steps.cache-key.outputs.cache-dir }}
           DEPS_CACHE_HIT: ${{ steps.cache-deps.outputs.cache-hit }}
+          LIBS_BUILD_RUNS: ${{ inputs.libs-build-runs }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           Import-Module (Join-Path $(pwd).Path '\php\BuildPhp') -Force          
           Invoke-PhpTests -PhpVersion ${{inputs.php-version}} `
@@ -129,15 +129,3 @@ jobs:
           Invoke-PhpSmokeTests -ArtifactsDirectory (Join-Path $(pwd).Path 'artifacts') `
                                -Arch ${{matrix.arch}} `
                                -Ts ${{matrix.ts}}
-
-  upload:
-    runs-on: ubuntu-latest
-    needs: [artifacts, tests, smoke-tests]
-    if: ${{ github.event.inputs.upload == 'true' }}
-    steps:
-      - name: Upload to downloads server
-        run: |
-          url="https://api.github.com/repos/${{ github.repository }}/actions/artifacts/${{ needs.artifacts.outputs.artifact-id }}/zip"
-          gh workflow run php.yml -R php/web-downloads -f url="$url" -f php-version=${{ inputs.php-version }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.WINDOWS_BUILDS_TOKEN }}

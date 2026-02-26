@@ -79,13 +79,12 @@ function Add-TestRequirements {
         }
 
         $FetchDeps = $False
-        $majorMinorVersion = ($PhpVersion -split '\.')[0..1] -join '.'
         if($null -eq $env:DEPS_DIR) {
-            $env:DEPS_DIR = "C:\deps-$majorMinorVersion-$Arch"
+            $env:DEPS_DIR = "C:\deps-$PhpVersion-$Arch"
             $FetchDeps = $True
         }
         if($FetchDeps -eq $True -or $null -eq $Env:DEPS_CACHE_HIT -or $Env:DEPS_CACHE_HIT -ne 'true') {
-            Get-PhpDeps -PhpVersion $majorMinorVersion -VsVersion $VsVersion -Arch $Arch -Destination $env:DEPS_DIR
+            Add-PhpDeps -PhpVersion $PhpVersion -VsVersion $VsVersion -Arch $Arch -Destination $env:DEPS_DIR
         }
         Invoke-EditBin -Exe "$binDirectoryPath\php.exe" -StackSize 8388608 -Arch $Arch
         Invoke-EditBin -Exe "$binDirectoryPath\php-cgi.exe" -StackSize 8388608 -Arch $Arch

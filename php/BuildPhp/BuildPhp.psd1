@@ -67,9 +67,9 @@
         'Add-TestRequirements',
         'Add-Vs',
         'Get-File',
+        'Get-LibsBuildDeps',
         'Get-OciSdk',
         'Get-PhpBuild',
-        'Get-PhpDeps',
         'Get-PhpSdk',
         'Get-PhpSrc',
         'Get-PhpTestPack',
@@ -92,6 +92,7 @@
 
         # Public functions
         'Invoke-PhpBuild',
+        'Invoke-PhpSmokeTests',
         'Invoke-PhpTests'
     )
 
