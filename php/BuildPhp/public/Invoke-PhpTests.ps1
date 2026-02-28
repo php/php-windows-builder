@@ -88,6 +88,11 @@ function Invoke-PhpTests {
             Set-SnmpTestEnvironment -TestsDirectoryPath "$buildDirectory\$testsDirectory"
         }
 
+        $testTimeout = "120"
+        if($TestType -eq "ext") {
+            $testTimeout = "300"
+        }
+
         $testResultFile = "$buildDirectory\test-$Arch-$Ts-$Opcache-$TestType.xml"
         $testLogFile = "$buildDirectory\test-$Arch-$Ts-$Opcache-$TestType.log"
 
@@ -101,7 +106,7 @@ function Invoke-PhpTests {
             "--offline",
             "--show-diff",
             "--show-slow", "1000",
-            "--set-timeout", "120",
+            "--set-timeout", $testTimeout,
             "--temp-source", "$buildDirectory\tmp",
             "--temp-target", "$buildDirectory\tmp",
             "-r", "$TestType-tests-to-run.txt"
