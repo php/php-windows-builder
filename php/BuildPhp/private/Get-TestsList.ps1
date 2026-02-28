@@ -25,7 +25,7 @@ function Get-TestsList {
         foreach ($line in Get-Content "$PSScriptRoot\..\config\${Type}_test_directories") {
             $ttr = Get-ChildItem -Path $line -Filter "*.phpt" -Recurse
             foreach ($t in $ttr) {
-                Add-Content $OutputFile ($t | Resolve-Path -Relative)
+                Add-Content $OutputFile $t.FullName
             }
         }
     }
