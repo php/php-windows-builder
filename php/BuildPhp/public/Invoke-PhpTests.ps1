@@ -88,6 +88,9 @@ function Invoke-PhpTests {
             Set-SnmpTestEnvironment -TestsDirectoryPath "$buildDirectory\$testsDirectory"
         }
 
+        $testResultFile = "$buildDirectory\test-$Arch-$Ts-$Opcache-$TestType.xml"
+        $testLogFile = "$buildDirectory\test-$Arch-$Ts-$Opcache-$TestType.log"
+
         $params = @(
             "-d", "open_basedir=",
             "-d", "output_buffering=0",
@@ -104,15 +107,63 @@ function Invoke-PhpTests {
             "-r", "$TestType-tests-to-run.txt"
         )
 
+        $workersParam = ""
         if($settings.workers -ne "") {
-            $params += $settings.workers
+            $workersParam = $settings.workers
+            $params += $workersParam
         }
 
-        & $buildDirectory\phpbin\php.exe @params
+        $invokeTests = {
+            param (
+                [string[]] $RunnerParams,
+                [string] $LogFilePath
+            )
+            if(Test-Path $LogFilePath) {
+                Remove-Item $LogFilePath -Force
+            }
 
-        Copy-Item "$buildDirectory\test-$Arch-$Ts-$Opcache-$TestType.xml" $currentDirectory
+            & $buildDirectory\phpbin\php.exe @RunnerParams 2>&1 | Tee-Object -FilePath $LogFilePath | Out-Host
+            return [int]$LASTEXITCODE
+        }
+
+        $isWorkerCrash = {
+            param (
+                [string] $LogFilePath
+            )
+            return (Test-Path $LogFilePath) -and (Select-String -Path $LogFilePath -Pattern "ERROR:\s+Worker \d+ died unexpectedly" -Quiet)
+        }
+
+        $exitCode = & $invokeTests -RunnerParams $params -LogFilePath $testLogFile
+
+        if($exitCode -ne 0 -and $workersParam -ne "") {
+            $baseParams = @($params | Where-Object { $_ -ne $workersParam })
+            $workerDied = & $isWorkerCrash -LogFilePath $testLogFile
+            if($workerDied) {
+                Write-Warning "Detected a run-tests worker crash. Retrying once with -j2."
+                $retryWithTwoWorkersParams = @($baseParams + "-j2")
+                $exitCode = & $invokeTests -RunnerParams $retryWithTwoWorkersParams -LogFilePath $testLogFile
+
+                if($exitCode -ne 0) {
+                    $workerDied = & $isWorkerCrash -LogFilePath $testLogFile
+                    if($workerDied) {
+                        Write-Warning "Detected another worker crash with -j2. Retrying once without parallel workers."
+                        $exitCode = & $invokeTests -RunnerParams $baseParams -LogFilePath $testLogFile
+                    }
+                }
+            }
+        }
+
+        if(Test-Path $testResultFile) {
+            Copy-Item $testResultFile $currentDirectory -Force
+        } else {
+            Write-Warning "Test results file was not generated: $testResultFile"
+        }
 
         Set-Location "$currentDirectory"
+
+        if($exitCode -ne 0) {
+            Write-Warning "PHP tests exited with code $exitCode."
+        }
     }
     end {
     }
