@@ -35,7 +35,7 @@ function Add-Vs {
                 Get-File -Url $vsWhereUrl -OutFile $vswherePath
             }
 
-            $instances = & $vswherePath -products '*' -format json 2> $null | ConvertFrom-Json
+            $instances = & $vswherePath -latest -products '*' -format json 2> $null | ConvertFrom-Json
             $vsInst = $instances | Select-Object -First 1
 
             $componentArgs = $Config.components | ForEach-Object { '--add'; $_ }

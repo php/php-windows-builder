@@ -27,6 +27,7 @@ function Get-VsVersion {
             Add-Vs -VsVersion $VsVersion -VsConfig $VsConfig
             $selectedToolset = Get-VsVersionHelper -VsVersion $VsVersion -VsConfig $VsConfig
         }
+
         return [PSCustomObject]@{
             vs = $VsVersion
             toolset = $selectedToolset

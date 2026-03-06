@@ -61,6 +61,28 @@ runs:
     - name: Checkout
       uses: actions/checkout@v5
 
+    - name: Check VS components
+      id: vs-check
+      shell: pwsh
+      run: |
+        Import-Module ${{ github.action_path }}\BuildPhpExtension -Force
+        Get-VsCacheInfo -PhpVersion ${{ inputs.php-version }}
+
+    - name: Restore VS components cache
+      id: vs-cache
+      if: steps.vs-check.outputs.needs-vs-install == 'true'
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{ steps.vs-check.outputs.vs-cache-path }}
+        key: ${{ steps.vs-check.outputs.vs-cache-key-prefix }}
+
+    - name: Restore VS toolset
+      if: steps.vs-cache.outputs.cache-hit == 'true'
+      shell: pwsh
+      run: |
+        Import-Module ${{ github.action_path }}\BuildPhpExtension -Force
+        Invoke-RestoreVsToolsetCache -CachePath "${{ steps.vs-check.outputs.vs-cache-path }}" -VsInstallPath "${{ steps.vs-check.outputs.vs-install-path }}"
+
     - name: Build PHP Extension
       id: build
       shell: pwsh
@@ -84,6 +106,21 @@ runs:
                                  -PhpVersion ${{inputs.php-version}} `
                                  -Arch ${{inputs.arch}} `
                                  -Ts ${{inputs.ts}}
+
+    - name: Stage VS toolset cache
+      if: steps.vs-check.outputs.needs-vs-install == 'true' && steps.vs-cache.outputs.cache-hit != 'true'
+      shell: pwsh
+      run: |
+        Import-Module ${{ github.action_path }}\BuildPhpExtension -Force
+        Invoke-SaveVsToolsetCache -PhpVersion ${{ inputs.php-version }} -CachePath "${{ steps.vs-check.outputs.vs-cache-path }}"
+
+    - name: Save VS components cache
+      if: steps.vs-check.outputs.needs-vs-install == 'true' && steps.vs-cache.outputs.cache-hit != 'true'
+      continue-on-error: true
+      uses: actions/cache/save@v4
+      with:
+        path: ${{ steps.vs-check.outputs.vs-cache-path }}
+        key: ${{ steps.vs-cache.outputs.cache-primary-key }}
 
     - name: Upload the build artifact
       uses: actions/upload-artifact@v5

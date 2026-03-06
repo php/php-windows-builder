@@ -95,11 +95,16 @@
         'Get-PhpSdk',
         'Get-PhpSrc',
         'Get-TempFiles',
-        'Get-VsVersionHelper',
+        'Get-VsCacheInfo',
+        'Get-VsInstallPath',
         'Get-VsVersion',
+        'Get-VsVersionHelper',
         'Invoke-Build',
         'Invoke-CleanupTempFiles',
+        'Invoke-RestoreVsToolsetCache',
+        'Invoke-SaveVsToolsetCache',
         'Invoke-Tests',
+        'Restore-VsToolsetFromCache',
         'Set-AmqpTestEnvironment',
         'Set-GAGroup',
         'Set-ImagickTestEnvironment',
@@ -107,6 +112,7 @@
         'Set-Oci819TestEnvironment',
         'Set-PdoOciTestEnvironment',
         'Set-XdebugTestEnvironment',
+        'Sync-VsToolsetCache',
 
         # Public functions
         'Invoke-PhpBuildExtension'
