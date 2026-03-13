@@ -58,7 +58,15 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Check checkout state
+      id: checkout-state
+      shell: pwsh
+      run: |
+        Import-Module ${{ github.action_path }}\BuildPhpExtension -Force
+        Add-Content -Path $env:GITHUB_OUTPUT -Value "checkout_state=$(Get-CheckoutState -Repository $env:GITHUB_REPOSITORY)" -Encoding utf8
+
     - name: Checkout
+      if: ${{ steps.checkout-state.outputs.checkout_state == 'false' }}
       uses: actions/checkout@v5
 
     - name: Check VS components

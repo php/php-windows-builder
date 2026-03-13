@@ -81,6 +81,7 @@
         'Add-Vs',
         'Get-ArgumentsFromConfig',
         'Get-BuildDirectory',
+        'Get-CheckoutState',
         'Get-Extension',
         'Get-ExtensionConfig',
         'Get-ExtensionName',
