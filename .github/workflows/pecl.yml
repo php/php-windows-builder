@@ -60,7 +60,7 @@ jobs:
       matrix: ${{ steps.extension-matrix.outputs.matrix }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Get the extension matrix
         id: extension-matrix
         uses: ./extension-matrix
@@ -79,7 +79,7 @@ jobs:
       matrix: ${{fromJson(needs.get-extension-matrix.outputs.matrix)}}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Build the extension
         uses: ./extension
         with:
@@ -107,14 +107,14 @@ jobs:
       artifact-id: ${{ steps.artifact.outputs.artifact-id }}
     steps:
       - name: Upload artifact
-        uses: actions/upload-artifact/merge@v5
+        uses: actions/upload-artifact/merge@v7
         id: merge
         with:
           name: artifact
           delete-merged: true
 
       - name: Get merged artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: artifact
           path: artifact
@@ -134,7 +134,7 @@ jobs:
           echo "artifact-path=/tmp/$extension" >> "$GITHUB_OUTPUT"
 
       - name: Upload zip
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         id: artifact
         with:
           name: ${{ steps.stage.outputs.artifact-name }}

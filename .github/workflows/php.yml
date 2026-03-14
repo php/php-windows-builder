@@ -22,7 +22,7 @@ jobs:
     runs-on: windows-2022
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Build
         uses: ./php
@@ -40,7 +40,7 @@ jobs:
       artifact-id: ${{ steps.artifacts.outputs.artifact-id }}
     steps:
       - name: Upload artifacts
-        uses: actions/upload-artifact/merge@v5
+        uses: actions/upload-artifact/merge@v7
         id: artifacts
         with:
           name: artifacts
@@ -56,10 +56,10 @@ jobs:
     needs: artifacts
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         id: artifacts
         with:
           name: artifacts
@@ -79,7 +79,7 @@ jobs:
 
       - name: Cache Deps
         id: cache-deps
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ steps.cache-key.outputs.cache-dir }}
           key: ${{ steps.cache-key.outputs.cache-key }}-${{ hashFiles('packages.txt') }}
@@ -99,7 +99,7 @@ jobs:
                           -TestType ${{matrix.test-type}}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         continue-on-error: true
         with:
           name: test-results-${{matrix.arch}}-${{matrix.ts}}-${{matrix.opcache}}-${{matrix.test-type}}
@@ -114,10 +114,10 @@ jobs:
     needs: [artifacts]
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Download artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: artifacts
           path: artifacts

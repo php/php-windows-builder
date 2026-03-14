@@ -71,7 +71,7 @@ runs:
 
     - name: Checkout
       if: ${{ steps.checkout-state.outputs.checkout_state == 'false' }}
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Check VS components
       id: vs-check
@@ -82,7 +82,7 @@ runs:
     - name: Restore VS components cache
       id: vs-cache
       if: steps.vs-check.outputs.needs-vs-install == 'true'
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: ${{ steps.vs-check.outputs.vs-cache-path }}
         key: ${{ steps.vs-check.outputs.vs-cache-key-prefix }}
@@ -125,13 +125,13 @@ runs:
     - name: Save VS components cache
       if: steps.vs-check.outputs.needs-vs-install == 'true' && steps.vs-cache.outputs.cache-hit != 'true'
       continue-on-error: true
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: ${{ steps.vs-check.outputs.vs-cache-path }}
         key: ${{ steps.vs-cache.outputs.cache-primary-key }}
 
     - name: Upload the build artifact
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v7
       with:
         name: ${{ steps.build.outputs.artifact }}
         path: artifacts/*

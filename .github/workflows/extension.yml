@@ -57,7 +57,7 @@ jobs:
       matrix: ${{ steps.extension-matrix.outputs.matrix }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Get the extension matrix
         id: extension-matrix
         uses: ./extension-matrix
@@ -76,7 +76,7 @@ jobs:
       matrix: ${{fromJson(needs.get-extension-matrix.outputs.matrix)}}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Build the extension
         uses: ./extension
         with:
@@ -97,7 +97,7 @@ jobs:
     needs: extension
     steps:
       - name: Upload artifacts
-        uses: actions/upload-artifact/merge@v5
+        uses: actions/upload-artifact/merge@v7
         with:
           name: artifacts
           delete-merged: true
