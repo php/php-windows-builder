@@ -1,0 +1,256 @@
+name: Local Test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: windows-2022
+    timeout-minutes: 240
+    env:
+      BUILD_ARCH: x64
+      BUILD_TS: nts
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Resolve latest PHP 8.5 and Xdebug releases
+        id: versions
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          $activeReleases = Invoke-RestMethod -Uri 'https://www.php.net/releases/active.php'
+          $phpRelease = $activeReleases.'8'.'8.5'
+          if (-not $phpRelease.version) {
+              throw 'Could not resolve the latest PHP 8.5 release from php.net.'
+          }
+
+          $phpVersion = $phpRelease.version
+          $phpMinorVersion = ($phpVersion -split '\.')[0..1] -join '.'
+
+          $headers = @{
+              Accept = 'application/vnd.github+json'
+              'X-GitHub-Api-Version' = '2022-11-28'
+          }
+          if ($env:GITHUB_TOKEN) {
+              $headers.Authorization = "Bearer $env:GITHUB_TOKEN"
+          }
+
+          $xdebugRelease = Invoke-RestMethod -Uri 'https://api.github.com/repos/xdebug/xdebug/releases/latest' -Headers $headers
+          $xdebugVersion = $xdebugRelease.tag_name.TrimStart('v')
+          if (-not $xdebugVersion) {
+              throw 'Could not resolve the latest Xdebug release from GitHub.'
+          }
+
+          "php-version=$phpVersion" | Add-Content -Path $env:GITHUB_OUTPUT
+          "php-version-minor=$phpMinorVersion" | Add-Content -Path $env:GITHUB_OUTPUT
+          "xdebug-version=$xdebugVersion" | Add-Content -Path $env:GITHUB_OUTPUT
+
+          $xdebugPublishedAt = [DateTimeOffset]::Parse($xdebugRelease.published_at).ToString('yyyy-MM-dd')
+          Write-Host "PHP 8.5 release: $phpVersion ($($phpRelease.date))"
+          Write-Host "Xdebug release: $xdebugVersion ($xdebugPublishedAt)"
+
+      - name: Install local modules into Program Files with Install-Module
+        shell: powershell
+        run: |
+          $repoName = 'LocalWorkspace'
+          $repoPath = Join-Path $env:RUNNER_TEMP 'psrepo'
+          $moduleNames = @('BuildPhp', 'BuildPhpExtension')
+          $programFilesRoots = @(
+              (Join-Path $env:ProgramFiles 'PowerShell\Modules'),
+              (Join-Path $env:ProgramFiles 'WindowsPowerShell\Modules')
+          )
+
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+          Import-Module PowerShellGet -Force
+          Get-PackageProvider -Name NuGet -ForceBootstrap | Out-Null
+
+          if (Get-PSRepository -Name $repoName -ErrorAction SilentlyContinue) {
+              Unregister-PSRepository -Name $repoName
+          }
+
+          Remove-Item -Path $repoPath -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -Path $repoPath -ItemType Directory -Force | Out-Null
+          Register-PSRepository -Name $repoName -SourceLocation $repoPath -PublishLocation $repoPath -InstallationPolicy Trusted
+
+          foreach ($moduleName in $moduleNames) {
+              Get-InstalledModule -Name $moduleName -AllVersions -ErrorAction SilentlyContinue | Uninstall-Module -Force -ErrorAction SilentlyContinue
+
+              foreach ($root in $programFilesRoots) {
+                  $installedPath = Join-Path $root $moduleName
+                  if (Test-Path $installedPath) {
+                      Remove-Item -Path $installedPath -Recurse -Force
+                  }
+              }
+          }
+
+          Publish-Module -Path (Join-Path $env:GITHUB_WORKSPACE 'php\BuildPhp') -Repository $repoName -NuGetApiKey 'local'
+          Publish-Module -Path (Join-Path $env:GITHUB_WORKSPACE 'extension\BuildPhpExtension') -Repository $repoName -NuGetApiKey 'local'
+
+          Install-Module -Name BuildPhp -Repository $repoName -Scope AllUsers -Force -AllowClobber -SkipPublisherCheck
+          Install-Module -Name BuildPhpExtension -Repository $repoName -Scope AllUsers -Force -AllowClobber -SkipPublisherCheck
+
+          foreach ($moduleName in $moduleNames) {
+              $module = Get-Module -ListAvailable -Name $moduleName | Sort-Object Version -Descending | Select-Object -First 1
+              if (-not $module) {
+                  throw "Failed to install module $moduleName."
+              }
+
+              $installedInProgramFiles = $false
+              foreach ($root in $programFilesRoots) {
+                  if ($module.ModuleBase.StartsWith($root, [System.StringComparison]::OrdinalIgnoreCase)) {
+                      $installedInProgramFiles = $true
+                      break
+                  }
+              }
+
+              if (-not $installedInProgramFiles) {
+                  throw "$moduleName was not installed under Program Files. Module path: $($module.ModuleBase)"
+              }
+
+              Write-Host "$moduleName installed at $($module.ModuleBase)"
+          }
+
+          "BUILDPHP_MODULE_BASE=$((Get-Module -ListAvailable -Name BuildPhp | Sort-Object Version -Descending | Select-Object -First 1).ModuleBase)" | Add-Content -Path $env:GITHUB_ENV
+          "BUILDPHPEXTENSION_MODULE_BASE=$((Get-Module -ListAvailable -Name BuildPhpExtension | Sort-Object Version -Descending | Select-Object -First 1).ModuleBase)" | Add-Content -Path $env:GITHUB_ENV
+
+      - name: Build PHP
+        shell: pwsh
+        run: |
+          $phpBuildRoot = Join-Path $env:RUNNER_TEMP 'php-build'
+          Remove-Item -Path $phpBuildRoot -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -Path $phpBuildRoot -ItemType Directory -Force | Out-Null
+
+          $buildPhpManifest = Join-Path $env:BUILDPHP_MODULE_BASE 'BuildPhp.psd1'
+          Write-Host "Importing BuildPhp from $buildPhpManifest"
+          Import-Module $buildPhpManifest -Force
+
+          Push-Location $phpBuildRoot
+          try {
+              Invoke-PhpBuild -PhpVersion '${{ steps.versions.outputs.php-version }}' `
+                              -Arch $env:BUILD_ARCH `
+                              -Ts $env:BUILD_TS
+          } finally {
+              Pop-Location
+          }
+
+      - name: Build Xdebug
+        shell: pwsh
+        env:
+          RUN_TESTS: 'false'
+        run: |
+          $xdebugBuildRoot = Join-Path $env:RUNNER_TEMP 'xdebug-build'
+          Remove-Item -Path $xdebugBuildRoot -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -Path $xdebugBuildRoot -ItemType Directory -Force | Out-Null
+
+          $buildPhpExtensionManifest = Join-Path $env:BUILDPHPEXTENSION_MODULE_BASE 'BuildPhpExtension.psd1'
+          Write-Host "Importing BuildPhpExtension from $buildPhpExtensionManifest"
+          Import-Module $buildPhpExtensionManifest -Force
+
+          Push-Location $xdebugBuildRoot
+          try {
+              Invoke-PhpBuildExtension -ExtensionUrl 'https://github.com/xdebug/xdebug' `
+                                       -ExtensionRef '${{ steps.versions.outputs.xdebug-version }}' `
+                                       -PhpVersion '${{ steps.versions.outputs.php-version-minor }}' `
+                                       -Arch $env:BUILD_ARCH `
+                                       -Ts $env:BUILD_TS `
+                                       -Libraries 'zlib' `
+                                       -Args '--with-xdebug'
+          } finally {
+              Pop-Location
+          }
+
+      - name: Smoke test PHP with built Xdebug
+        shell: pwsh
+        env:
+          PHP_VERSION: ${{ steps.versions.outputs.php-version }}
+          XDEBUG_VERSION: ${{ steps.versions.outputs.xdebug-version }}
+        run: |
+          $phpArtifacts = Join-Path $env:RUNNER_TEMP 'php-build\artifacts'
+          $xdebugArtifacts = Join-Path $env:RUNNER_TEMP 'xdebug-build\artifacts'
+          $smokeRoot = Join-Path $env:RUNNER_TEMP 'smoke'
+          $phpExtract = Join-Path $smokeRoot 'php'
+          $xdebugExtract = Join-Path $smokeRoot 'xdebug'
+
+          Remove-Item -Path $smokeRoot -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -Path $phpExtract -ItemType Directory -Force | Out-Null
+          New-Item -Path $xdebugExtract -ItemType Directory -Force | Out-Null
+
+          $phpZip = Get-ChildItem -Path $phpArtifacts -File -Filter '*.zip' | Where-Object {
+              $_.Name -notmatch '^php-(devel-pack|debug-pack|test-pack)-' -and
+              $_.Name -notmatch '-src\.zip$'
+          } | Sort-Object Name | Select-Object -First 1
+          if (-not $phpZip) {
+              throw 'Could not find the built PHP runtime archive.'
+          }
+
+          $xdebugZip = Get-ChildItem -Path $xdebugArtifacts -File -Filter '*.zip' | Sort-Object Name | Select-Object -First 1
+          if (-not $xdebugZip) {
+              throw 'Could not find the built Xdebug archive.'
+          }
+
+          Expand-Archive -Path $phpZip.FullName -DestinationPath $phpExtract -Force
+          Expand-Archive -Path $xdebugZip.FullName -DestinationPath $xdebugExtract -Force
+
+          $xdebugDll = Get-ChildItem -Path $xdebugExtract -Filter 'php_xdebug*.dll' -File -Recurse | Select-Object -First 1
+          if (-not $xdebugDll) {
+              throw 'Could not find the built Xdebug DLL in the artifact.'
+          }
+
+          $phpExtDirectory = Join-Path $phpExtract 'ext'
+          New-Item -Path $phpExtDirectory -ItemType Directory -Force | Out-Null
+          Copy-Item -Path $xdebugDll.FullName -Destination (Join-Path $phpExtDirectory 'php_xdebug.dll') -Force
+
+          Get-ChildItem -Path $xdebugExtract -Filter '*.dll' -File -Recurse | Where-Object {
+              $_.FullName -ne $xdebugDll.FullName
+          } | ForEach-Object {
+              Copy-Item -Path $_.FullName -Destination $phpExtract -Force
+          }
+
+          $phpIni = Join-Path $phpExtract 'php.ini'
+          @(
+              '[PHP]'
+              "extension_dir=$phpExtDirectory"
+              "zend_extension=$phpExtDirectory\php_xdebug.dll"
+          ) | Set-Content -Path $phpIni -Encoding Ascii
+
+          $phpExe = Join-Path $phpExtract 'php.exe'
+          if (-not (Test-Path $phpExe)) {
+              throw "Could not find php.exe in $phpExtract."
+          }
+
+          $phpVersionOutput = (& $phpExe -c $phpIni -v 2>&1) | Out-String
+          $phpVersionOutput | Tee-Object -FilePath (Join-Path $smokeRoot 'php-v.txt')
+          if ($LASTEXITCODE -ne 0) {
+              throw 'php -v failed.'
+          }
+          if ($phpVersionOutput -notmatch [regex]::Escape($env:PHP_VERSION)) {
+              throw "php -v did not report PHP $($env:PHP_VERSION)."
+          }
+          if ($phpVersionOutput -notmatch 'Xdebug v') {
+              throw 'php -v did not report a loaded Xdebug extension.'
+          }
+
+          $xdebugInfoOutput = (& $phpExe -c $phpIni --ri xdebug 2>&1) | Out-String
+          $xdebugInfoOutput | Tee-Object -FilePath (Join-Path $smokeRoot 'xdebug-ri.txt')
+          if ($LASTEXITCODE -ne 0) {
+              throw 'php --ri xdebug failed.'
+          }
+          if ($xdebugInfoOutput -notmatch [regex]::Escape($env:XDEBUG_VERSION)) {
+              throw "php --ri xdebug did not report Xdebug $($env:XDEBUG_VERSION)."
+          }
+
+      - name: Upload build and smoke artifacts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: program-files-smoke-artifacts
+          if-no-files-found: ignore
+          path: |
+            ${{ runner.temp }}\php-build\artifacts\*
+            ${{ runner.temp }}\xdebug-build\artifacts\*
+            ${{ runner.temp }}\smoke\*

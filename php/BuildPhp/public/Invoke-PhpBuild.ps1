@@ -61,15 +61,15 @@ function Invoke-PhpBuild {
 
         if(-not [string]::IsNullOrWhiteSpace($env:LIBS_BUILD_RUNS)) {
             Add-PhpDeps -PhpVersion $PhpVersion -VsVersion $VsConfig.vs -Arch $Arch -Destination "$buildPath\..\deps"
-            $task = "$PSScriptRoot\..\runner\task-$Ts.bat"
+            $taskTemplate = Join-Path $PSScriptRoot "..\runner\task-$Ts.bat"
         } else {
-            $task = "$PSScriptRoot\..\runner\task-$Ts-with-deps.bat"
+            $taskTemplate = Join-Path $PSScriptRoot "..\runner\task-$Ts-with-deps.bat"
         }
 
-        & "$buildDirectory\php-sdk\phpsdk-starter.bat" -c $VsConfig.vs -a $Arch -s $VsConfig.toolset -t $task
-        if (-not $?) {
-            throw "build failed with errorlevel $LastExitCode"
-        }
+        $task = [System.IO.Path]::GetFileName($taskTemplate)
+        Copy-Item -Path $taskTemplate -Destination $task -Force
+
+        Invoke-PhpSdkStarter -BuildDirectory $buildDirectory -VsConfig $VsConfig -Arch $Arch -Task $task
 
         $artifacts = if ($Ts -eq "ts") {"..\obj\Release_TS\php-*.zip"} else {"..\obj\Release\php-*.zip"}
         New-Item "$currentDirectory\artifacts" -ItemType "directory" -Force > $null 2>&1
