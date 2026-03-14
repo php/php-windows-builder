@@ -47,6 +47,12 @@ on:
       test-runner-args:
         description: 'Arguments for the test runner'
         required: false
+      upload:
+        type: choice
+        options: ['true', 'false']
+        description: Upload artifacts to the downloads server
+        required: false
+        default: 'true'
 jobs:
   get-extension-matrix:
     runs-on: ubuntu-latest
@@ -137,6 +143,7 @@ jobs:
   upload:
     runs-on: ubuntu-latest
     needs: artifact
+    if: ${{ github.event.inputs.upload == 'true' }}
     steps:
       - name: Upload to downloads server
         run: |
