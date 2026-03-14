@@ -64,6 +64,7 @@
         # Private functions (sorted)
         'Add-BuildRequirements',
         'Add-Path',
+        'Add-PhpDeps',
         'Add-TestRequirements',
         'Add-Vs',
         'Get-File',
@@ -79,6 +80,7 @@
         'Get-VsVersion',
         'Get-VsVersionHelper',
         'Invoke-EditBin',
+        'Invoke-PhpSdkStarter',
         'Set-EnchantTestEnvironment',
         'Set-FirebirdTestEnvironment',
         'Set-MsSqlTestEnvironment',
