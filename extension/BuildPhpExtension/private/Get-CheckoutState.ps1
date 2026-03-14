@@ -19,15 +19,18 @@ Function Get-CheckoutState {
         $checkout_state = $true;
         if([string]::IsNullOrWhiteSpace($Repository) -or -not(Test-Path .git)) {
             $checkout_state = $false
-        }
-        try {
-            $originUrl = git remote get-url origin 2>$null
-            if($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($originUrl)) {
+        } else {
+            try {
+                $originUrl = git remote get-url origin 2> $null
+                if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($originUrl)) {
+                    $checkout_state = $false
+                } else {
+                    $checkout_state = ($originUrl -match "(^|[:/])$([regex]::Escape($Repository) )(\.git)?$")
+                }
+            }
+            catch {
                 $checkout_state = $false
             }
-            $checkout_state = ($originUrl -match "(^|[:/])$([regex]::Escape($Repository))(\.git)?$")
-        } catch {
-            $checkout_state = $false
         }
         $checkout_state = $checkout_state.ToString().ToLowerInvariant()
         if($null -ne $env:GITHUB_OUTPUT) {
