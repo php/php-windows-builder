@@ -16,20 +16,24 @@ Function Get-CheckoutState {
         if([string]::IsNullOrWhiteSpace($Repository)) {
             $Repository = $env:GITHUB_REPOSITORY
         }
-
+        $checkout_state = $true;
         if([string]::IsNullOrWhiteSpace($Repository) -or -not(Test-Path .git)) {
-            return $false.ToString().ToLowerInvariant()
+            $checkout_state = $false
         }
-
         try {
             $originUrl = git remote get-url origin 2>$null
             if($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($originUrl)) {
-                return $false.ToString().ToLowerInvariant()
+                $checkout_state = $false
             }
-
-            return ($originUrl -match "(^|[:/])$([regex]::Escape($Repository))(\.git)?$").ToString().ToLowerInvariant()
+            $checkout_state = ($originUrl -match "(^|[:/])$([regex]::Escape($Repository))(\.git)?$")
         } catch {
-            return $false.ToString().ToLowerInvariant()
+            $checkout_state = $false
+        }
+        $checkout_state = $checkout_state.ToString().ToLowerInvariant()
+        if($null -ne $env:GITHUB_OUTPUT) {
+            Add-Content -Path $env:GITHUB_OUTPUT -Value "checkout_state=$checkout_state" -Encoding utf8
+        } else {
+            return $checkout_state
         }
     }
     end {

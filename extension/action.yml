@@ -58,12 +58,16 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Import module
+      shell: pwsh
+      run: |
+        Add-Content -Path $env:GITHUB_ENV -Value "PSModulePath=${{ github.action_path }};$env:PSModulePath" -Encoding utf8
+
     - name: Check checkout state
       id: checkout-state
       shell: pwsh
       run: |
-        Import-Module ${{ github.action_path }}\BuildPhpExtension -Force
-        Add-Content -Path $env:GITHUB_OUTPUT -Value "checkout_state=$(Get-CheckoutState -Repository $env:GITHUB_REPOSITORY)" -Encoding utf8
+        Get-CheckoutState -Repository $env:GITHUB_REPOSITORY
 
     - name: Checkout
       if: ${{ steps.checkout-state.outputs.checkout_state == 'false' }}
@@ -73,7 +77,6 @@ runs:
       id: vs-check
       shell: pwsh
       run: |
-        Import-Module ${{ github.action_path }}\BuildPhpExtension -Force
         Get-VsCacheInfo -PhpVersion ${{ inputs.php-version }}
 
     - name: Restore VS components cache
@@ -88,7 +91,6 @@ runs:
       if: steps.vs-cache.outputs.cache-hit == 'true'
       shell: pwsh
       run: |
-        Import-Module ${{ github.action_path }}\BuildPhpExtension -Force
         Invoke-RestoreVsToolsetCache -CachePath "${{ steps.vs-check.outputs.vs-cache-path }}" -VsInstallPath "${{ steps.vs-check.outputs.vs-install-path }}"
 
     - name: Build PHP Extension
@@ -108,7 +110,6 @@ runs:
         AUTO_DETECT_ARGS: ${{env.auto-detect-args}}
         AUTO_DETECT_LIBS: ${{env.auto-detect-libs}}
       run: |
-        Import-Module ${{ github.action_path }}\BuildPhpExtension -Force
         Invoke-PhpBuildExtension -ExtensionUrl "${{inputs.extension-url}}" `
                                  -ExtensionRef "${{inputs.extension-ref}}" `
                                  -PhpVersion ${{inputs.php-version}} `
@@ -119,7 +120,6 @@ runs:
       if: steps.vs-check.outputs.needs-vs-install == 'true' && steps.vs-cache.outputs.cache-hit != 'true'
       shell: pwsh
       run: |
-        Import-Module ${{ github.action_path }}\BuildPhpExtension -Force
         Invoke-SaveVsToolsetCache -PhpVersion ${{ inputs.php-version }} -CachePath "${{ steps.vs-check.outputs.vs-cache-path }}"
 
     - name: Save VS components cache
