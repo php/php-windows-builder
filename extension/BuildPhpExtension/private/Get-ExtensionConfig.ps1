@@ -251,9 +251,9 @@ Function Get-ExtensionConfig {
             }
 
             # TODO: This should be implemented using composer.json once implemented
-            $packageXml = Get-ChildItem (Get-Location).Path -Recurse -Filter "package.xml" -ErrorAction SilentlyContinue | Select-Object -First 1
+            $packageXml = Get-RecursiveFilePath -Directory (Get-Location).Path -FileName 'package.xml'
             if($null -ne $packageXml) {
-                $xml = [xml](Get-Content $packageXml.FullName)
+                $xml = [xml](Get-Content $packageXml)
                 $config.docs = $xml.SelectNodes("//*[@role='doc']") | ForEach-Object {
                     $path = $_.name
                     $current = $_.ParentNode

@@ -19,10 +19,7 @@ function Get-ExtensionSource {
     process {
         if($env:GITHUB_ACTIONS -eq "true") {
             if ($null -eq $ExtensionUrl -or $ExtensionUrl -eq '') {
-                $configW32 = $null
-                try {
-                    $configW32 = [System.IO.Directory]::EnumerateFiles((Get-Location).Path, 'config.w32', [System.IO.SearchOption]::AllDirectories) | Select-Object -First 1
-                } catch { }
+                $configW32 = Get-RecursiveFilePath -Directory (Get-Location).Path -FileName 'config.w32'
                 if($null -eq $configW32) {
                     $ExtensionUrl = "https://github.com/$env:GITHUB_REPOSITORY"
                 }

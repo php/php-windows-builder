@@ -106,7 +106,7 @@ function Get-Extension {
             }
         }
 
-        $configW32 = Get-ChildItem (Get-Location).Path -Recurse -Filter "config.w32" -ErrorAction SilentlyContinue | Select-Object -First 1
+        $configW32 = Get-RecursiveFilePath -Directory (Get-Location).Path -FileName 'config.w32'
         if($null -eq $configW32) {
             if($LocalSrc) {
                 throw "No config.w32 found, please make sure you are in the extension source directory and it supports Windows."
@@ -114,10 +114,22 @@ function Get-Extension {
                 throw "No config.w32 found, please check if the extension supports Windows."
             }
         }
-        $subDirectory = $configW32.DirectoryName
+        $subDirectory = Split-Path -Path $configW32 -Parent
         if((Get-Location).Path -ne $subDirectory) {
             Copy-Item -Path "${subDirectory}\*" -Destination $BuildDirectory -Recurse -Force
             Remove-Item -Path $subDirectory -Recurse -Force
+        }
+
+        $selectedConfigW32 = Join-Path (Resolve-Path $BuildDirectory).Path "config.w32"
+        if (Test-Path -LiteralPath $selectedConfigW32 -PathType Leaf) {
+            Get-ChildItem -LiteralPath (Resolve-Path $BuildDirectory).Path -Recurse -Filter "config.w32" -File -ErrorAction SilentlyContinue |
+                Where-Object {
+                    -not [System.StringComparer]::OrdinalIgnoreCase.Equals(
+                        (Resolve-Path -LiteralPath $_.FullName).Path,
+                        $selectedConfigW32
+                    )
+                } |
+                Remove-Item -Force
         }
         $name = Get-ExtensionName
 

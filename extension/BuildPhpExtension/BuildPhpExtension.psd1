@@ -95,6 +95,7 @@
         'Get-PhpDevelBuild',
         'Get-PhpSdk',
         'Get-PhpSrc',
+        'Get-RecursiveFilePath',
         'Get-TempFiles',
         'Get-VsCacheInfo',
         'Get-VsInstallPath',
