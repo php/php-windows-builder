@@ -59,7 +59,7 @@ function Invoke-PhpBuild {
         New-Item "..\obj" -ItemType "directory" > $null 2>&1
         Copy-Item "..\config.$Ts.bat"
 
-        if($null -ne $env:LIBS_BUILD_RUNS) {
+        if(-not [string]::IsNullOrWhiteSpace($env:LIBS_BUILD_RUNS)) {
             Add-PhpDeps -PhpVersion $PhpVersion -VsVersion $VsConfig.vs -Arch $Arch -Destination "$buildPath\..\deps"
             $task = "$PSScriptRoot\..\runner\task-$Ts.bat"
         } else {
