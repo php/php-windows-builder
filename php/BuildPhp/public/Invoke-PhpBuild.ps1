@@ -44,39 +44,51 @@ function Invoke-PhpBuild {
 
         New-Item "$buildDirectory" -ItemType "directory" -Force > $null 2>&1
 
-        Set-Location "$buildDirectory"
+        try {
+            Set-Location "$buildDirectory"
 
-        Add-BuildRequirements -PhpVersion $PhpVersion -Arch $Arch -FetchSrc:$fetchSrc
+            Add-BuildRequirements -PhpVersion $PhpVersion -Arch $Arch -FetchSrc:$fetchSrc
 
-        Copy-Item -Path $PSScriptRoot\..\config -Destination . -Recurse
-        $buildPath = "$buildDirectory\config\$($VsConfig.vs)\$Arch\php-$PhpVersion"
-        $sourcePath = "$buildDirectory\php-$PhpVersion-src"
-        if(-not($fetchSrc)) {
-            $sourcePath = $currentDirectory
+            $configDirectory = Join-Path $PSScriptRoot "..\config\$($VsConfig.vs)\$Arch"
+            $configBatch = Join-Path $configDirectory "config.$Ts.bat"
+
+            if($fetchSrc) {
+                Copy-Item -Path $PSScriptRoot\..\config -Destination . -Recurse
+                $buildPath = "$buildDirectory\config\$($VsConfig.vs)\$Arch\php-$PhpVersion"
+                $sourcePath = "$buildDirectory\php-$PhpVersion-src"
+                Move-Item $sourcePath $buildPath
+            } else {
+                $buildPath = $currentDirectory
+            }
+
+            $buildParent = Split-Path -Path $buildPath -Parent
+            $artifactsDirectory = Join-Path $currentDirectory 'artifacts'
+
+            Set-Location "$buildPath"
+            New-Item (Join-Path $buildParent 'obj') -ItemType "directory" -Force > $null 2>&1
+            Copy-Item -Path $configBatch -Destination (Join-Path $buildPath "config.$Ts.bat") -Force
+
+            if(-not [string]::IsNullOrWhiteSpace($env:LIBS_BUILD_RUNS)) {
+                Add-PhpDeps -PhpVersion $PhpVersion -VsVersion $VsConfig.vs -Arch $Arch -Destination (Join-Path $buildParent 'deps')
+                $taskTemplate = Join-Path $PSScriptRoot "..\runner\task-$Ts.bat"
+            } else {
+                $taskTemplate = Join-Path $PSScriptRoot "..\runner\task-$Ts-with-deps.bat"
+            }
+
+            $task = [System.IO.Path]::GetFileName($taskTemplate)
+            Copy-Item -Path $taskTemplate -Destination $task -Force
+
+            Invoke-PhpSdkStarter -BuildDirectory $buildDirectory -VsConfig $VsConfig -Arch $Arch -Task $task
+
+            $artifacts = if ($Ts -eq "ts") {"..\obj\Release_TS\php-*.zip"} else {"..\obj\Release\php-*.zip"}
+            New-Item "$artifactsDirectory" -ItemType "directory" -Force > $null 2>&1
+            xcopy $artifacts "$artifactsDirectory\*"
+            if($fetchSrc) {
+                Move-Item "$buildDirectory\php-$PhpVersion-src.zip" "$artifactsDirectory\"
+            }
+        } finally {
+            Set-Location "$currentDirectory"
         }
-        Move-Item $sourcePath $buildPath
-        Set-Location "$buildPath"
-        New-Item "..\obj" -ItemType "directory" > $null 2>&1
-        Copy-Item "..\config.$Ts.bat"
-
-        if(-not [string]::IsNullOrWhiteSpace($env:LIBS_BUILD_RUNS)) {
-            Add-PhpDeps -PhpVersion $PhpVersion -VsVersion $VsConfig.vs -Arch $Arch -Destination "$buildPath\..\deps"
-            $taskTemplate = Join-Path $PSScriptRoot "..\runner\task-$Ts.bat"
-        } else {
-            $taskTemplate = Join-Path $PSScriptRoot "..\runner\task-$Ts-with-deps.bat"
-        }
-
-        $task = [System.IO.Path]::GetFileName($taskTemplate)
-        Copy-Item -Path $taskTemplate -Destination $task -Force
-
-        Invoke-PhpSdkStarter -BuildDirectory $buildDirectory -VsConfig $VsConfig -Arch $Arch -Task $task
-
-        $artifacts = if ($Ts -eq "ts") {"..\obj\Release_TS\php-*.zip"} else {"..\obj\Release\php-*.zip"}
-        New-Item "$currentDirectory\artifacts" -ItemType "directory" -Force > $null 2>&1
-        xcopy $artifacts "$currentDirectory\artifacts\*"
-        Move-Item "$buildDirectory\php-$PhpVersion-src.zip" "$currentDirectory\artifacts\"
-
-        Set-Location "$currentDirectory"
     }
     end {
     }

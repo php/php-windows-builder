@@ -31,6 +31,7 @@ jobs:
 
           $phpVersion = $phpRelease.version
           $phpMinorVersion = ($phpVersion -split '\.')[0..1] -join '.'
+          $phpTag = "php-$phpVersion"
 
           $headers = @{
               Accept = 'application/vnd.github+json'
@@ -48,11 +49,20 @@ jobs:
 
           "php-version=$phpVersion" | Add-Content -Path $env:GITHUB_OUTPUT
           "php-version-minor=$phpMinorVersion" | Add-Content -Path $env:GITHUB_OUTPUT
+          "php-tag=$phpTag" | Add-Content -Path $env:GITHUB_OUTPUT
           "xdebug-version=$xdebugVersion" | Add-Content -Path $env:GITHUB_OUTPUT
 
           $xdebugPublishedAt = [DateTimeOffset]::Parse($xdebugRelease.published_at).ToString('yyyy-MM-dd')
           Write-Host "PHP 8.5 release: $phpVersion ($($phpRelease.date))"
           Write-Host "Xdebug release: $xdebugVersion ($xdebugPublishedAt)"
+
+      - name: Checkout php-src for local-source build
+        uses: actions/checkout@v6
+        with:
+          repository: php/php-src
+          ref: ${{ steps.versions.outputs.php-tag }}
+          path: php-src
+          fetch-depth: 1
 
       - name: Install local modules into Program Files with Install-Module
         shell: powershell
@@ -121,18 +131,19 @@ jobs:
       - name: Build PHP
         shell: pwsh
         run: |
-          $phpBuildRoot = Join-Path $env:RUNNER_TEMP 'php-build'
-          Remove-Item -Path $phpBuildRoot -Recurse -Force -ErrorAction SilentlyContinue
-          New-Item -Path $phpBuildRoot -ItemType Directory -Force | Out-Null
-
           $buildPhpManifest = Join-Path $env:BUILDPHP_MODULE_BASE 'BuildPhp.psd1'
+          $phpSourceRoot = Join-Path $env:GITHUB_WORKSPACE 'php-src'
+
+          if (-not (Test-Path (Join-Path $phpSourceRoot 'main\php_version.h'))) {
+              throw "Could not find a local php-src checkout in $phpSourceRoot."
+          }
+
           Write-Host "Importing BuildPhp from $buildPhpManifest"
           Import-Module $buildPhpManifest -Force
 
-          Push-Location $phpBuildRoot
+          Push-Location $phpSourceRoot
           try {
-              Invoke-PhpBuild -PhpVersion '${{ steps.versions.outputs.php-version }}' `
-                              -Arch $env:BUILD_ARCH `
+              Invoke-PhpBuild -Arch $env:BUILD_ARCH `
                               -Ts $env:BUILD_TS
           } finally {
               Pop-Location
@@ -170,7 +181,7 @@ jobs:
           PHP_VERSION: ${{ steps.versions.outputs.php-version }}
           XDEBUG_VERSION: ${{ steps.versions.outputs.xdebug-version }}
         run: |
-          $phpArtifacts = Join-Path $env:RUNNER_TEMP 'php-build\artifacts'
+          $phpArtifacts = Join-Path $env:GITHUB_WORKSPACE 'php-src\artifacts'
           $xdebugArtifacts = Join-Path $env:RUNNER_TEMP 'xdebug-build\artifacts'
           $smokeRoot = Join-Path $env:RUNNER_TEMP 'smoke'
           $phpExtract = Join-Path $smokeRoot 'php'
@@ -251,6 +262,6 @@ jobs:
           name: program-files-smoke-artifacts
           if-no-files-found: ignore
           path: |
-            ${{ runner.temp }}\php-build\artifacts\*
+            ${{ github.workspace }}\php-src\artifacts\*
             ${{ runner.temp }}\xdebug-build\artifacts\*
             ${{ runner.temp }}\smoke\*
