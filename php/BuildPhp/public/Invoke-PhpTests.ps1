@@ -12,6 +12,10 @@ function Invoke-PhpTests {
         Specify Cache
     .PARAMETER TestType
         Test Type
+    .PARAMETER SourceRepository
+        php-src repository to source tests from when SourceRef is provided.
+    .PARAMETER SourceRef
+        Optional branch, tag, or SHA in the custom php-src repository.
     #>
     [OutputType()]
     param (
@@ -32,7 +36,11 @@ function Invoke-PhpTests {
         [string] $Opcache,
         [Parameter(Mandatory = $true, Position=4, HelpMessage='Test Type')]
         [ValidateSet('ext', 'php')]
-        [string] $TestType
+        [string] $TestType,
+        [Parameter(Mandatory = $false, Position=5, HelpMessage='php-src repository to source tests from when SourceRef is provided')]
+        [string] $SourceRepository = 'php/php-src',
+        [Parameter(Mandatory = $false, Position=6, HelpMessage='Optional branch, tag, or SHA in the custom php-src repository')]
+        [string] $SourceRef = ''
     )
     begin {
     }
@@ -57,7 +65,14 @@ function Invoke-PhpTests {
 
         Set-Location "$buildDirectory"
 
-        Add-TestRequirements -PhpVersion $PhpVersion -Arch $Arch -Ts $Ts -VsVersion $VsData.vs -TestsDirectory $testsDirectory -ArtifactsDirectory $currentDirectory
+        Add-TestRequirements -PhpVersion $PhpVersion `
+                             -Arch $Arch `
+                             -Ts $Ts `
+                             -VsVersion $VsData.vs `
+                             -TestsDirectory $testsDirectory `
+                             -ArtifactsDirectory $currentDirectory `
+                             -SourceRepository $SourceRepository `
+                             -SourceRef $SourceRef
 
         Set-PhpIniForTests -BuildDirectory $buildDirectory -Opcache $Opcache
 

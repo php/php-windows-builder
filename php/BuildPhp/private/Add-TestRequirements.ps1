@@ -12,6 +12,10 @@ function Add-TestRequirements {
         VS Version
     .PARAMETER TestsDirectory
         Tests Directory
+    .PARAMETER SourceRepository
+        php-src repository to source tests from when SourceRef is provided.
+    .PARAMETER SourceRef
+        Optional branch, tag, or SHA in the custom php-src repository.
     #>
     [OutputType()]
     param (
@@ -35,7 +39,11 @@ function Add-TestRequirements {
         [string] $TestsDirectory,
         [Parameter(Mandatory = $true, Position=5, HelpMessage='Artifacts Directory')]
         [ValidateNotNull()]
-        [string] $ArtifactsDirectory
+        [string] $ArtifactsDirectory,
+        [Parameter(Mandatory = $false, Position=6, HelpMessage='php-src repository to source tests from when SourceRef is provided')]
+        [string] $SourceRepository = 'php/php-src',
+        [Parameter(Mandatory = $false, Position=7, HelpMessage='Optional branch, tag, or SHA in the custom php-src repository')]
+        [string] $SourceRef = ''
     )
     begin {
     }
@@ -55,6 +63,7 @@ function Add-TestRequirements {
 
         $testZipFilePath = Join-Path $ArtifactsDirectory $testZipFile
         $testsDirectoryPath = Join-Path $currentDirectory $TestsDirectory
+        $useCustomSource = -not [string]::IsNullOrWhiteSpace($SourceRef)
 
         if(-not(Test-Path $binZipFilePath)) {
             Write-Host "Downloading PHP build $binZipFile..."
@@ -67,9 +76,16 @@ function Add-TestRequirements {
             }
         }
 
-        if(-not(Test-Path $testZipFilePath)) {
-            Write-Host "Downloading PHP test pack $testZipFile..."
-            Get-PhpTestPack -PhpVersion $PhpVersion -TestsDirectory $TestsDirectory
+        if($useCustomSource -or -not(Test-Path $testZipFilePath)) {
+            if($useCustomSource) {
+                Write-Host "Downloading PHP tests from custom php-src source..."
+            } else {
+                Write-Host "Downloading PHP test pack $testZipFile..."
+            }
+            Get-PhpTestPack -PhpVersion $PhpVersion `
+                            -TestsDirectory $TestsDirectory `
+                            -SourceRepository $SourceRepository `
+                            -SourceRef $SourceRef
         } else {
             try {
                 [System.IO.Compression.ZipFile]::ExtractToDirectory($testZipFilePath, $testsDirectoryPath)
