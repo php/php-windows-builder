@@ -23,6 +23,7 @@ function Set-PhpIniForTests {
         $ini = "$BuildDirectory\phpbin\php.ini"
         Copy-Item "$PSScriptRoot\..\config\ini\extensions.ini" $ini
         Add-Content $ini "extension_dir=$BuildDirectory\phpbin\ext"
+        Add-Content $ini "memory_limit=-1"
         if ($Opcache -eq "opcache") {
             New-Item "$BuildDirectory/file_cache" -ItemType "directory" > $null 2>&1
             $opcacheIni = Get-Content "$PSScriptRoot\..\config\ini\opcache-$Arch.ini" -Raw
