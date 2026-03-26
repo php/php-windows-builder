@@ -1,0 +1,156 @@
+name: Build PHP with custom library builds from winlibs/winlib-builder (source)
+run-name: Build PHP from source ${{ inputs.php-src-ref }}
+on:
+  workflow_dispatch:
+    inputs:
+      php-src-repository:
+        description: 'php-src repository to source builds and tests from'
+        required: true
+      php-src-ref:
+        description: 'Branch, tag, or SHA in the php-src repository to source builds and tests from'
+        required: true
+      libs-build-runs:
+        description: 'Comma-separated list of GitHub Actions run IDs from winlibs/winlib-builder'
+        required: false
+
+jobs:
+  php:
+    strategy:
+      matrix:
+        arch: [x64, x86]
+        ts: [nts, ts]
+    runs-on: windows-2022
+    steps:
+      - name: Checkout PHP source
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ inputs.php-src-repository }}
+          ref: ${{ inputs.php-src-ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          path: builder
+
+      - name: Build
+        uses: ./builder/php
+        with:
+          arch: ${{ matrix.arch }}
+          ts: ${{ matrix.ts }}
+          libs-build-runs: ${{ inputs.libs-build-runs }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          PHP_BUILD_PROVIDER: "The PHP Group"
+
+  artifacts:
+    runs-on: ubuntu-latest
+    needs: php
+    outputs:
+      artifact-id: ${{ steps.artifacts.outputs.artifact-id }}
+    steps:
+      - name: Upload artifacts
+        uses: actions/upload-artifact/merge@v7
+        id: artifacts
+        with:
+          name: artifacts
+          delete-merged: true
+
+  tests:
+    needs: artifacts
+    strategy:
+      matrix:
+        arch: [x64, x86]
+        ts: [nts, ts]
+        opcache: [opcache, nocache]
+        test-type: [php, ext]
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        id: artifacts
+        with:
+          name: artifacts
+
+      - name: Get Cache Key
+        id: cache-key
+        run: |
+          $artifactDirectory = $(pwd).Path
+          $zip = Get-ChildItem -Path $artifactDirectory -Filter "php-*.zip" -File |
+            Where-Object { $_.Name -match "^php-(.+?)-(?:nts-)?Win32-vs\d+-${{ matrix.arch }}\.zip$" } |
+            Select-Object -First 1
+          if ($null -eq $zip) {
+            throw "Unable to determine PHP version from build artifacts in $artifactDirectory"
+          }
+          $phpVersion = [regex]::Match($zip.Name, '^php-(.+?)-(?:nts-)?Win32-vs\d+-').Groups[1].Value
+
+          $pv = $phpVersion
+          if($phpVersion -ne 'master') {
+            $pv = $phpVersion.Split('.')[0..1] -join '.'
+          }
+          $vsVersion = (Get-Content -Raw -Path (Join-Path $(pwd).Path '\php\BuildPhp\config\vs.json') | ConvertFrom-Json).php.$pv
+          $packagesListUrl = "https://downloads.php.net/~windows/php-sdk/deps/series/packages-$pv-$vsVersion-${{ matrix.arch }}-staging.txt"
+          Invoke-WebRequest -OutFile packages.txt -Uri $packagesListUrl
+          Add-Content -Value "php-version=$phpVersion" -Path $env:GITHUB_OUTPUT
+          Add-Content -Value "cache-key=deps-$pv-${{ matrix.arch }}-${{ inputs.libs-build-runs }}" -Path $env:GITHUB_OUTPUT
+          Add-Content -Value "cache-dir=C:\deps-$pv-${{ matrix.arch }}" -Path $env:GITHUB_OUTPUT
+
+      - name: Cache Deps
+        id: cache-deps
+        uses: actions/cache@v5
+        with:
+          path: ${{ steps.cache-key.outputs.cache-dir }}
+          key: ${{ steps.cache-key.outputs.cache-key }}-${{ hashFiles('packages.txt') }}
+
+      - name: Test PHP
+        shell: pwsh
+        continue-on-error: true
+        env:
+          DEPS_DIR: ${{ steps.cache-key.outputs.cache-dir }}
+          DEPS_CACHE_HIT: ${{ steps.cache-deps.outputs.cache-hit }}
+          LIBS_BUILD_RUNS: ${{ inputs.libs-build-runs }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          Import-Module (Join-Path $(pwd).Path '\php\BuildPhp') -Force
+          Invoke-PhpTests -PhpVersion ${{ steps.cache-key.outputs.php-version }} `
+                          -Arch ${{matrix.arch}} `
+                          -Ts ${{matrix.ts}} `
+                          -Opcache ${{matrix.opcache}} `
+                          -TestType ${{matrix.test-type}} `
+                          -SourceRepository '${{ inputs.php-src-repository }}' `
+                          -SourceRef '${{ inputs.php-src-ref }}'
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        continue-on-error: true
+        with:
+          name: test-results-${{matrix.arch}}-${{matrix.ts}}-${{matrix.opcache}}-${{matrix.test-type}}
+          path: test-${{matrix.arch}}-${{matrix.ts}}-${{matrix.opcache}}-${{matrix.test-type}}.xml
+
+  smoke-tests:
+    strategy:
+      matrix:
+        arch: [x64, x86]
+        ts: [nts, ts]
+    runs-on: windows-2022
+    needs: [artifacts]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: artifacts
+          path: artifacts
+
+      - name: Smoke test PHP builds
+        shell: pwsh
+        run: |
+          Import-Module (Join-Path $(pwd).Path '\php\BuildPhp') -Force
+          Invoke-PhpSmokeTests -ArtifactsDirectory (Join-Path $(pwd).Path 'artifacts') `
+                               -Arch ${{matrix.arch}} `
+                               -Ts ${{matrix.ts}}

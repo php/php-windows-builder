@@ -8,8 +8,8 @@ branding:
 
 inputs:
   php-version:
-    description: PHP version to build
-    required: true
+    description: PHP version to build, skip this to build from the current source directory
+    required: false
   arch:
     description: Architecture to build
     required: true
@@ -27,9 +27,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Checkout
-      uses: actions/checkout@v6
-
     - name: Build PHP
       shell: pwsh
       env:
@@ -37,12 +34,12 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token }}
       run: |
         Import-Module ${{ github.action_path }}\BuildPhp -Force
-        Invoke-PhpBuild -PhpVersion ${{inputs.php-version}} `
-                        -Arch ${{inputs.arch}} `
-                        -Ts ${{inputs.ts}}
+        Invoke-PhpBuild -PhpVersion '${{ inputs.php-version }}' `
+                        -Arch '${{ inputs.arch }}' `
+                        -Ts '${{ inputs.ts }}'
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v7
       with:
-        name: artifacts-${{inputs.php-version}}-${{inputs.arch}}-${{inputs.ts}}
+        name: artifacts-${{ inputs.php-version || 'source' }}-${{inputs.arch}}-${{inputs.ts}}
         path: artifacts/*
