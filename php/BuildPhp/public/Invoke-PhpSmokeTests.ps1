@@ -39,15 +39,15 @@ function Invoke-PhpSmokeTests {
         }
 
         $zipPattern = "php-*-$Arch.zip"
-        $zipRegex = if($Ts -eq 'nts') {
-            "^php-[^-]+-nts-Win32-vs\d+-${Arch}\.zip$"
-        } else {
-            "^php-[^-]+-Win32-vs\d+-${Arch}\.zip$"
-        }
+        $zipRegex = "^php-(.+?)(-nts)?-Win32-v[sc]\d+-${Arch}\.zip$"
         $zipMatches = @(
             Get-ChildItem -Path $artifactsPath -Filter $zipPattern -File |
                 Where-Object {
-                    $_.Name -match $zipRegex
+                    $zipMatch = [regex]::Match($_.Name, $zipRegex, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
+                    $_.Name -notmatch '^php-(devel-pack|debug-pack|test-pack)-' -and
+                    $_.Name -notmatch '-src\.zip$' -and
+                    $zipMatch.Success -and
+                    (($Ts -eq 'nts') -eq $zipMatch.Groups[2].Success)
                 } |
                 Sort-Object Name
         )
