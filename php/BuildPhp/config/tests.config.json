@@ -3,12 +3,12 @@
   "7.1": {"runner": "run-tests.php", "workers": "", "progress": ""},
   "7.2": {"runner": "run-tests.php", "workers": "", "progress": ""},
   "7.3": {"runner": "run-tests.php", "workers": "", "progress": ""},
-  "7.4": {"runner": "run-tests.php", "workers": "-jNumWorkers", "progress": ""},
-  "8.0": {"runner": "run-tests.php", "workers": "-jNumWorkers", "progress": ""},
-  "8.1": {"runner": "run-tests.php", "workers": "-jNumWorkers", "progress": ""},
-  "8.2": {"runner": "run-tests.php", "workers": "-jNumWorkers", "progress": "--no-progress"},
-  "8.3": {"runner": "run-tests.php", "workers": "-jNumWorkers", "progress": "--no-progress"},
-  "8.4": {"runner": "run-tests.php", "workers": "-jNumWorkers", "progress": "--no-progress"},
-  "8.5": {"runner": "run-tests.php", "workers": "-jNumWorkers", "progress": "--no-progress"},
-  "default": {"runner": "run-tests.php", "workers": "-jNumWorkers", "progress": "--no-progress"}
+  "7.4": {"runner": "run-tests.php", "compatPatch": "run-tests-7.4.patch", "workers": "-j6", "progress": ""},
+  "8.0": {"runner": "run-tests.php", "compatPatch": "run-tests-8.0.patch", "workers": "-j6", "progress": ""},
+  "8.1": {"runner": "run-tests.php", "compatPatch": "run-tests-8.1.patch", "workers": "-j6", "progress": ""},
+  "8.2": {"runner": "run-tests.php", "compatPatch": "run-tests-8.2-plus.patch", "workers": "-j6", "progress": "--no-progress"},
+  "8.3": {"runner": "run-tests.php", "compatPatch": "run-tests-8.2-plus.patch", "workers": "-j6", "progress": "--no-progress"},
+  "8.4": {"runner": "run-tests.php", "compatPatch": "run-tests-8.2-plus.patch", "workers": "-j6", "progress": "--no-progress"},
+  "8.5": {"runner": "run-tests.php", "compatPatch": "run-tests-8.2-plus.patch", "workers": "-j6", "progress": "--no-progress"},
+  "default": {"runner": "run-tests.php", "compatPatch": "run-tests-8.2-plus.patch", "workers": "-j6", "progress": "--no-progress"}
 }

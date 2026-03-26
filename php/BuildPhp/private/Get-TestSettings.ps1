@@ -16,8 +16,6 @@ function Get-TestSettings {
         $settings = $null
     }
     process {
-        $workers = $Env:NUMBER_OF_PROCESSORS / 2 * 3
-
         $config = Get-Content "$PSScriptRoot\..\config\tests.config.json" -Raw | ConvertFrom-Json
         $majorMinorVersion = $PhpVersion.Substring(0, 3)
         if ($config.PSObject.Properties.Name -contains $majorMinorVersion) {
@@ -26,7 +24,6 @@ function Get-TestSettings {
             $settings = $config.default
         }
 
-        $settings.workers = $settings.workers.Replace('NumWorkers', $workers)
         return $settings
     }
     end {

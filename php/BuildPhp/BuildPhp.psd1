@@ -79,6 +79,7 @@
         'Get-TestsList',
         'Get-VsVersion',
         'Get-VsVersionHelper',
+        'Invoke-CompatRunTestsPatch',
         'Invoke-EditBin',
         'Invoke-PhpSdkStarter',
         'Set-EnchantTestEnvironment',

@@ -1,0 +1,479 @@
+--- run-tests.php
++++ run-tests.php
+@@ -143,6 +143,278 @@
+  * code that was previously found at the top level. It could and should be
+  * refactored to be smaller and more manageable.
+  */
++if (!function_exists('buildphp_worker_recovery_format_test_index')) {
++    function buildphp_worker_recovery_has_object_junit()
++    {
++        return isset($GLOBALS['junit'])
++            && is_object($GLOBALS['junit'])
++            && method_exists($GLOBALS['junit'], 'mergeResults')
++            && method_exists($GLOBALS['junit'], 'clear');
++    }
++
++    function buildphp_worker_recovery_format_test_index($name, $redir_tested)
++    {
++        if (is_array($name)) {
++            return "# $name[1]: $name[0]";
++        }
++
++        if ($redir_tested) {
++            return "# $redir_tested: $name";
++        }
++
++        return $name;
++    }
++
++    function buildphp_worker_recovery_get_result_test_name($name, $redir_tested)
++    {
++        if (is_array($name) && $redir_tested) {
++            return $name[0];
++        }
++
++        return $name;
++    }
++
++    function buildphp_worker_recovery_test_file($name)
++    {
++        return is_array($name) ? $name[0] : $name;
++    }
++
++    function buildphp_worker_recovery_find_test_index(array $tests, $name)
++    {
++        $serialized = serialize($name);
++
++        foreach ($tests as $index => $candidate) {
++            if (serialize($candidate) === $serialized) {
++                return $index;
++            }
++        }
++
++        return null;
++    }
++
++    function buildphp_worker_recovery_collect_junit()
++    {
++        if (buildphp_worker_recovery_has_object_junit()) {
++            $junit = $GLOBALS['junit'];
++            return $junit->isEnabled() ? $junit : null;
++        }
++
++        if (function_exists('junit_enabled')) {
++            return junit_enabled() ? $GLOBALS['JUNIT'] : null;
++        }
++
++        return null;
++    }
++
++    function buildphp_worker_recovery_reset_junit()
++    {
++        if (buildphp_worker_recovery_has_object_junit()) {
++            $GLOBALS['junit']->clear();
++            return;
++        }
++
++        if (function_exists('junit_init')) {
++            junit_init();
++        }
++    }
++
++    function buildphp_worker_recovery_merge_junit($workerJunit)
++    {
++        if (buildphp_worker_recovery_has_object_junit()) {
++            if ($workerJunit !== null) {
++                $GLOBALS['junit']->mergeResults($workerJunit);
++            }
++            return;
++        }
++
++        if ($workerJunit !== null && function_exists('junit_enabled') && junit_enabled()) {
++            junit_merge_results($workerJunit);
++        }
++    }
++
++    function buildphp_worker_recovery_mark_bork_junit($shortname, $message)
++    {
++        if (buildphp_worker_recovery_has_object_junit()) {
++            $junit = $GLOBALS['junit'];
++            if ($junit->isEnabled()) {
++                $junit->markTestAs('BORK', $shortname, $shortname, null, $message);
++            }
++            return;
++        }
++
++        if (function_exists('junit_enabled') && junit_enabled()) {
++            junit_mark_test_as('BORK', $shortname, $shortname, null, $message);
++        }
++    }
++
++    function buildphp_worker_recovery_track_started(&$workerBatches, $workerID, $assignedName, $name, $index)
++    {
++        if (!isset($workerBatches[$workerID])) {
++            return;
++        }
++
++        $pendingIndex = buildphp_worker_recovery_find_test_index($workerBatches[$workerID]['pending'], $assignedName);
++        if ($pendingIndex !== null) {
++            unset($workerBatches[$workerID]['pending'][$pendingIndex]);
++            $workerBatches[$workerID]['pending'] = array_values($workerBatches[$workerID]['pending']);
++        }
++
++        $workerBatches[$workerID]['current'] = [
++            'name' => $name,
++            'index' => $index,
++        ];
++    }
++
++    function buildphp_worker_recovery_release_conflicts($workerID, &$activeConflicts, &$waitingTests, &$test_files)
++    {
++        foreach ($activeConflicts as $key => $activeWorkerID) {
++            if ($activeWorkerID === $workerID) {
++                unset($activeConflicts[$key]);
++                if (isset($waitingTests[$key])) {
++                    while ($test = array_pop($waitingTests[$key])) {
++                        $test_files[] = $test;
++                    }
++                    unset($waitingTests[$key]);
++                }
++            }
++        }
++    }
++
++    function buildphp_worker_recovery_mark_bork($name, $index, $message, &$PHP_FAILED_TESTS, &$test_results, $result_tests_file)
++    {
++        $file = buildphp_worker_recovery_test_file($name);
++        $shortname = str_replace(TEST_PHP_SRCDIR . '/', '', $file);
++
++        show_result('BORK', $message, $shortname);
++        $PHP_FAILED_TESTS['BORKED'][] = [
++            'name' => $file,
++            'test_name' => '',
++            'output' => '',
++            'diff' => '',
++            'info' => "$message [$file]",
++        ];
++
++        buildphp_worker_recovery_mark_bork_junit($shortname, $message);
++
++        if (!is_array($name)) {
++            $test_results[$index] = 'BORKED';
++            if ($result_tests_file) {
++                fwrite($result_tests_file, "BORKED\t$index\n");
++            }
++        }
++    }
++
++    function buildphp_worker_recovery_start_worker($workerID, &$workerProcs, &$workerSocks, $listenSock, $thisPHP, $thisScript, $workerEnv, $sockUri)
++    {
++        $proc = proc_open(
++            [$thisPHP, $thisScript],
++            [],
++            $pipes,
++            null,
++            $workerEnv + [
++                "TEST_PHP_WORKER" => $workerID,
++                "TEST_PHP_URI" => $sockUri,
++            ],
++            [
++                "suppress_errors" => true,
++                'create_new_console' => true,
++            ]
++        );
++        if ($proc === false) {
++            return false;
++        }
++
++        $workerSock = stream_socket_accept($listenSock, 5);
++        if ($workerSock === false) {
++            proc_terminate($proc);
++            return false;
++        }
++
++        $greeting = base64_encode(serialize([
++            "type" => "hello",
++            "GLOBALS" => $GLOBALS,
++            "constants" => [
++                "INIT_DIR" => INIT_DIR,
++                "TEST_PHP_SRCDIR" => TEST_PHP_SRCDIR,
++                "PHP_QA_EMAIL" => PHP_QA_EMAIL,
++                "QA_SUBMISSION_PAGE" => QA_SUBMISSION_PAGE,
++                "QA_REPORTS_PAGE" => QA_REPORTS_PAGE,
++                "TRAVIS_CI" => TRAVIS_CI
++            ]
++        ])) . "\n";
++
++        stream_set_timeout($workerSock, 5);
++        if (fwrite($workerSock, $greeting) === false) {
++            fclose($workerSock);
++            proc_terminate($proc);
++            return false;
++        }
++
++        $rawReply = fgets($workerSock);
++        if ($rawReply === false) {
++            fclose($workerSock);
++            proc_terminate($proc);
++            return false;
++        }
++
++        $reply = unserialize(base64_decode($rawReply));
++        if (!$reply || $reply["type"] !== "hello_reply") {
++            fclose($workerSock);
++            proc_terminate($proc);
++            return false;
++        }
++
++        stream_set_timeout($workerSock, 0);
++        stream_set_blocking($workerSock, false);
++
++        $workerProcs[$workerID] = $proc;
++        $workerSocks[$workerID] = $workerSock;
++
++        return true;
++    }
++
++    function buildphp_worker_recovery_handle_worker_death($workerID, &$workerProcs, &$workerSocks, &$workerBatches, &$rawMessageBuffers, &$activeConflicts, &$waitingTests, &$test_files, &$testsInProgress, &$PHP_FAILED_TESTS, &$test_results, $result_tests_file, $listenSock, $thisPHP, $thisScript, $workerEnv, $sockUri)
++    {
++        $hadBatch = isset($workerBatches[$workerID]);
++        if ($hadBatch) {
++            $testsInProgress--;
++            buildphp_worker_recovery_release_conflicts($workerID, $activeConflicts, $waitingTests, $test_files);
++
++            $currentTest = $workerBatches[$workerID]['current'];
++            if ($currentTest !== null) {
++                buildphp_worker_recovery_mark_bork(
++                    $currentTest['name'],
++                    $currentTest['index'],
++                    "Worker $workerID died unexpectedly",
++                    $PHP_FAILED_TESTS,
++                    $test_results,
++                    $result_tests_file
++                );
++            }
++
++            foreach ($workerBatches[$workerID]['pending'] as $pendingTest) {
++                $test_files[] = $pendingTest;
++            }
++        }
++
++        if (isset($workerProcs[$workerID])) {
++            proc_terminate($workerProcs[$workerID]);
++            unset($workerProcs[$workerID]);
++        }
++
++        if (isset($workerSocks[$workerID])) {
++            fclose($workerSocks[$workerID]);
++            unset($workerSocks[$workerID]);
++        }
++
++        unset($workerBatches[$workerID], $rawMessageBuffers[$workerID]);
++
++        if ($hadBatch && !buildphp_worker_recovery_start_worker($workerID, $workerProcs, $workerSocks, $listenSock, $thisPHP, $thisScript, $workerEnv, $sockUri)) {
++            echo "WARNING: Failed to respawn worker $workerID after an unexpected exit.\n";
++        }
++    }
++}
++
+ function main(): void
+ {
+     /* This list was derived in a naïve mechanical fashion. If a member
+@@ -1357,22 +1629,20 @@
+     }
+ 
+     foreach ($test_files as $name) {
+-        if (is_array($name)) {
+-            $index = "# $name[1]: $name[0]";
+-
+-            if ($redir_tested) {
+-                $name = $name[0];
+-            }
+-        } elseif ($redir_tested) {
+-            $index = "# $redir_tested: $name";
+-        } else {
+-            $index = $name;
+-        }
++        $assignedName = $name;
++        $index = buildphp_worker_recovery_format_test_index($name, $redir_tested);
++        $name = buildphp_worker_recovery_get_result_test_name($name, $redir_tested);
+         $test_idx++;
+ 
+         if ($workerID) {
+             $PHP_FAILED_TESTS = ['BORKED' => [], 'FAILED' => [], 'WARNED' => [], 'LEAKED' => [], 'XFAILED' => [], 'XLEAKED' => [], 'SLOW' => []];
+             ob_start();
++            send_message($workerSock, [
++                "type" => "test_started",
++                "assigned_name" => $assignedName,
++                "name" => $name,
++                "index" => $index,
++            ]);
+         }
+ 
+         $result = run_test($php, $name, $env);
+@@ -1384,12 +1654,15 @@
+             if ($workerID) {
+                 send_message($workerSock, [
+                     "type" => "test_result",
++                    "assigned_name" => $assignedName,
+                     "name" => $name,
+                     "index" => $index,
+                     "result" => $result,
+                     "text" => $resultText,
+-                    "PHP_FAILED_TESTS" => $PHP_FAILED_TESTS
++                    "PHP_FAILED_TESTS" => $PHP_FAILED_TESTS,
++                    "junit" => buildphp_worker_recovery_collect_junit()
+                 ]);
++                buildphp_worker_recovery_reset_junit();
+                 continue;
+             }
+ 
+@@ -1420,6 +1693,7 @@
+ 
+     $workerProcs = [];
+     $workerSocks = [];
++    $workerBatches = [];
+ 
+     // Each test may specify a list of conflict keys. While a test that conflicts with
+     // key K is running, no other test that conflicts with K may run. Conflict keys are
+@@ -1565,6 +1839,23 @@
+ 
+ escape:
+     while ($test_files || $sequentialTests || $testsInProgress > 0) {
++        if (!$workerSocks) {
++            foreach (array_merge($test_files, $sequentialTests) as $pendingTest) {
++                $test_idx++;
++                buildphp_worker_recovery_mark_bork(
++                    buildphp_worker_recovery_get_result_test_name($pendingTest, $redir_tested),
++                    buildphp_worker_recovery_format_test_index($pendingTest, $redir_tested),
++                    'All parallel workers died unexpectedly',
++                    $PHP_FAILED_TESTS,
++                    $test_results,
++                    $result_tests_file
++                );
++            }
++            $test_files = [];
++            $sequentialTests = [];
++            break;
++        }
++
+         $toRead = array_values($workerSocks);
+         $toWrite = null;
+         $toExcept = null;
+@@ -1574,6 +1865,28 @@
+                 if ($i === false) {
+                     kill_children($workerProcs);
+                     error("Could not find worker stdout in array of worker stdouts, THIS SHOULD NOT HAPPEN.");
++                }
++                if (feof($workerSock)) {
++                    buildphp_worker_recovery_handle_worker_death(
++                        $i,
++                        $workerProcs,
++                        $workerSocks,
++                        $workerBatches,
++                        $rawMessageBuffers,
++                        $activeConflicts,
++                        $waitingTests,
++                        $test_files,
++                        $testsInProgress,
++                        $PHP_FAILED_TESTS,
++                        $test_results,
++                        $result_tests_file,
++                        $listenSock,
++                        $thisPHP,
++                        $thisScript,
++                        $GLOBALS['environment'],
++                        $sockUri
++                    );
++                    continue;
+                 }
+                 while (false !== ($rawMessage = fgets($workerSock))) {
+                     // work around fgets truncating things
+@@ -1595,19 +1908,12 @@
+ 
+                     switch ($message["type"]) {
+                         case "tests_finished":
+-                            $testsInProgress--;
+-                            foreach ($activeConflicts as $key => $workerId) {
+-                                if ($workerId === $i) {
+-                                    unset($activeConflicts[$key]);
+-                                    if (isset($waitingTests[$key])) {
+-                                        while ($test = array_pop($waitingTests[$key])) {
+-                                            $test_files[] = $test;
+-                                        }
+-                                        unset($waitingTests[$key]);
+-                                    }
+-                                }
++                            if (isset($workerBatches[$i])) {
++                                $testsInProgress--;
++                                buildphp_worker_recovery_release_conflicts($i, $activeConflicts, $waitingTests, $test_files);
++                                unset($workerBatches[$i]);
+                             }
+-                            $junit->mergeResults($message["junit"]);
++                            buildphp_worker_recovery_merge_junit(isset($message["junit"]) ? $message["junit"] : null);
+                             // no break
+                         case "ready":
+                             // Schedule sequential tests only once we are down to one worker.
+@@ -1640,6 +1946,10 @@
+                                     }
+                                 }
+                                 $testsInProgress++;
++                                $workerBatches[$i] = [
++                                    'pending' => $files,
++                                    'current' => null,
++                                ];
+                                 send_message($workerSocks[$i], [
+                                     "type" => "run_tests",
+                                     "test_files" => $files,
+@@ -1648,13 +1958,20 @@
+                                 ]);
+                             } else {
+                                 proc_terminate($workerProcs[$i]);
+-                                unset($workerProcs[$i]);
+-                                unset($workerSocks[$i]);
++                                unset($workerProcs[$i], $workerSocks[$i]);
++                                unset($workerBatches[$i]);
+                                 goto escape;
+                             }
+                             break;
++                        case "test_started":
++                            buildphp_worker_recovery_track_started($workerBatches, $i, $message["assigned_name"], $message["name"], $message["index"]);
++                            break;
+                         case "test_result":
+                             list($name, $index, $result, $resultText) = [$message["name"], $message["index"], $message["result"], $message["text"]];
++                            buildphp_worker_recovery_merge_junit(isset($message["junit"]) ? $message["junit"] : null);
++                            if (isset($workerBatches[$i])) {
++                                $workerBatches[$i]['current'] = null;
++                            }
+                             foreach ($message["PHP_FAILED_TESTS"] as $category => $tests) {
+                                 $PHP_FAILED_TESTS[$category] = array_merge($PHP_FAILED_TESTS[$category], $tests);
+                             }
+@@ -1796,9 +2113,9 @@
+                 run_all_tests($command["test_files"], $command["env"], $command["redir_tested"]);
+                 send_message($workerSock, [
+                     "type" => "tests_finished",
+-                    "junit" => $junit->isEnabled() ? $junit : null,
++                    "junit" => buildphp_worker_recovery_collect_junit(),
+                 ]);
+-                $junit->clear();
++                buildphp_worker_recovery_reset_junit();
+                 break;
+             default:
+                 send_message($workerSock, [
+@@ -3481,6 +3798,8 @@
+         }
+ 
+         $suite = $this->getSuiteName($file_name);
++        $this->initSuite($suite);
++        $this->suites[$suite]['files'][$file_name] = $file_name;
+ 
+         $this->record($suite, 'test_total');
+ 
+@@ -3529,6 +3848,7 @@
+     private function record(string $suite, string $param, $value = 1): void
+     {
+         $this->rootSuite[$param] += $value;
++        $this->initSuite($suite);
+         $this->suites[$suite][$param] += $value;
+     }
+ 

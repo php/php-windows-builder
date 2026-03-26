@@ -94,6 +94,40 @@ function Add-TestRequirements {
             }
         }
 
+        $compatVersion = $PhpVersion
+        $versionFilePath = Join-Path $testsDirectoryPath 'main\php_version.h'
+        if (Test-Path -Path $versionFilePath) {
+            $versionContent = Get-Content -Path $versionFilePath -Raw
+            $majorMatch = [regex]::Match($versionContent, 'PHP_MAJOR_VERSION\s+(\d+)')
+            $minorMatch = [regex]::Match($versionContent, 'PHP_MINOR_VERSION\s+(\d+)')
+            if ($majorMatch.Success -and $minorMatch.Success) {
+                $compatVersion = "$($majorMatch.Groups[1].Value).$($minorMatch.Groups[1].Value)"
+            }
+        }
+
+        $compatPatchApplied = $true
+        $testSettings = Get-TestSettings -PhpVersion $compatVersion
+        $compatPatchName = if ($testSettings.PSObject.Properties.Name -contains 'compatPatch') { $testSettings.compatPatch } else { '' }
+        if (-not [string]::IsNullOrWhiteSpace($compatPatchName)) {
+            $compatPatchPath = Join-Path $PSScriptRoot "..\config\run-tests\$compatPatchName"
+            if(-not(Test-Path -Path $compatPatchPath)) {
+                throw "Compatibility run-tests patch not found: $compatPatchPath"
+            }
+
+            $compatPatchApplied = Invoke-CompatRunTestsPatch `
+                -Path (Join-Path $testsDirectoryPath 'run-tests.php') `
+                -PatchPath $compatPatchPath
+            if ($compatPatchApplied) {
+                Write-Host "Applied compatibility run-tests patch ($compatPatchName) in $testsDirectoryPath"
+            } else {
+                $warningMessage = "Failed to patch the runner for handling worker crashes, defaulting to 2 workers."
+                Write-Warning $warningMessage
+                if ($env:GITHUB_ACTIONS -eq 'true') {
+                    Write-Host "::warning $warningMessage"
+                }
+            }
+        }
+
         $FetchDeps = $False
         if($null -eq $env:DEPS_DIR) {
             $env:DEPS_DIR = "C:\deps-$PhpVersion-$Arch"
@@ -105,6 +139,9 @@ function Add-TestRequirements {
         Invoke-EditBin -Exe "$binDirectoryPath\php.exe" -StackSize 8388608 -Arch $Arch
         Invoke-EditBin -Exe "$binDirectoryPath\php-cgi.exe" -StackSize 8388608 -Arch $Arch
         Add-Path "$env:DEPS_DIR\bin"
+        return [PSCustomObject]@{
+            CompatPatchApplied = $compatPatchApplied
+        }
     }
     end {
     }
