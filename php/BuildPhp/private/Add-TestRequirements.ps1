@@ -67,7 +67,7 @@ function Add-TestRequirements {
 
         if(-not(Test-Path $binZipFilePath)) {
             Write-Host "Downloading PHP build $binZipFile..."
-            Get-PhpBuild -PhpVersion $PhpVersion -Arch $Arch -Ts $Ts -VsVersion $VsVersion
+            $null = Get-PhpBuild -PhpVersion $PhpVersion -Arch $Arch -Ts $Ts -VsVersion $VsVersion
         } else {
             try {
                 [System.IO.Compression.ZipFile]::ExtractToDirectory($binZipFilePath, $binDirectoryPath)
@@ -82,10 +82,10 @@ function Add-TestRequirements {
             } else {
                 Write-Host "Downloading PHP test pack $testZipFile..."
             }
-            Get-PhpTestPack -PhpVersion $PhpVersion `
-                            -TestsDirectory $TestsDirectory `
-                            -SourceRepository $SourceRepository `
-                            -SourceRef $SourceRef
+            $null = Get-PhpTestPack -PhpVersion $PhpVersion `
+                                    -TestsDirectory $TestsDirectory `
+                                    -SourceRepository $SourceRepository `
+                                    -SourceRef $SourceRef
         } else {
             try {
                 [System.IO.Compression.ZipFile]::ExtractToDirectory($testZipFilePath, $testsDirectoryPath)
@@ -134,11 +134,11 @@ function Add-TestRequirements {
             $FetchDeps = $True
         }
         if($FetchDeps -eq $True -or $null -eq $Env:DEPS_CACHE_HIT -or $Env:DEPS_CACHE_HIT -ne 'true') {
-            Add-PhpDeps -PhpVersion $PhpVersion -VsVersion $VsVersion -Arch $Arch -Destination $env:DEPS_DIR
+            $null = Add-PhpDeps -PhpVersion $PhpVersion -VsVersion $VsVersion -Arch $Arch -Destination $env:DEPS_DIR
         }
-        Invoke-EditBin -Exe "$binDirectoryPath\php.exe" -StackSize 8388608 -Arch $Arch
-        Invoke-EditBin -Exe "$binDirectoryPath\php-cgi.exe" -StackSize 8388608 -Arch $Arch
-        Add-Path "$env:DEPS_DIR\bin"
+        $null = Invoke-EditBin -Exe "$binDirectoryPath\php.exe" -StackSize 8388608 -Arch $Arch
+        $null = Invoke-EditBin -Exe "$binDirectoryPath\php-cgi.exe" -StackSize 8388608 -Arch $Arch
+        $null = Add-Path "$env:DEPS_DIR\bin"
         return [PSCustomObject]@{
             CompatPatchApplied = $compatPatchApplied
         }

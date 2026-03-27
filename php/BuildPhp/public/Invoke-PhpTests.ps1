@@ -127,8 +127,17 @@ function Invoke-PhpTests {
             "-r", "$TestType-tests-to-run.txt"
         )
 
+        $compatPatchApplied = $true
+        if ($null -ne $testSetup) {
+            foreach ($setupOutput in @($testSetup)) {
+                if ($setupOutput -and $setupOutput.PSObject.Properties.Name -contains 'CompatPatchApplied') {
+                    $compatPatchApplied = [bool]$setupOutput.CompatPatchApplied
+                }
+            }
+        }
+
         $workers = $settings.workers
-        if($workers -ne "" -and $testSetup -and -not $testSetup.CompatPatchApplied) {
+        if($workers -ne "" -and -not $compatPatchApplied) {
             $workers = "-j2"
         }
 
