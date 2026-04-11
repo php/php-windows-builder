@@ -36,25 +36,15 @@ function Add-PhpDeps {
             New-Item -ItemType Directory -Force -Path $Destination | Out-Null
         }
 
-        $depsPhpVersion = $PhpVersion
-        if ($PhpVersion -ne 'master') {
-            $versionParts = $PhpVersion.Split('.')
-            if ($versionParts.Count -ge 2) {
-                $depsPhpVersion = $versionParts[0..1] -join '.'
-            }
-        }
-
         $downloadedLibs = @()
         if ($env:LIBS_BUILD_RUNS) {
             $downloadedLibs = Get-LibsBuildDeps -Arch $Arch -Destination $Destination
         }
 
-        $seriesUrl = "$baseurl/series/packages-$depsPhpVersion-$VsVersion-$Arch-staging.txt"
-        Write-Host "Fetching series listing: $seriesUrl"
-        $series = Invoke-WebRequest -Uri $seriesUrl -UseBasicParsing -ErrorAction Stop
-        $lines = @()
-        if ($series -and $series.Content) {
-            $lines = $series.Content -split "[\r\n]+" | Where-Object { $_ -and $_.Trim().Length -gt 0 }
+        $packageData = Get-PhpDepsPackages -PhpVersion $PhpVersion -VsVersion $VsVersion -Arch $Arch
+        $lines = @($packageData.Packages)
+        if ($packageData.OverrideLibraries.Count -ne 0) {
+            $downloadedLibs = @($downloadedLibs | Where-Object { $packageData.OverrideLibraries -notcontains $_ })
         }
 
         foreach ($line in $lines) {

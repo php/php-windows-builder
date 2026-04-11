@@ -1,0 +1,26 @@
+{
+  "8.2": {
+    "maxVersion": "8.2.30",
+    "libraries": {
+      "libcurl": "8.19.0"
+    }
+  },
+  "8.3": {
+    "maxVersion": "8.3.30",
+    "libraries": {
+      "libcurl": "8.19.0"
+    }
+  },
+  "8.4": {
+    "maxVersion": "8.4.20",
+    "libraries": {
+      "libcurl": "8.19.0"
+    }
+  },
+  "8.5": {
+    "maxVersion": "8.5.5",
+    "libraries": {
+      "libcurl": "8.19.0-1"
+    }
+  }
+}

@@ -65,24 +65,11 @@ jobs:
       - name: Get Cache Key
         id: cache-key
         run: |
-          $pv = '${{inputs.php-version}}'
-          if('${{inputs.php-version}}' -ne 'master') {
-            $pv = '${{inputs.php-version}}'.Split('.')[0..1] -join '.'
-          }
-          $libsBuildRunsKey = 'default'
-          $libsBuildRuns = @('${{ inputs.libs-build-runs }}' -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' }) -join ','
-          if ($libsBuildRuns) {
-            $libsBuildRunsKey = [System.Convert]::ToHexString(
-              [System.Security.Cryptography.SHA256]::HashData(
-                [System.Text.Encoding]::UTF8.GetBytes($libsBuildRuns)
-              )
-            ).ToLowerInvariant().Substring(0, 16)
-          }
-          $vsVersion = (Get-Content -Raw -Path (Join-Path $(pwd).Path '\php\BuildPhp\config\vs.json') | ConvertFrom-Json).php.$pv
-          $packagesListUrl = "https://downloads.php.net/~windows/php-sdk/deps/series/packages-$pv-$vsVersion-${{ matrix.arch }}-staging.txt"
-          Invoke-WebRequest -OutFile packages.txt -Uri $packagesListUrl
-          Add-Content -Value "cache-key=deps-$pv-${{ matrix.arch }}-$libsBuildRunsKey" -Path $env:GITHUB_OUTPUT
-          Add-Content -Value "cache-dir=C:\deps-$pv-${{ matrix.arch }}" -Path $env:GITHUB_OUTPUT
+          Import-Module (Join-Path $(pwd).Path '\php\BuildPhp') -Force
+          $cacheInfo = Get-DepsCacheInfo -PhpVersion '${{inputs.php-version}}' -Arch '${{ matrix.arch }}' -LibsBuildRuns '${{ inputs.libs-build-runs }}' -IncludeDefaultRunsKey
+          Set-Content -Path packages.txt -Value ($cacheInfo.Packages -join "`n")
+          Add-Content -Value "cache-key=$($cacheInfo.CacheKey)" -Path $env:GITHUB_OUTPUT
+          Add-Content -Value "cache-dir=$($cacheInfo.CacheDir)" -Path $env:GITHUB_OUTPUT
 
       - name: Cache Deps
         id: cache-deps

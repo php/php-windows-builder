@@ -67,13 +67,8 @@ function Invoke-PhpBuild {
             Set-Location "$buildPath"
             New-Item (Join-Path $buildParent 'obj') -ItemType "directory" -Force > $null 2>&1
             Copy-Item -Path $configBatch -Destination (Join-Path $buildPath "config.$Ts.bat") -Force
-
-            if(-not [string]::IsNullOrWhiteSpace($env:LIBS_BUILD_RUNS)) {
-                Add-PhpDeps -PhpVersion $PhpVersion -VsVersion $VsConfig.vs -Arch $Arch -Destination (Join-Path $buildParent 'deps')
-                $taskTemplate = Join-Path $PSScriptRoot "..\runner\task-$Ts.bat"
-            } else {
-                $taskTemplate = Join-Path $PSScriptRoot "..\runner\task-$Ts-with-deps.bat"
-            }
+            Add-PhpDeps -PhpVersion $PhpVersion -VsVersion $VsConfig.vs -Arch $Arch -Destination (Join-Path $buildParent 'deps')
+            $taskTemplate = Join-Path $PSScriptRoot "..\runner\task-$Ts.bat"
 
             $task = [System.IO.Path]::GetFileName($taskTemplate)
             Copy-Item -Path $taskTemplate -Destination $task -Force
