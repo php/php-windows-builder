@@ -42,6 +42,7 @@ Function Add-Extension {
                         }
                     }
                 }
+                Update-CurlDependencyConfig -PhpVersion $Config.php_version | Out-Null
                 $configW32Content = [string](Get-Content -Path "config.w32")
                 $arguments = Get-ArgumentsFromConfig $Extension $configW32Content
                 $argumentString = ''

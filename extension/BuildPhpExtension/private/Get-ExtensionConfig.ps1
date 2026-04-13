@@ -139,6 +139,7 @@ Function Get-ExtensionConfig {
                 }
             }
 
+            Update-CurlDependencyConfig -PhpVersion $PhpVersion | Out-Null
             $configW32Content = [string](Get-Content -Path "config.w32")
             if($configW32Content.contains('PATH_PROG')) {
                 [regex]::Matches($configW32Content, 'PATH_PROG\(([''"])([^''"]+)\1') | ForEach-Object {

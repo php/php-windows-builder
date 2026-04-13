@@ -16,10 +16,10 @@ Function Invoke-Build {
         Add-StepLog "Building $($Config.name) extension"
         try {
             Set-GAGroup start
+            Update-CurlDependencyConfig -PhpVersion $Config.php_version | Out-Null
 
             $builder = "php-sdk\phpsdk-starter.bat"
             $task = [System.IO.Path]::Combine($PSScriptRoot, '..\config\task.bat')
-
             $options = $Config.options
             if ($Config.debug_symbols) {
                 $options += " --enable-debug-pack"
