@@ -29,6 +29,14 @@ function Get-PhpBuildDetails {
                         Sort-Object { [System.Version]$_ } -Descending |
                         Select-Object -First 1
             }
+            # Fall back attempt to QA builds (e.g. 8.6 doesn't match above because it's not an exact version)
+            if($null -eq $phpSemver -and $releaseState -eq 'releases') {
+                $releaseState = 'qa'
+                $baseUrl = "https://downloads.php.net/~windows/$releaseState"
+                $fallbackBaseUrl = "https://downloads.php.net/~windows/$releaseState/archives"
+                $releases = Get-File -Url "$baseUrl/releases.json" | ConvertFrom-Json
+                $phpSemver = $releases.$($Config.php_version).version
+            }
         }
         return [PSCustomObject]@{
             phpSemver = $phpSemver
