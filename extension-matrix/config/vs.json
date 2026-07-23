@@ -54,6 +54,12 @@
     "os": "windows-2022",
     "type": "github-hosted"
   },
+  "8.6": {
+    "vs": "2026",
+    "os": "windows-2025-vs2026",
+    "dev": true,
+    "type": "github-hosted"
+  },
   "master": {
     "vs": "2026",
     "os": "windows-2025-vs2026",
