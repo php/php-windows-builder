@@ -2,6 +2,13 @@ name: Local Test
 
 on:
   workflow_dispatch:
+    inputs:
+      sbom:
+        type: choice
+        options: ['true', 'false']
+        description: Add SBOM files to binary archives
+        required: false
+        default: 'true'
 
 permissions:
   contents: read
@@ -150,7 +157,8 @@ jobs:
           Push-Location $phpSourceRoot
           try {
               Invoke-PhpBuild -Arch $env:BUILD_ARCH `
-                              -Ts $env:BUILD_TS
+                              -Ts $env:BUILD_TS `
+                              -Sbom ('${{ inputs.sbom }}' -eq 'true')
           } finally {
               Pop-Location
           }

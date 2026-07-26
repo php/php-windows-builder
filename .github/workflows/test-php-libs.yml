@@ -9,6 +9,12 @@ on:
       libs-build-runs:
         description: 'Comma-separated list of GitHub Actions run IDs from winlibs/winlib-builder'
         required: false
+      sbom:
+        type: choice
+        options: ['true', 'false']
+        description: Add SBOM files to binary archives
+        required: false
+        default: 'true'
 
 jobs:
   php:
@@ -28,6 +34,7 @@ jobs:
           arch: ${{ matrix.arch }}
           ts: ${{ matrix.ts }}
           libs-build-runs: ${{ inputs.libs-build-runs }}
+          sbom: ${{ inputs.sbom }}
         env:
           PHP_BUILD_PROVIDER: "The PHP Group"
 
