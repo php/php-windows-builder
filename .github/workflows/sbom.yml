@@ -1,0 +1,62 @@
+name: Publish PHP SBOM metadata
+run-name: Publish SBOM metadata for ${{ inputs.php-ref }}
+on:
+  workflow_dispatch:
+    inputs:
+      php-ref:
+        description: PHP source ref
+        required: true
+
+jobs:
+  publish:
+    runs-on: windows-2025
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - name: Checkout builder
+        uses: actions/checkout@v6
+
+      - name: Checkout PHP
+        uses: actions/checkout@v6
+        with:
+          repository: php/php-src
+          ref: ${{ inputs.php-ref }}
+          path: php-src
+
+      - name: Generate metadata
+        id: metadata
+        shell: pwsh
+        env:
+          PHP_REF: ${{ inputs.php-ref }}
+        run: |
+          Import-Module (Join-Path $PWD 'php\BuildPhp') -Force
+          $versionHeader = Get-Content -LiteralPath 'php-src\main\php_version.h' -Raw
+          $major = [regex]::Match($versionHeader, 'PHP_MAJOR_VERSION\s+(\d+)').Groups[1].Value
+          $minor = [regex]::Match($versionHeader, 'PHP_MINOR_VERSION\s+(\d+)').Groups[1].Value
+          $phpVersion = if($env:PHP_REF -eq 'master') { 'master' } else { "$major.$minor" }
+          $output = "php-$phpVersion.json"
+          New-PhpSbomMetadata -PhpVersion $phpVersion -SourceDirectory 'php-src' -OutputPath $output
+          Add-Content -LiteralPath $env:GITHUB_OUTPUT -Value "php-version=$phpVersion"
+          Add-Content -LiteralPath $env:GITHUB_OUTPUT -Value "file=$output"
+          $sbom = Get-Content -LiteralPath $output -Raw | ConvertFrom-Json | ConvertTo-Json -Depth 10 -Compress
+          Add-Content -LiteralPath $env:GITHUB_OUTPUT -Value "sbom=$sbom"
+
+      - name: Upload metadata
+        uses: actions/upload-artifact@v7
+        with:
+          name: php-${{ steps.metadata.outputs.php-version }}-sbom-metadata
+          path: ${{ steps.metadata.outputs.file }}
+          retention-days: 1
+
+      - name: Publish metadata
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.WINDOWS_BUILDS_TOKEN }}
+          PHP_VERSION: ${{ steps.metadata.outputs.php-version }}
+          SBOM: ${{ steps.metadata.outputs.sbom }}
+        run: |
+          gh workflow run sbom.yml \
+            --repo php/web-downloads \
+            --raw-field php-version="$PHP_VERSION" \
+            --raw-field sbom="$SBOM"

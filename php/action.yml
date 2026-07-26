@@ -16,6 +16,10 @@ inputs:
   ts:
     description: Thread safety to build
     required: true
+  sbom:
+    description: Add SBOM files to binary archives
+    required: false
+    default: 'false'
   libs-build-runs:
     description: Comma-separated list of GitHub Actions run IDs from winlibs/winlib-builder to download artifacts from
     required: false
@@ -36,7 +40,8 @@ runs:
         Import-Module ${{ github.action_path }}\BuildPhp -Force
         Invoke-PhpBuild -PhpVersion '${{ inputs.php-version }}' `
                         -Arch '${{ inputs.arch }}' `
-                        -Ts '${{ inputs.ts }}'
+                        -Ts '${{ inputs.ts }}' `
+                        -Sbom ('${{ inputs.sbom }}' -eq 'true')
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v7

@@ -12,6 +12,12 @@ on:
         description: Upload artifacts to the downloads server
         required: false
         default: 'true'
+      sbom:
+        type: choice
+        options: ['true', 'false']
+        description: Add SBOM files to binary archives
+        required: false
+        default: 'true'
 
 jobs:
   php:
@@ -30,6 +36,7 @@ jobs:
           php-version: ${{ inputs.php-version }}
           arch: ${{ matrix.arch }}
           ts: ${{ matrix.ts }}
+          sbom: ${{ inputs.sbom }}
         env:
           PHP_BUILD_PROVIDER: "The PHP Group"
 

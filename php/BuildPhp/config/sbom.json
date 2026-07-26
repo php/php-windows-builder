@@ -1,0 +1,494 @@
+{
+  "components": [
+    {
+      "name": "Berkeley uuencode",
+      "path": "ext/standard/uuencode.c",
+      "license": "BSD-4-Clause-UC",
+      "purl": "pkg:generic/berkeley-uuencode"
+    },
+    {
+      "name": "Boost.Context assembly",
+      "path": "Zend/asm",
+      "license": "BSL-1.0",
+      "purl": "pkg:generic/boost-context-assembly"
+    },
+    {
+      "name": "crypt_blowfish",
+      "version": "1.3",
+      "path": "ext/standard/crypt_blowfish.c",
+      "license": "bcrypt-Solar-Designer",
+      "purl": "pkg:generic/crypt_blowfish@{version}"
+    },
+    {
+      "name": "DynASM",
+      "version": "1.5.0",
+      "path": "ext/opcache/jit/ir/dynasm",
+      "license": "MIT",
+      "purl": "pkg:generic/dynasm@{version}"
+    },
+    {
+      "name": "FreeSec libcrypt",
+      "path": "ext/standard/crypt_freesec.c",
+      "license": "BSD-3-Clause",
+      "purl": "pkg:generic/freesec-libcrypt"
+    },
+    {
+      "name": "libarchive tar format_octal",
+      "path": "ext/phar/tar.c",
+      "license": "BSD-2-Clause",
+      "purl": "pkg:generic/libarchive-format-octal"
+    },
+    {
+      "name": "libavifinfo",
+      "version": "2b924defa4c2cd227540efe164067a8cc913eeba",
+      "path": "ext/standard/libavifinfo",
+      "license": "BSD-2-Clause",
+      "purl": "pkg:generic/libavifinfo@{version}"
+    },
+    {
+      "name": "libbcmath",
+      "version": "0.2",
+      "path": "ext/bcmath/libbcmath",
+      "license": "LGPL-2.1-only",
+      "purl": "pkg:generic/libbcmath@{version}"
+    },
+    {
+      "name": "libgd",
+      "version": "2.4.0",
+      "path": "ext/gd/libgd",
+      "license": "GD",
+      "purl": "pkg:generic/libgd@{version}"
+    },
+    {
+      "name": "libmagic",
+      "version": "5.46",
+      "path": "ext/fileinfo/libmagic",
+      "license": "BSD-2-Clause",
+      "purl": "pkg:generic/libmagic@{version}"
+    },
+    {
+      "name": "libmbfl",
+      "version": "1.3.2",
+      "path": "ext/mbstring/libmbfl",
+      "license": "LGPL-2.1-only",
+      "purl": "pkg:generic/libmbfl@{version}"
+    },
+    {
+      "name": "libxmlrpc",
+      "version": "0.51",
+      "path": "ext/xmlrpc/libxmlrpc",
+      "license": "BSD-3-Clause",
+      "purl": "pkg:generic/xmlrpc-epi@{version}"
+    },
+    {
+      "name": "libzip",
+      "version": "1.1.2",
+      "path": "ext/zip/lib",
+      "license": "BSD-3-Clause",
+      "purl": "pkg:generic/libzip@{version}"
+    },
+    {
+      "name": "libzip zip_dirent",
+      "path": "ext/phar/zip.c",
+      "license": "BSD-3-Clause",
+      "purl": "pkg:generic/libzip-zip-dirent"
+    },
+    {
+      "name": "MTRand",
+      "version": "1.0",
+      "path": "ext/random/engine_mt19937.c",
+      "license": "BSD-3-Clause",
+      "purl": "pkg:generic/mtrand@{version}"
+    },
+    {
+      "name": "OpenLDAP ucgendat",
+      "path": "ext/mbstring/ucgendat/ucgendat.php",
+      "license": "OLDAP-2.8 AND MIT",
+      "purl": "pkg:generic/openldap-ucgendat"
+    },
+    {
+      "name": "Oniguruma",
+      "version": "6.9.4",
+      "path": "ext/mbstring/oniguruma",
+      "license": "BSD-2-Clause",
+      "purl": "pkg:generic/oniguruma@{version}"
+    },
+    {
+      "name": "pcrelib",
+      "version": "8.41",
+      "path": "ext/pcre/pcrelib",
+      "license": "BSD-3-Clause",
+      "purl": "pkg:generic/pcre@{version}"
+    },
+    {
+      "name": "pcre2lib",
+      "version": "10.44",
+      "path": "ext/pcre/pcre2lib",
+      "license": "BSD-3-Clause WITH PCRE2-exception",
+      "purl": "pkg:generic/pcre2@{version}"
+    },
+    {
+      "name": "SQLite",
+      "version": "3.28.0",
+      "path": "ext/sqlite3/libsqlite",
+      "license": "blessing",
+      "purl": "pkg:generic/sqlite@{version}"
+    },
+    {
+      "name": "snprintf",
+      "path": "main/snprintf.c",
+      "license": "ISC AND Apache-1.0",
+      "purl": "pkg:generic/snprintf"
+    },
+    {
+      "name": "strlcat",
+      "path": "main/strlcat.c",
+      "license": "BSD-3-Clause",
+      "purl": "pkg:generic/strlcat"
+    },
+    {
+      "name": "strlcpy",
+      "path": "main/strlcpy.c",
+      "license": "BSD-3-Clause",
+      "purl": "pkg:generic/strlcpy"
+    },
+    {
+      "name": "strnatcmp",
+      "path": "ext/standard/strnatcmp.c",
+      "license": "Zlib",
+      "purl": "pkg:generic/strnatcmp"
+    },
+    {
+      "name": "Tcl scanf implementation",
+      "version": "8.3.0",
+      "path": "ext/standard/scanf.c",
+      "license": "TCL",
+      "purl": "pkg:generic/tcl-scanf@{version}"
+    },
+    {
+      "name": "timelib",
+      "version": "2022.17",
+      "path": "ext/date/lib",
+      "license": "MIT",
+      "purl": "pkg:generic/timelib@{version}"
+    },
+    {
+      "name": "XKCP SHA-3",
+      "path": "ext/hash/sha3",
+      "license": "CC0-1.0 AND Brian-Gladman-3-Clause",
+      "purl": "pkg:generic/xkcp-sha3"
+    },
+    {
+      "name": "xxHash",
+      "version": "0.8.2",
+      "path": "ext/hash/xxhash",
+      "license": "BSD-2-Clause",
+      "purl": "pkg:generic/xxhash@{version}"
+    }
+  ],
+  "php": {
+    "7.1": {
+      "exclude": [
+        "Boost.Context assembly",
+        "DynASM",
+        "libavifinfo",
+        "OpenLDAP ucgendat",
+        "pcre2lib",
+        "XKCP SHA-3",
+        "xxHash"
+      ],
+      "overrides": {
+        "libgd": {
+          "version": "2.0.35"
+        },
+        "libmagic": {
+          "version": "5.22"
+        },
+        "MTRand": {
+          "path": "ext/standard/mt_rand.c"
+        },
+        "Oniguruma": {
+          "version": "5.9.6"
+        },
+        "pcrelib": {
+          "version": "8.38"
+        },
+        "timelib": {
+          "version": "2016.05"
+        }
+      }
+    },
+    "7.2": {
+      "exclude": [
+        "Boost.Context assembly",
+        "DynASM",
+        "libavifinfo",
+        "OpenLDAP ucgendat",
+        "pcre2lib",
+        "xxHash"
+      ],
+      "overrides": {
+        "libgd": {
+          "version": "2.0.35"
+        },
+        "libmagic": {
+          "version": "5.31"
+        },
+        "MTRand": {
+          "path": "ext/standard/mt_rand.c"
+        },
+        "Oniguruma": {
+          "version": "6.3.0"
+        },
+        "pcrelib": {
+          "version": "8.41"
+        },
+        "timelib": {
+          "version": "2017.09"
+        }
+      }
+    },
+    "7.3": {
+      "exclude": [
+        "Boost.Context assembly",
+        "DynASM",
+        "libavifinfo",
+        "pcrelib",
+        "xxHash"
+      ],
+      "overrides": {
+        "libgd": {
+          "version": "2.0.35"
+        },
+        "libmagic": {
+          "version": "5.33"
+        },
+        "MTRand": {
+          "path": "ext/standard/mt_rand.c"
+        },
+        "pcre2lib": {
+          "version": "10.32"
+        },
+        "timelib": {
+          "version": "2018.04"
+        }
+      }
+    },
+    "7.4": {
+      "exclude": [
+        "Boost.Context assembly",
+        "DynASM",
+        "libavifinfo",
+        "libzip",
+        "Oniguruma",
+        "pcrelib",
+        "SQLite",
+        "xxHash"
+      ],
+      "overrides": {
+        "libgd": {
+          "version": "2.0.35"
+        },
+        "libmagic": {
+          "version": "5.37"
+        },
+        "MTRand": {
+          "path": "ext/standard/mt_rand.c"
+        },
+        "pcre2lib": {
+          "version": "10.35"
+        },
+        "timelib": {
+          "version": "2018.04"
+        }
+      }
+    },
+    "8.0": {
+      "exclude": [
+        "Boost.Context assembly",
+        "libavifinfo",
+        "libxmlrpc",
+        "libzip",
+        "Oniguruma",
+        "pcrelib",
+        "SQLite",
+        "xxHash"
+      ],
+      "overrides": {
+        "DynASM": {
+          "path": "ext/opcache/jit/dynasm",
+          "version": "1.4.0"
+        },
+        "libgd": {
+          "version": "2.0.35"
+        },
+        "libmagic": {
+          "version": "5.39"
+        },
+        "MTRand": {
+          "path": "ext/standard/mt_rand.c"
+        },
+        "pcre2lib": {
+          "version": "10.35"
+        },
+        "timelib": {
+          "version": "2020.03"
+        }
+      }
+    },
+    "8.1": {
+      "exclude": [
+        "libavifinfo",
+        "libxmlrpc",
+        "libzip",
+        "Oniguruma",
+        "pcrelib",
+        "SQLite"
+      ],
+      "overrides": {
+        "DynASM": {
+          "path": "ext/opcache/jit/dynasm"
+        },
+        "libgd": {
+          "version": "2.0.35"
+        },
+        "libmagic": {
+          "version": "5.40"
+        },
+        "MTRand": {
+          "path": "ext/standard/mt_rand.c"
+        },
+        "pcre2lib": {
+          "version": "10.39"
+        },
+        "timelib": {
+          "version": "2021.19"
+        },
+        "xxHash": {
+          "version": "0.8.0"
+        }
+      }
+    },
+    "8.2": {
+      "exclude": [
+        "libxmlrpc",
+        "libzip",
+        "Oniguruma",
+        "pcrelib",
+        "SQLite"
+      ],
+      "overrides": {
+        "DynASM": {
+          "path": "ext/opcache/jit/dynasm"
+        },
+        "libavifinfo": {
+          "version": "96f34d945ac7dac229feddfa94dbae66e202b838"
+        },
+        "libgd": {
+          "version": "2.0.35"
+        },
+        "libmagic": {
+          "version": "5.40"
+        },
+        "pcre2lib": {
+          "version": "10.40"
+        },
+        "timelib": {
+          "version": "2022.12"
+        },
+        "xxHash": {
+          "version": "0.8.1"
+        }
+      }
+    },
+    "8.3": {
+      "exclude": [
+        "libxmlrpc",
+        "libzip",
+        "Oniguruma",
+        "pcrelib",
+        "SQLite"
+      ],
+      "overrides": {
+        "DynASM": {
+          "path": "ext/opcache/jit/dynasm"
+        },
+        "libavifinfo": {
+          "version": "96f34d945ac7dac229feddfa94dbae66e202b838"
+        },
+        "libgd": {
+          "version": "2.0.35"
+        },
+        "libmagic": {
+          "version": "5.43"
+        },
+        "pcre2lib": {
+          "version": "10.42"
+        },
+        "timelib": {
+          "version": "2022.14"
+        },
+        "xxHash": {
+          "version": "0.8.1"
+        }
+      }
+    },
+    "8.4": {
+      "exclude": [
+        "libxmlrpc",
+        "libzip",
+        "Oniguruma",
+        "pcrelib",
+        "SQLite"
+      ],
+      "overrides": {
+        "libgd": {
+          "version": "2.0.35"
+        },
+        "libmagic": {
+          "version": "5.45"
+        },
+        "xxHash": {
+          "version": "0.8.1"
+        }
+      }
+    },
+    "8.5": {
+      "exclude": [
+        "libxmlrpc",
+        "libzip",
+        "Oniguruma",
+        "pcrelib",
+        "SQLite"
+      ],
+      "overrides": {
+        "libgd": {
+          "version": "2.0.35"
+        },
+        "xxHash": {
+          "version": "0.8.1"
+        }
+      }
+    },
+    "8.6": {
+      "exclude": [
+        "libxmlrpc",
+        "libzip",
+        "Oniguruma",
+        "pcrelib",
+        "SQLite"
+      ],
+      "overrides": {}
+    },
+    "master": {
+      "exclude": [
+        "libxmlrpc",
+        "libzip",
+        "Oniguruma",
+        "pcrelib",
+        "SQLite"
+      ],
+      "overrides": {}
+    }
+  }
+}
