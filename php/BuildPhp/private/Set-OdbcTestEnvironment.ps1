@@ -11,12 +11,8 @@ function Set-OdbcTestEnvironment {
         $env:ODBC_TEST_USER = 'sa'
         $env:ODBC_TEST_PASS = 'Password12!'
         $env:ODBC_TEST_DSN  = "Driver={ODBC Driver 17 for SQL Server};Server=(local)\SQLEXPRESS;Database=master;uid=$($env:ODBC_TEST_USER);pwd=$($env:ODBC_TEST_PASS)"
-        $env:PDOTEST_DSN = "odbc:$($env:ODBC_TEST_DSN)"
-        $env:PDOTEST_USER = $env:ODBC_TEST_USER
-        $env:PDOTEST_PASS = $env:ODBC_TEST_PASS
-        $env:PDO_ODBC_TEST_DSN = $env:PDOTEST_DSN
+        $env:PDO_ODBC_TEST_DSN = "odbc:$($env:ODBC_TEST_DSN)"
         $env:PDO_ODBC_TEST_USER = $env:ODBC_TEST_USER
         $env:PDO_ODBC_TEST_PASS = $env:ODBC_TEST_PASS
     }
 }
-
