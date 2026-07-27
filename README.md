@@ -153,20 +153,20 @@ If the `php-version-list` input is not provided, it will use the PHP versions re
 
 It will also check if a GitHub hosted Windows runner is available with the required Visual Studio version to build the extension for the PHP version or try to install it. To override this for building the extension for older PHP versions, you will have to set the input `allow-old-php-versions` to `true` and add self-hosted Windows runners as specified in the table below.
 
-| PHP Version | Visual Studio Version | Windows Runner Labels       |
-|-------------|-----------------------|-----------------------------|
-| 7.0         | 2015 (vc14)           | windows-2012, self-hosted   |
-| 7.1         | 2015 (vc14)           | windows-2012, self-hosted   |
-| 7.2         | 2017 (vc15)           | windows-2022, github-hosted |
-| 7.3         | 2017 (vc15)           | windows-2022, github-hosted |
-| 7.4         | 2017 (vc15)           | windows-2022, github-hosted |
-| 8.0         | 2019 (vs16)           | windows-2022, github-hosted |
-| 8.1         | 2019 (vs16)           | windows-2022, github-hosted |
-| 8.2         | 2019 (vs16)           | windows-2022, github-hosted |
-| 8.3         | 2019 (vs16)           | windows-2022, github-hosted |
-| 8.4         | 2022 (vs17)           | windows-2022, github-hosted |
-| 8.5         | 2022 (vs17)           | windows-2022, github-hosted |
-| master      | 2026 (vs18)           | windows-2025-vs2026, github-hosted |
+| PHP Version  | Visual Studio Version | Windows Runner Labels              |
+|--------------|-----------------------|------------------------------------|
+| 7.0          | 2015 (vc14)           | windows-2012, self-hosted          |
+| 7.1          | 2015 (vc14)           | windows-2012, self-hosted          |
+| 7.2          | 2017 (vc15)           | windows-2022, github-hosted        |
+| 7.3          | 2017 (vc15)           | windows-2022, github-hosted        |
+| 7.4          | 2017 (vc15)           | windows-2022, github-hosted        |
+| 8.0          | 2019 (vs16)           | windows-2022, github-hosted        |
+| 8.1          | 2019 (vs16)           | windows-2022, github-hosted        |
+| 8.2          | 2019 (vs16)           | windows-2022, github-hosted        |
+| 8.3          | 2019 (vs16)           | windows-2022, github-hosted        |
+| 8.4          | 2022 (vs17)           | windows-2022, github-hosted        |
+| 8.5          | 2022 (vs17)           | windows-2022, github-hosted        |
+| 8.6 / master | 2026 (vs18)           | windows-2025-vs2026, github-hosted |
 
 ### Release
 
