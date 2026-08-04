@@ -125,7 +125,7 @@ function Invoke-PhpTests {
             $settings.runner,
             "-p", "$buildDirectory\phpbin\php.exe",
             "-n",
-            "-c", "$buildDirectory\phpbin\php.ini",
+            "-c", "$buildDirectory\phpbin\php-test.ini",
             $settings.progress,
             "-g", "FAIL,BORK,WARN,LEAK",
             "-q",

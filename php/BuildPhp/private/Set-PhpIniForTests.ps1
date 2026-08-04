@@ -35,6 +35,8 @@ function Set-PhpIniForTests {
         $iniTemplate = Join-Path $PSScriptRoot "..\config\ini\$TestType.ini"
         Copy-Item $iniTemplate $ini -Force
         Add-Content $ini "extension_dir=$BuildDirectory\phpbin\ext"
+        $testIni = Join-Path $BuildDirectory 'phpbin\php-test.ini'
+        Copy-Item $ini $testIni -Force
 
         if ($Opcache -eq "opcache") {
             if ($TestType -eq "php") {
@@ -44,7 +46,7 @@ function Set-PhpIniForTests {
             $opcacheIni = Get-Content $opcacheIniPath -Raw -ErrorAction Stop
             $opcacheIni = $opcacheIni.Replace("OPCACHE_ERROR_LOG_PATH", "$BuildDirectory\opcache_error.log")
             $opcacheIni = $opcacheIni.Replace("OPCACHE_FILE_CACHE_PATH", "$BuildDirectory\file_cache")
-            Add-Content $ini $opcacheIni
+            Add-Content $testIni $opcacheIni
         }
     }
     end {
