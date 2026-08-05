@@ -50,9 +50,40 @@ function New-PhpSbomMetadata {
 
         $entry = [ordered]@{ name = $component.name }
         $componentVersion = ''
-        if($component.PSObject.Properties.Name -contains 'version') {
-            $entry.version = $component.version
-            $componentVersion = $component.version
+        $hasVersionSource = $component.PSObject.Properties.Name -contains 'versionSource'
+        if($hasVersionSource) {
+            if($component.versionSource.PSObject.Properties.Name -contains 'gitLog') {
+                $versionText = (& git -C $SourceDirectory log --follow '--format=%s' -- $component.path) -join "`n"
+                if($LASTEXITCODE -ne 0) {
+                    throw "Could not read the Git history for bundled component $($component.name)"
+                }
+                $versionMatch = [regex]::Match($versionText, $component.versionSource.pattern)
+            } else {
+                $versionMatch = $null
+                foreach($sourcePath in @($component.versionSource.path)) {
+                    $versionPath = Join-Path $SourceDirectory $sourcePath.Replace('{path}', $component.path)
+                    if(Test-Path -LiteralPath $versionPath -PathType Leaf) {
+                        $versionText = Get-Content -LiteralPath $versionPath -Raw
+                        $versionMatch = [regex]::Match($versionText, $component.versionSource.pattern)
+                        if($versionMatch.Success) {
+                            break
+                        }
+                    }
+                }
+            }
+
+            if($null -eq $versionMatch -or -not $versionMatch.Success) {
+                throw "Could not determine the version of bundled component $($component.name)"
+            }
+            if($component.versionSource.PSObject.Properties.Name -contains 'groups') {
+                $componentVersion = ($component.versionSource.groups | ForEach-Object { $versionMatch.Groups[$_].Value }) -join '.'
+            } else {
+                $componentVersion = $versionMatch.Groups['version'].Value
+            }
+            if(-not $componentVersion) {
+                throw "Could not determine the version of bundled component $($component.name)"
+            }
+            $entry.version = $componentVersion
         }
         $entry.path = $component.path
         $entry.license = $component.license

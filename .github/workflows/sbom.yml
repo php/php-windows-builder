@@ -6,6 +6,10 @@ on:
       php-ref:
         description: PHP source ref
         required: true
+      upload:
+        description: Upload metadata to downloads.php.net
+        type: boolean
+        default: true
 
 jobs:
   publish:
@@ -23,6 +27,7 @@ jobs:
           repository: php/php-src
           ref: ${{ inputs.php-ref }}
           path: php-src
+          fetch-depth: 0
 
       - name: Generate metadata
         id: metadata
@@ -41,6 +46,10 @@ jobs:
           Add-Content -LiteralPath $env:GITHUB_OUTPUT -Value "file=$output"
           $sbom = Get-Content -LiteralPath $output -Raw | ConvertFrom-Json | ConvertTo-Json -Depth 10 -Compress
           Add-Content -LiteralPath $env:GITHUB_OUTPUT -Value "sbom=$sbom"
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value "### $output"
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value '```json'
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value (Get-Content -LiteralPath $output -Raw)
+          Add-Content -LiteralPath $env:GITHUB_STEP_SUMMARY -Value '```'
 
       - name: Upload metadata
         uses: actions/upload-artifact@v7
@@ -50,6 +59,7 @@ jobs:
           retention-days: 1
 
       - name: Publish metadata
+        if: inputs.upload
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.WINDOWS_BUILDS_TOKEN }}
