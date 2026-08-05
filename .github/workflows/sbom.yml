@@ -27,7 +27,6 @@ jobs:
           repository: php/php-src
           ref: ${{ inputs.php-ref }}
           path: php-src
-          fetch-depth: 0
 
       - name: Generate metadata
         id: metadata

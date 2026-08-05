@@ -14,10 +14,7 @@
     },
     {
       "name": "crypt_blowfish",
-      "versionSource": {
-        "gitLog": true,
-        "pattern": "Upgrade crypt_blowfish to version (?<version>[0-9.]+)"
-      },
+      "version": "1.3",
       "path": "ext/standard/crypt_blowfish.c",
       "license": "bcrypt-Solar-Designer",
       "purl": "pkg:generic/crypt_blowfish@{version}"
