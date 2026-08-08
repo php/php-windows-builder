@@ -36,12 +36,12 @@ runs:
       env:
         LIBS_BUILD_RUNS: ${{ inputs.libs-build-runs }}
         GITHUB_TOKEN: ${{ inputs.github-token }}
+        SBOM: ${{ inputs.sbom }}
       run: |
         Import-Module ${{ github.action_path }}\BuildPhp -Force
         Invoke-PhpBuild -PhpVersion '${{ inputs.php-version }}' `
                         -Arch '${{ inputs.arch }}' `
-                        -Ts '${{ inputs.ts }}' `
-                        -Sbom ('${{ inputs.sbom }}' -eq 'true')
+                        -Ts '${{ inputs.ts }}'
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v7

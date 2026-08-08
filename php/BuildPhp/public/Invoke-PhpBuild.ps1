@@ -8,8 +8,6 @@ function Invoke-PhpBuild {
         PHP Architecture
     .PARAMETER Ts
         PHP Build Type
-    .PARAMETER Sbom
-        Add SBOM files to binary archives
     #>
     [OutputType()]
     param (
@@ -22,9 +20,7 @@ function Invoke-PhpBuild {
         [Parameter(Mandatory = $true, Position=2, HelpMessage='PHP Build Type')]
         [ValidateNotNull()]
         [ValidateSet('nts', 'ts')]
-        [string] $Ts,
-        [Parameter(Mandatory = $false, Position=3, HelpMessage='Add SBOM files')]
-        [bool] $Sbom = $false
+        [string] $Ts
     )
     begin {
     }
@@ -74,18 +70,9 @@ function Invoke-PhpBuild {
             Copy-Item -Path $configBatch -Destination (Join-Path $buildPath "config.$Ts.bat") -Force
             Add-PhpDeps -PhpVersion $PhpVersion -VsVersion $VsConfig.vs -Arch $Arch -Destination $depsDirectory
 
-            $sbomMetadata = ''
-            if($Sbom) {
-                if($PhpVersion -eq 'master') {
-                    $sbomVersion = 'master'
-                } elseif($PhpVersion -match '(\d+\.\d+)') {
-                    $sbomVersion = $Matches[1]
-                } else {
-                    throw "Cannot determine SBOM metadata version from PHP version $PhpVersion"
-                }
-                $sbomMetadata = Join-Path $buildDirectory "php-$sbomVersion.json"
-                Get-File -Url "https://downloads.php.net/~windows/php-sdk/sbom/php-$sbomVersion.json" -OutFile $sbomMetadata
-            }
+            $sbomMetadata = Get-PhpSbomMetadata -Sbom $env:SBOM `
+                                                    -PhpVersion $PhpVersion `
+                                                    -BuildDirectory $buildDirectory
             $taskTemplate = Join-Path $PSScriptRoot "..\runner\task-$Ts.bat"
 
             $task = [System.IO.Path]::GetFileName($taskTemplate)
@@ -106,7 +93,7 @@ function Invoke-PhpBuild {
             New-Item "$artifactsDirectory" -ItemType "directory" -Force > $null 2>&1
             xcopy $artifacts "$artifactsDirectory\*"
 
-            if($Sbom) {
+            if($sbomMetadata) {
                 foreach($artifact in $binaryArtifacts) {
                     $artifactPath = Join-Path $artifactsDirectory $artifact.Name
                     & "$buildDirectory\php-sdk\bin\phpsdk_sbom.bat" --export "$artifactPath"

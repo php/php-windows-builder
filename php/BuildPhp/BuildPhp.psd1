@@ -74,6 +74,7 @@
         'Get-OciSdk',
         'Get-PhpDepsPackages',
         'Get-PhpBuild',
+        'Get-PhpSbomMetadata',
         'Get-PhpSdk',
         'Get-PhpSrc',
         'Get-PhpTestPack',
