@@ -7,7 +7,7 @@ function Get-PhpSdk {
     param (
     )
     begin {
-        $sdkVersion = "php-sdk-2.8.1"
+        $sdkVersion = "php-sdk-2.8.2"
         $url = "https://github.com/php/php-sdk-binary-tools/archive/$sdkVersion.zip"
     }
     process {
