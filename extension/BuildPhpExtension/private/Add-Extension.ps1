@@ -69,7 +69,8 @@ Function Add-Extension {
                     $Config.vs_version,
                     $Config.arch
                 ) -join "-")
-                & $builder -c $Config.vs_version -a $Config.Arch -s $Config.vs_toolset -t $task | Tee-Object -FilePath "build-$suffix.txt"
+                $toolsetArgs = if ($Config.vs_version -eq 'vs18') { @() } else { @('-s', $Config.vs_toolset) }
+                & $builder -c $Config.vs_version -a $Config.Arch @toolsetArgs -t $task | Tee-Object -FilePath "build-$suffix.txt"
                 Write-Host (Get-Content "build-$suffix.txt" -Raw)
                 $includePath = "$currentDirectory\php-dev\include"
                 New-Item -Path $includePath\ext -Name $Extension -ItemType "directory" | Out-Null

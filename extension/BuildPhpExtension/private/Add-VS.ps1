@@ -35,13 +35,17 @@ function Add-VS {
                 Get-File -Url $vsWhereUrl -OutFile $vswherePath
             }
 
+            $requiredChannel = [int]($VsVersion -replace '\D', '')
             $instances = & $vswherePath -latest -products '*' -format json 2> $null | ConvertFrom-Json
             $vsInst = $instances | Select-Object -First 1
+            if ($vsInst -and [int]$vsInst.installationVersion.Split('.')[0] -lt $requiredChannel) {
+                $vsInst = $null
+            }
 
             $componentArgs = $Config.components | ForEach-Object { '--add'; $_ }
 
             if ($vsInst) {
-                [string]$channel = $vsInst.installationVersion.Split('.')[0]
+                [int]$channel = $vsInst.installationVersion.Split('.')[0]
                 $productId = $null
                 if ($vsInst.catalog -and $vsInst.catalog.PSObject.Properties['productId']) {
                     $productId = $vsInst.catalog.productId
@@ -54,7 +58,8 @@ function Add-VS {
                     $exe = 'vs_buildtools.exe'
                 }
 
-                $installerUrl = "https://aka.ms/vs/$channel/release/$exe"
+                $releaseChannel = if ($channel -ge 18) { 'stable' } else { 'release' }
+                $installerUrl = "https://aka.ms/vs/$channel/$releaseChannel/$exe"
                 $installerPath = Join-Path $env:TEMP $exe
 
                 Get-File -Url $installerUrl -OutFile $installerPath
@@ -64,9 +69,10 @@ function Add-VS {
                     --quiet --wait --norestart --nocache `
                     @componentArgs 2>&1 | ForEach-Object { Write-Host $_ }
             } else {
-                $channel = $VsVersion -replace '\D', ''
+                $channel = $requiredChannel
                 $exe = 'vs_buildtools.exe'
-                $installerUrl = "https://aka.ms/vs/$channel/release/$exe"
+                $releaseChannel = if ($channel -ge 18) { 'stable' } else { 'release' }
+                $installerUrl = "https://aka.ms/vs/$channel/$releaseChannel/$exe"
                 $installerPath = Join-Path $env:TEMP $exe
 
                 Get-File -Url $installerUrl -OutFile $installerPath

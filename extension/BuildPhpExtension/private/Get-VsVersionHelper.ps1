@@ -24,19 +24,29 @@ function Get-VsVersionHelper {
         if (-not (Test-Path $vswherePath)) {
             throw "vswhere is not available"
         }
-        $MSVCDirectory = & $vswherePath -latest -products * -find "VC\Tools\MSVC"
         $selectedToolset = $null
         $minor = $null
-        foreach ($toolset in (Get-ChildItem $MSVCDirectory)) {
-            $toolsetMajorVersion, $toolsetMinorVersion = $toolset.Name.split(".")[0,1]
-            $requiredVs = $VsConfig.vs.$VsVersion
-            $majorVersionCheck = [int]$requiredVs.major -eq [int]$toolsetMajorVersion
-            $minorLowerBoundCheck = [int]$toolsetMinorVersion -ge [int]$requiredVs.minorMin
-            $minorUpperBoundCheck = ($null -eq $requiredVs.minorMax) -or ([int]$toolsetMinorVersion -le [int]$requiredVs.minorMax)
-            if ($majorVersionCheck -and $minorLowerBoundCheck -and $minorUpperBoundCheck) {
-                if($null -eq $minor -or [int]$toolsetMinorVersion -gt [int]$minor) {
-                    $selectedToolset = $toolset.Name.Trim()
-                    $minor = $toolsetMinorVersion
+        $requiredChannel = [int]($VsVersion -replace '\D', '')
+        $requiredVs = $VsConfig.vs.$VsVersion
+        $instances = @(& $vswherePath -products '*' -format json 2> $null | ConvertFrom-Json)
+        foreach ($vsInst in $instances) {
+            if ([int]$vsInst.installationVersion.Split('.')[0] -lt $requiredChannel) {
+                continue
+            }
+            $MSVCDirectory = Join-Path $vsInst.installationPath 'VC\Tools\MSVC'
+            if (-not (Test-Path $MSVCDirectory)) {
+                continue
+            }
+            foreach ($toolset in (Get-ChildItem $MSVCDirectory)) {
+                $toolsetMajorVersion, $toolsetMinorVersion = $toolset.Name.split(".")[0,1]
+                $majorVersionCheck = [int]$requiredVs.major -eq [int]$toolsetMajorVersion
+                $minorLowerBoundCheck = [int]$toolsetMinorVersion -ge [int]$requiredVs.minorMin
+                $minorUpperBoundCheck = ($null -eq $requiredVs.minorMax) -or ([int]$toolsetMinorVersion -le [int]$requiredVs.minorMax)
+                if ($majorVersionCheck -and $minorLowerBoundCheck -and $minorUpperBoundCheck) {
+                    if($null -eq $minor -or [int]$toolsetMinorVersion -gt [int]$minor) {
+                        $selectedToolset = $toolset.Name.Trim()
+                        $minor = $toolsetMinorVersion
+                    }
                 }
             }
         }
