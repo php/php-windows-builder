@@ -48,6 +48,9 @@ Function Get-ArgumentsFromConfig {
         if($depsExtensions -contains $Extension) {
             $argValue = "../deps,shared"
         }
+        if($Extension -eq "judy") {
+            $argValue = "../deps,shared"
+        }
 
         $arg=''
         if($null -ne $buildArgPrefix) {

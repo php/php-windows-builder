@@ -159,7 +159,8 @@ Function Get-ExtensionConfig {
                 $arguments = Get-ArgumentsFromConfig $Extension $configW32Content
                 foreach ($argument in $arguments) {
                     $argumentKey = $argument.Split("=")[0]
-                    if ($null -ne $argument -and -not ($config.options.contains($argumentKey))) {
+                    if ($null -ne $argument) {
+                        $config.options = $config.options -replace "$argumentKey[^ ]*", ""
                         $config.options += " $argument"
                     }
                 }
