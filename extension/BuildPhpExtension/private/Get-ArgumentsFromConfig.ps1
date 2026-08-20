@@ -15,6 +15,7 @@ Function Get-ArgumentsFromConfig {
         [string] $ConfigW32Content
     )
     begin {
+        $depsExtensions = Get-Content -Path "$PSScriptRoot\..\config\deps-path-extensions.json" -Raw | ConvertFrom-Json
     }
     process {
         $buildArgPrefix = $null;
@@ -44,7 +45,7 @@ Function Get-ArgumentsFromConfig {
         if($ConfigW32Content.Contains("PHP_$($Extension.ToUpper())_SHARED")) {
             $argValue = "shared"
         }
-        if($Extension -eq "oci8_19" -or $Extension -eq "pdo_oci" -or $Extension -eq 'ibm_db2' -or $Extension -eq 'pdo_ibm') {
+        if($depsExtensions -contains $Extension) {
             $argValue = "../deps,shared"
         }
 
