@@ -52,6 +52,9 @@ Function Add-Extension {
                         $argumentString += " $argument"
                     }
                 }
+                if (Test-ClangToolset -PhpVersion $Config.php_version) {
+                    $argumentString += " --with-toolset=clang"
+                }
                 $bat_content = @()
                 $bat_content += ""
                 $bat_content += "call phpize 2>&1"

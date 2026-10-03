@@ -39,7 +39,7 @@ function Invoke-PhpSmokeTests {
         }
 
         $zipPattern = "php-*-$Arch.zip"
-        $zipRegex = "^php-(.+?)(-nts)?-Win32-v[sc]\d+-${Arch}\.zip$"
+        $zipRegex = "^php-(.+?)(-nts)?-Win32-(?:v[sc]\d+|clang)-${Arch}\.zip$"
         $zipMatches = @(
             Get-ChildItem -Path $artifactsPath -Filter $zipPattern -File |
                 Where-Object {

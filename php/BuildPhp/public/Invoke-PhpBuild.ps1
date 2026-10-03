@@ -43,6 +43,9 @@ function Invoke-PhpBuild {
 
         New-Item "$buildDirectory" -ItemType "directory" -Force > $null 2>&1
 
+        $clangResourceDirectory = $null
+        $originalClangResourceDirectory = $env:PHP_CLANG_RESOURCE_DIR
+
         try {
             Set-Location "$buildDirectory"
 
@@ -78,6 +81,11 @@ function Invoke-PhpBuild {
             $task = [System.IO.Path]::GetFileName($taskTemplate)
             Copy-Item -Path $taskTemplate -Destination $task -Force
 
+            if($Arch -eq 'x86' -and (Select-String -LiteralPath $configBatch -SimpleMatch '--with-toolset=clang' -Quiet)) {
+                $clangResourceDirectory = Get-ClangX86ProfileRuntime -BuildDirectory $buildDirectory
+                $env:PHP_CLANG_RESOURCE_DIR = $clangResourceDirectory
+            }
+
             Invoke-PhpSdkStarter -BuildDirectory $buildDirectory -VsConfig $VsConfig -Arch $Arch -Task $task
 
             $artifacts = if ($Ts -eq "ts") {"..\obj\Release_TS\php-*.zip"} else {"..\obj\Release\php-*.zip"}
@@ -107,6 +115,10 @@ function Invoke-PhpBuild {
             }
         } finally {
             Set-Location "$currentDirectory"
+            $env:PHP_CLANG_RESOURCE_DIR = $originalClangResourceDirectory
+            if($clangResourceDirectory) {
+                Remove-Item -LiteralPath $clangResourceDirectory -Recurse -Force
+            }
         }
     }
     end {
