@@ -44,6 +44,7 @@ Build a specific version of PHP, with the required architecture and thread safet
 #### Inputs
 
 - `php-version` (required): The PHP version to build. It supports values in major.minor.patch format, e.g., 7.4.25, 8.0.12, etc., or `master` for the master branch of `php-src`.
+- `build-number` (optional): A positive integer identifying a rebuild. For example, `php-version: '8.5.12'` with `build-number: '1'` builds the existing `php-8.5.12` source tag and names the packages `8.5.12-1`. To build a numbered source tag such as `php-8.5.12-1`, use `php-version: '8.5.12-1'` and omit `build-number`. If both specify a number, they must agree. Numbering changes package filenames and external SBOM artifact references; it does not modify the PHP source version or ABI. Build numbers require a full version; they cannot be combined with `master`.
 - `arch` (required): The architecture to build. It supports values `x64` and `x86`.
 - `ts` (required): The thread safety to build. It supports values `ts` and `nts`.
 

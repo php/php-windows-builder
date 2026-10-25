@@ -1,11 +1,15 @@
 name: Build PHP
-run-name: Build PHP ${{ inputs.php-version }}
+run-name: Build PHP ${{ inputs.php-version }}${{ inputs.build-number && format(' (build {0})', inputs.build-number) || '' }}
 on:
   workflow_dispatch:
     inputs:
       php-version:
         description: 'PHP version to build'
         required: true
+      build-number:
+        description: 'Optional positive build number for rebuilding the existing PHP tag'
+        type: string
+        required: false
       upload:
         type: choice
         options: ['true', 'false']
@@ -21,6 +25,8 @@ on:
 
 jobs:
   php:
+    outputs:
+      php-version: ${{ steps.build.outputs.php-version }}
     strategy:
       matrix:
         arch: [x64, x86]
@@ -31,9 +37,11 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Build
+        id: build
         uses: ./php
         with:
           php-version: ${{ inputs.php-version }}
+          build-number: ${{ inputs.build-number }}
           arch: ${{ matrix.arch }}
           ts: ${{ matrix.ts }}
           sbom: ${{ inputs.sbom }}
@@ -60,7 +68,7 @@ jobs:
         opcache: [opcache, nocache]
         test-type: [php, ext]
     runs-on: ${{ (contains(inputs.php-version, 'master') || contains(inputs.php-version, '8.6') || contains(inputs.php-version, '8.7')) && 'windows-2025-vs2026' || 'windows-2022' }}
-    needs: artifacts
+    needs: [php, artifacts]
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -98,9 +106,10 @@ jobs:
         env:
           DEPS_DIR: ${{ steps.cache-key.outputs.cache-dir }}
           DEPS_CACHE_HIT: ${{ steps.cache-deps.outputs.cache-hit }}
+          PHP_VERSION: ${{ needs.php.outputs.php-version }}
         run: |
           Import-Module (Join-Path $(pwd).Path '\php\BuildPhp') -Force          
-          Invoke-PhpTests -PhpVersion ${{inputs.php-version}} `
+          Invoke-PhpTests -PhpVersion $env:PHP_VERSION `
                           -Arch ${{matrix.arch}} `
                           -Ts ${{matrix.ts}} `
                           -Opcache ${{matrix.opcache}} `
@@ -140,12 +149,13 @@ jobs:
 
   upload:
     runs-on: ubuntu-latest
-    needs: [artifacts, tests, smoke-tests]
+    needs: [php, artifacts, tests, smoke-tests]
     if: ${{ github.event.inputs.upload == 'true' }}
     steps:
       - name: Upload to downloads server
         run: |
           url="https://api.github.com/repos/${{ github.repository }}/actions/artifacts/${{ needs.artifacts.outputs.artifact-id }}/zip"
-          gh workflow run php.yml -R php/web-downloads -f url="$url" -f php-version=${{ inputs.php-version }}
+          gh workflow run php.yml -R php/web-downloads -f url="$url" -f php-version="$PHP_VERSION"
         env:
           GITHUB_TOKEN: ${{ secrets.WINDOWS_BUILDS_TOKEN }}
+          PHP_VERSION: ${{ needs.php.outputs.php-version }}

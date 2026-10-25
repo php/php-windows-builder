@@ -29,6 +29,7 @@ function Get-PhpDepsPackages {
     }
 
     process {
+        $PhpVersion = (Get-PhpBuildVersion -PhpVersion $PhpVersion).PhpVersion
         $depsPhpVersion = $PhpVersion
         if ($PhpVersion -ne 'master') {
             $versionParts = $PhpVersion.Split('.')

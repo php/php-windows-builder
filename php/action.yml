@@ -10,6 +10,9 @@ inputs:
   php-version:
     description: PHP version to build, skip this to build from the current source directory
     required: false
+  build-number:
+    description: Positive build number to append when rebuilding an existing PHP source tag
+    required: false
   arch:
     description: Architecture to build
     required: true
@@ -28,23 +31,35 @@ inputs:
     required: false
     default: ${{ github.token }}  
 
+outputs:
+  php-version:
+    description: PHP package version, including the build number when specified
+    value: ${{ steps.build.outputs.php-version }}
+
 runs:
   using: composite
   steps:
     - name: Build PHP
+      id: build
       shell: pwsh
       env:
         LIBS_BUILD_RUNS: ${{ inputs.libs-build-runs }}
         GITHUB_TOKEN: ${{ inputs.github-token }}
         SBOM: ${{ inputs.sbom }}
+        PHP_VERSION: ${{ inputs.php-version }}
+        PHP_BUILD_NUMBER: ${{ inputs.build-number }}
       run: |
         Import-Module ${{ github.action_path }}\BuildPhp -Force
-        Invoke-PhpBuild -PhpVersion '${{ inputs.php-version }}' `
+        $version = if ($env:PHP_VERSION) { $env:PHP_VERSION } else { Get-SourcePhpVersion }
+        $buildVersion = Get-PhpBuildVersion -PhpVersion $version -BuildNumber $env:PHP_BUILD_NUMBER
+        Invoke-PhpBuild -PhpVersion $env:PHP_VERSION `
                         -Arch '${{ inputs.arch }}' `
-                        -Ts '${{ inputs.ts }}'
+                        -Ts '${{ inputs.ts }}' `
+                        -BuildNumber $env:PHP_BUILD_NUMBER
+        Add-Content -LiteralPath $env:GITHUB_OUTPUT -Value "php-version=$($buildVersion.PackageVersion)"
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v7
       with:
-        name: artifacts-${{ inputs.php-version || 'source' }}-${{inputs.arch}}-${{inputs.ts}}
+        name: artifacts-${{ steps.build.outputs.php-version }}-${{inputs.arch}}-${{inputs.ts}}
         path: artifacts/*

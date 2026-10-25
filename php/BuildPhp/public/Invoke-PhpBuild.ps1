@@ -8,6 +8,8 @@ function Invoke-PhpBuild {
         PHP Architecture
     .PARAMETER Ts
         PHP Build Type
+    .PARAMETER BuildNumber
+        Optional positive build number for rebuilding an existing source tag.
     #>
     [OutputType()]
     param (
@@ -20,7 +22,10 @@ function Invoke-PhpBuild {
         [Parameter(Mandatory = $true, Position=2, HelpMessage='PHP Build Type')]
         [ValidateNotNull()]
         [ValidateSet('nts', 'ts')]
-        [string] $Ts
+        [string] $Ts,
+        [Parameter(Mandatory = $false, Position=3)]
+        [ValidatePattern('^(?:[1-9][0-9]*)?$')]
+        [string] $BuildNumber = ''
     )
     begin {
     }
@@ -31,7 +36,8 @@ function Invoke-PhpBuild {
             $fetchSrc = $False
             $PhpVersion = Get-SourcePhpVersion
         }
-        $VsConfig = (Get-VsVersion -PhpVersion $PhpVersion)
+        $buildVersion = Get-PhpBuildVersion -PhpVersion $PhpVersion -BuildNumber $BuildNumber
+        $VsConfig = (Get-VsVersion -PhpVersion $buildVersion.PhpVersion)
         if($null -eq $VsConfig.vs) {
             throw "PHP version $PhpVersion is not supported."
         }
@@ -68,10 +74,10 @@ function Invoke-PhpBuild {
             Set-Location "$buildPath"
             New-Item (Join-Path $buildParent 'obj') -ItemType "directory" -Force > $null 2>&1
             Copy-Item -Path $configBatch -Destination (Join-Path $buildPath "config.$Ts.bat") -Force
-            Add-PhpDeps -PhpVersion $PhpVersion -VsVersion $VsConfig.vs -Arch $Arch -Destination $depsDirectory
+            Add-PhpDeps -PhpVersion $buildVersion.PhpVersion -VsVersion $VsConfig.vs -Arch $Arch -Destination $depsDirectory
 
             $sbomMetadata = Get-PhpSbomMetadata -Sbom $env:SBOM `
-                                                    -PhpVersion $PhpVersion `
+                                                    -PhpVersion $buildVersion.PhpVersion `
                                                     -BuildDirectory $buildDirectory
             $taskTemplate = Join-Path $PSScriptRoot "..\runner\task-$Ts.bat"
 
@@ -105,6 +111,7 @@ function Invoke-PhpBuild {
             if($fetchSrc) {
                 Move-Item "$buildDirectory\php-$PhpVersion-src.zip" "$artifactsDirectory\"
             }
+            Set-PhpArtifactVersion -ArtifactsDirectory $artifactsDirectory -PackageVersion $buildVersion.PackageVersion
         } finally {
             Set-Location "$currentDirectory"
         }
