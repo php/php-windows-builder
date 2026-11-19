@@ -69,7 +69,8 @@ function Invoke-PhpBuild {
 
             $buildParent = Split-Path -Path $buildPath -Parent
             $depsDirectory = Join-Path $buildParent 'deps'
-            $artifactsDirectory = Join-Path $currentDirectory 'artifacts'
+            $outputDirectory = Join-Path $currentDirectory 'artifacts'
+            $artifactsDirectory = if ($buildVersion.BuildNumber) { Join-Path $buildDirectory 'artifacts' } else { $outputDirectory }
 
             Set-Location "$buildPath"
             New-Item (Join-Path $buildParent 'obj') -ItemType "directory" -Force > $null 2>&1
@@ -112,6 +113,17 @@ function Invoke-PhpBuild {
                 Move-Item "$buildDirectory\php-$PhpVersion-src.zip" "$artifactsDirectory\"
             }
             Set-PhpArtifactVersion -ArtifactsDirectory $artifactsDirectory -PackageVersion $buildVersion.PackageVersion
+            if ($buildVersion.BuildNumber) {
+                $null = New-Item -Path $outputDirectory -ItemType Directory -Force -ErrorAction Stop
+                $packages = Get-ChildItem -LiteralPath $artifactsDirectory -File
+                foreach ($package in $packages) {
+                    $destination = Join-Path $outputDirectory $package.Name
+                    if (Test-Path -LiteralPath $destination) {
+                        throw "PHP artifact already exists: $destination"
+                    }
+                }
+                $packages | Move-Item -Destination $outputDirectory -ErrorAction Stop
+            }
         } finally {
             Set-Location "$currentDirectory"
         }
