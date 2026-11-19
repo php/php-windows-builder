@@ -78,6 +78,7 @@ Function Get-ExtensionConfig {
                 package_name = $packageName
                 ref = $ref
                 php_version = $PhpVersion
+                php_test_pack_url = ''
                 arch = $Arch
                 ts = $Ts
                 vs_version = $VsVersion

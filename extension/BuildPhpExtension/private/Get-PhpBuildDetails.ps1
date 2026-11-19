@@ -13,9 +13,15 @@ function Get-PhpBuildDetails {
     begin {
     }
     process {
+        $testPackUrl = ''
         if($Config.php_version -eq 'master') {
             $baseUrl = $fallbackBaseUrl = "https://github.com/shivammathur/php-builder-windows/releases/download/master"
-            $PhpSemver = 'master'
+            $phpSemver = 'master'
+        } elseif($Config.php_version -eq '8.7') {
+            $baseUrl = $fallbackBaseUrl = "https://github.com/shivammathur/php-builder-windows/releases/download/php8.7"
+            $manifest = Get-File -Url "$baseUrl/manifest.json" | ConvertFrom-Json
+            $phpSemver = "$($manifest.dev.version)-dev"
+            $testPackUrl = "$baseUrl/$($manifest.dev.test)"
         } else {
             $releaseState = if ($Config.php_version -match "[a-z]") {"qa"} else {"releases"}
             $baseUrl = "https://downloads.php.net/~windows/$releaseState"
@@ -42,6 +48,7 @@ function Get-PhpBuildDetails {
             phpSemver = $phpSemver
             baseUrl = $baseUrl
             fallbackBaseUrl = $fallbackBaseUrl
+            testPackUrl = $testPackUrl
         }
     }
     end {

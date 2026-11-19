@@ -59,7 +59,8 @@ function Add-BuildRequirements {
                                       -Ts $Ts `
                                       -VsVersion $VsVersion `
                                       -VsToolset $VsToolset
-        $buildDetails = Get-PhpBuildDetails -Config $Config
+        $buildDetails = Get-PhpBuildDetails -Config $config
+        $config.php_test_pack_url = $buildDetails.testPackUrl
         $prefix = Get-PhpBuild -Config $config -BuildDetails $buildDetails
         Get-PhpDevelBuild -Config $config -BuildDetails $buildDetails
         Add-Dependencies -Config $config -Prefix $prefix

@@ -13,15 +13,23 @@ Function Set-PdoOciTestEnvironment {
     process {
         $currentDirectory = (Get-Location).Path
         $env:TEST_WORKERS = 1
-        Get-PhpSrc -PhpVersion $Config.php_version
+        $phpTestsDirectory = Join-Path $currentDirectory "php-$($Config.php_version)-src"
+        if($Config.PSObject.Properties['php_test_pack_url'] -and $Config.php_test_pack_url) {
+            $testPack = Join-Path $currentDirectory "php-test-pack-$($Config.php_version).zip"
+            Get-File -Url $Config.php_test_pack_url -OutFile $testPack
+            Expand-Archive -LiteralPath $testPack -DestinationPath $phpTestsDirectory -Force
+        } else {
+            Get-PhpSrc -PhpVersion $Config.php_version
+        }
+        $pdoTestsDirectory = Join-Path $phpTestsDirectory 'ext\pdo\tests'
 
         # This test is not compatible with Oracle XE
-        $testPath = "$currentDirectory\php-$($Config.php_version)-src\ext\pdo\tests\gh20553.phpt"
+        $testPath = Join-Path $pdoTestsDirectory 'gh20553.phpt'
         if (Test-Path $testPath) {
             Remove-Item $testPath -Force
         }
 
-        $env:PDO_TEST_DIR = "$currentDirectory\php-$($Config.php_version)-src\ext\pdo\tests"
+        $env:PDO_TEST_DIR = $pdoTestsDirectory
         $env:PDO_OCI_TEST_DIR = "$currentDirectory\tests"
         $env:PDO_OCI_TEST_USER = "system"
         $env:PDO_OCI_TEST_PASS = "oracle"
