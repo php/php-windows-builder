@@ -112,12 +112,6 @@ Function Get-ExtensionConfig {
                     }
                 }
             }
-            $config.options = $config.options -join " "
-
-            if($null -ne $env:CONFIGURE_ARGS -and -not([string]::IsNullOrWhiteSpace($env:CONFIGURE_ARGS))) {
-                $config.options += " $env:CONFIGURE_ARGS"
-            }
-
             $Libraries = @()
             if($null -ne $env:LIBRARIES -and -not([string]::IsNullOrWhiteSpace($env:LIBRARIES))) {
                 $Libraries = ($env:LIBRARIES -replace ' ', '') -split ','
@@ -157,14 +151,13 @@ Function Get-ExtensionConfig {
             }
 
             if($env:AUTO_DETECT_ARGS -eq 'true') {
-                $arguments = Get-ArgumentsFromConfig $Extension $configW32Content
-                foreach ($argument in $arguments) {
-                    $argumentKey = $argument.Split("=")[0]
-                    if ($null -ne $argument) {
-                        $config.options = $config.options -replace "$argumentKey[^ ]*", ""
-                        $config.options += " $argument"
-                    }
-                }
+                $config.options += @(Get-ArgumentsFromConfig $Extension $configW32Content | Where-Object { $_ -like '--*' })
+            }
+
+            $config.options = $config.options -join " "
+
+            if($null -ne $env:CONFIGURE_ARGS -and -not([string]::IsNullOrWhiteSpace($env:CONFIGURE_ARGS))) {
+                $config.options += " $env:CONFIGURE_ARGS"
             }
 
             if($configW32Content.contains('ADD_EXTENSION_DEP')) {
