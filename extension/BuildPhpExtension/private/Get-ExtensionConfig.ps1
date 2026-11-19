@@ -113,6 +113,10 @@ Function Get-ExtensionConfig {
             }
             $config.options = $config.options -join " "
 
+            if (Test-ClangToolset -PhpVersion $PhpVersion) {
+                $config.options += " --with-toolset=clang"
+            }
+
             if($null -ne $env:CONFIGURE_ARGS -and -not([string]::IsNullOrWhiteSpace($env:CONFIGURE_ARGS))) {
                 $config.options += " $env:CONFIGURE_ARGS"
             }

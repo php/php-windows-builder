@@ -59,6 +59,12 @@ function Add-TestRequirements {
 
         $currentDirectory = (Get-Location).Path
         $binZipFilePath = Join-Path $ArtifactsDirectory $binZipFile
+        if(-not(Test-Path -LiteralPath $binZipFilePath)) {
+            $clangBinZipFilePath = Join-Path $ArtifactsDirectory "php-$versionInUrl-$tsPart-clang-$Arch.zip"
+            if(Test-Path -LiteralPath $clangBinZipFilePath) {
+                $binZipFilePath = $clangBinZipFilePath
+            }
+        }
         $binDirectoryPath = Join-Path $currentDirectory phpbin
 
         $testZipFilePath = Join-Path $ArtifactsDirectory $testZipFile
