@@ -143,6 +143,8 @@ jobs:
 
       - name: Build PHP
         shell: pwsh
+        env:
+          SBOM: ${{ inputs.sbom }}
         run: |
           $buildPhpManifest = Join-Path $env:BUILDPHP_MODULE_BASE 'BuildPhp.psd1'
           $phpSourceRoot = Join-Path $env:GITHUB_WORKSPACE 'php-src'
@@ -157,8 +159,7 @@ jobs:
           Push-Location $phpSourceRoot
           try {
               Invoke-PhpBuild -Arch $env:BUILD_ARCH `
-                              -Ts $env:BUILD_TS `
-                              -Sbom ('${{ inputs.sbom }}' -eq 'true')
+                              -Ts $env:BUILD_TS
           } finally {
               Pop-Location
           }
