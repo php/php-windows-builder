@@ -32,7 +32,7 @@ function New-PhpSbomMetadata {
     }
 
     $excludedComponents = @($versionConfig.Value.exclude)
-    $components = @($config.components | Where-Object { $_.name -notin $excludedComponents } | ConvertTo-Json -Depth 10 | ConvertFrom-Json)
+    $components = @($config.components | Where-Object { $_.name -notin $excludedComponents } | ConvertTo-Json -Depth 10 | ConvertFrom-Json | ForEach-Object { $_ })
     foreach($override in $versionConfig.Value.overrides.PSObject.Properties) {
         $component = $components | Where-Object { $_.name -eq $override.Name }
         if($null -eq $component) {
