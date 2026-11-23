@@ -36,7 +36,7 @@ function Add-VS {
             }
 
             $requiredChannel = [int]($VsVersion -replace '\D', '')
-            $instances = & $vswherePath -latest -products '*' -format json 2> $null | ConvertFrom-Json
+            $instances = & $vswherePath -latest -products (Get-VsProductIds) -format json 2> $null | ConvertFrom-Json
             $vsInst = $instances | Select-Object -First 1
             if ($vsInst -and [int]$vsInst.installationVersion.Split('.')[0] -lt $requiredChannel) {
                 $vsInst = $null

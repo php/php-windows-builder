@@ -99,6 +99,7 @@
         'Get-TempFiles',
         'Get-VsCacheInfo',
         'Get-VsInstallPath',
+        'Get-VsProductIds',
         'Get-VsVersion',
         'Get-VsVersionHelper',
         'Invoke-Build',
