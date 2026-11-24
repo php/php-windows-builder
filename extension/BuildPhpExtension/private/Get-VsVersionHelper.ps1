@@ -28,7 +28,7 @@ function Get-VsVersionHelper {
         $minor = $null
         $requiredChannel = [int]($VsVersion -replace '\D', '')
         $requiredVs = $VsConfig.vs.$VsVersion
-        $instances = @(& $vswherePath -products '*' -format json 2> $null | ConvertFrom-Json)
+        $instances = @(& $vswherePath -products '*' -format json 2> $null | ConvertFrom-Json | ForEach-Object { $_ })
         foreach ($vsInst in $instances) {
             if ([int]$vsInst.installationVersion.Split('.')[0] -lt $requiredChannel) {
                 continue

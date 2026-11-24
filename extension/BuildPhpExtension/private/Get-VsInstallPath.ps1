@@ -14,7 +14,7 @@ function Get-VsInstallPath {
             return ''
         }
 
-        $vsInstallPath = & $vswherePath -latest -products * -property installationPath 2>$null | Select-Object -First 1
+        $vsInstallPath = & $vswherePath -latest -products (Get-VsProductIds) -property installationPath 2>$null | Select-Object -First 1
         if ($null -eq $vsInstallPath) {
             return ''
         }

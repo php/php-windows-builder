@@ -35,7 +35,7 @@ function Add-WindowsTestHelpers {
             throw "vswhere is not available to generate Windows test helper $badCmdExe"
         }
 
-        $vsInstallationPath = (& $vswherePath -latest -products * -property installationPath | Select-Object -First 1).Trim()
+        $vsInstallationPath = (& $vswherePath -latest -products (Get-VsProductIds) -property installationPath | Select-Object -First 1).Trim()
         if ([string]::IsNullOrWhiteSpace($vsInstallationPath)) {
             throw "Visual Studio installation path could not be determined for Windows test helper generation"
         }

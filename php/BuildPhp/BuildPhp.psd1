@@ -82,6 +82,7 @@
         'Get-SourcePhpVersion',
         'Get-TestSettings',
         'Get-TestsList',
+        'Get-VsProductIds',
         'Get-VsVersion',
         'Get-VsVersionHelper',
         'Invoke-CompatRunTestsPatch',
